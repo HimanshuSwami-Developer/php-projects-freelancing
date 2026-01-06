@@ -50,7 +50,7 @@ $stmt = $conn->prepare("
            act_doc, act_expirey,
            sia_doc, sia_expirey,
            share_code_doc, share_code_expirey
-    FROM users
+    FROM users where role != 'owner'
     ORDER BY emp_id ASC
 ");
 $stmt->execute();
@@ -95,6 +95,58 @@ $expiryMap = [
     class="w-full md:w-1/2 border p-2 rounded"
     onkeyup="filterUsers()"
 >
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+
+  <!-- ACT -->
+  <div class="border p-3 rounded bg-gray-50">
+    <h3 class="font-semibold mb-2">ACT Certificate Expiry</h3>
+    <input type="date" id="actFrom" class="border p-2 rounded w-full mb-2">
+    <input type="date" id="actTo" class="border p-2 rounded w-full mb-2">
+    <select id="actSort" class="border p-2 rounded w-full mb-2">
+      <option value="asc">Ascending</option>
+      <option value="desc">Descending</option>
+    </select>
+    <button onclick="filterExpiry('act')" class="bg-blue-600 text-white w-full py-1 rounded">
+      Apply
+    </button>
+  </div>
+
+  <!-- SIA -->
+  <div class="border p-3 rounded bg-gray-50">
+    <h3 class="font-semibold mb-2">SIA Certificate Expiry</h3>
+    <input type="date" id="siaFrom" class="border p-2 rounded w-full mb-2">
+    <input type="date" id="siaTo" class="border p-2 rounded w-full mb-2">
+    <select id="siaSort" class="border p-2 rounded w-full mb-2">
+      <option value="asc">Ascending</option>
+      <option value="desc">Descending</option>
+    </select>
+    <button onclick="filterExpiry('sia')" class="bg-blue-600 text-white w-full py-1 rounded">
+      Apply
+    </button>
+  </div>
+
+  <!-- SHARE CODE -->
+  <div class="border p-3 rounded bg-gray-50">
+    <h3 class="font-semibold mb-2">Share Code Expiry</h3>
+    <input type="date" id="shareFrom" class="border p-2 rounded w-full mb-2">
+    <input type="date" id="shareTo" class="border p-2 rounded w-full mb-2">
+    <select id="shareSort" class="border p-2 rounded w-full mb-2">
+      <option value="asc">Ascending</option>
+      <option value="desc">Descending</option>
+    </select>
+    <button onclick="filterExpiry('share')" class="bg-blue-600 text-white w-full py-1 rounded">
+      Apply
+    </button>
+  </div>
+
+</div>
+
+<button onclick="resetAllFilters()"
+  class="mb-4 bg-gray-600 text-white px-4 py-2 rounded">
+  Reset All Filters
+</button>
+
 
 <div class="bg-white rounded shadow overflow-x-auto">
 <table id="usersTable" class="w-full border mt-4">
@@ -165,9 +217,23 @@ if (!empty($user[$key]) && file_exists($path)): ?>
 <?php endif; ?>
 </td>
 
-<td class="p-2 border">
-<?= $user[$expiryMap[$key]] ?? '-' ?>
+<?php if ($key === 'act_doc'): ?>
+<td class="p-2 border expiry-act"
+    data-date="<?= $user['act_expirey'] ?? '' ?>">
+    <?= !empty($user['act_expirey']) ? $user['act_expirey'] : '-' ?>
 </td>
+<?php elseif ($key === 'sia_doc'): ?>
+<td class="p-2 border expiry-sia"
+    data-date="<?= $user['sia_expirey'] ?? '' ?>">
+    <?= !empty($user['sia_expirey']) ? $user['sia_expirey'] : '-' ?>
+</td>
+<?php elseif ($key === 'share_code_doc'): ?>
+<td  class="p-2 border expiry-share" 
+    data-date="<?= $user['share_code_expirey'] ?? '' ?>">
+    <?= !empty($user['share_code_expirey']) ? $user['share_code_expirey'] : '-' ?>
+</td>
+<?php endif; ?>
+
 <?php endforeach; ?>
 
 </tr>
@@ -176,6 +242,66 @@ if (!empty($user[$key]) && file_exists($path)): ?>
 </table>
 </div>
 </div>
+
+<script>
+function filterExpiry(type) {
+
+    // 🔄 Always reset table first
+    resetTable();
+
+    // 🔄 Reset other filters (ONLY ONE ACTIVE)
+    ['act', 'sia', 'share'].forEach(t => {
+        if (t !== type) {
+            document.getElementById(t + 'From').value = '';
+            document.getElementById(t + 'To').value = '';
+            document.getElementById(t + 'Sort').value = 'asc';
+        }
+    });
+
+    const from = document.getElementById(type + 'From').value;
+    const to   = document.getElementById(type + 'To').value;
+    const sort = document.getElementById(type + 'Sort').value;
+
+    const tbody = document.querySelector('#usersTable tbody');
+    const rows  = Array.from(tbody.querySelectorAll('tr'));
+
+    let filtered = rows.filter(row => {
+        const cell = row.querySelector('.expiry-' + type);
+        if (!cell || !cell.dataset.date) return false;
+
+        const d = new Date(cell.dataset.date);
+
+        if (from && d < new Date(from)) return false;
+        if (to && d > new Date(to)) return false;
+
+        return true;
+    });
+
+    filtered.sort((a, b) => {
+        const da = new Date(a.querySelector('.expiry-' + type).dataset.date);
+        const db = new Date(b.querySelector('.expiry-' + type).dataset.date);
+        return sort === 'asc' ? da - db : db - da;
+    });
+
+    tbody.innerHTML = '';
+    filtered.forEach(r => tbody.appendChild(r));
+}
+
+// 🔄 Restore original table
+function resetTable() {
+    const tbody = document.querySelector('#usersTable tbody');
+    const rows = Array.from(tbody.querySelectorAll('tr'));
+    rows.sort((a, b) =>
+        a.cells[0].innerText.localeCompare(b.cells[0].innerText)
+    );
+    tbody.innerHTML = '';
+    rows.forEach(r => tbody.appendChild(r));
+}
+
+function resetAllFilters() {
+    window.location.reload();
+}
+</script>
 
 <!-- SEARCH SCRIPT -->
 <script>
