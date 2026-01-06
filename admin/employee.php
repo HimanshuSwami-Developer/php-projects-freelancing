@@ -95,11 +95,6 @@ if (
     <input type="text" id="searchInput" placeholder="Search by Employee ID, Name or Email"
         class="w-full md:w-1/2 border p-2 rounded"
         onkeyup="filterUsers()">
-
-    <button onclick="downloadZip()"
-        class="hidden bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-        Download All Documents
-    </button>
 </div>
 
 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
@@ -345,24 +340,6 @@ function filterUsers() {
 
         trs[i].style.display = show ? '' : 'none';
     }
-}
-
-function downloadZip() {
-    const loader = document.getElementById('loader');
-    loader.classList.remove('hidden');
-
-    // Create hidden iframe for download
-    const iframe = document.createElement('iframe');
-    iframe.style.display = 'none';
-    iframe.src = 'download_zip.php';
-
-    document.body.appendChild(iframe);
-
-    // Hide loader after some time (safe fallback)
-    setTimeout(() => {
-        loader.classList.add('hidden');
-        document.body.removeChild(iframe);
-    }, 8000);
 }
 </script>
 
