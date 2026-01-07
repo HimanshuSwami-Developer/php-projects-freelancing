@@ -3,11 +3,13 @@
 
 class Database {
     
-    // private $host = "localhost";
-    // private $username = "admin";
-    // private $password = "Uw3(E^&LTUw@";
-    // private $dbname = "ereal_state";
-    private $host = "localhost";
+    //   private $host = "sql206.infinityfree.com";
+    //  private $username = "if0_40766948";
+    //  private $password = "Goku1234ss3";
+    //  private $dbname = "if0_40766948_sys_tracker";
+    
+
+     private $host = "localhost";
     private $username = "root";
     private $password = "";
     // private $dbname = "ereal_state";
