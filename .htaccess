@@ -1,0 +1,26 @@
+#Options +FollowSymLinks
+RewriteEngine On
+ 
+ 
+
+# ✅ Explicit rewrites for PayPal
+RewriteRule ^success$ success.php [L,QSA]
+RewriteRule ^cancel$ cancel.php [L,QSA]
+ 
+RewriteCond %{REQUEST_FILENAME}\.html -f
+RewriteRule ^([^\.]+)$ $1.html [L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ $1.php
+# Return 404 if original request is .php And .html
+RewriteCond %{THE_REQUEST} "^[^ ]* .*?\.php[? ].*$"
+RewriteRule .* - [L,R=404]
+RewriteCond %{THE_REQUEST} "^[^ ]* .*?\.html[? ].*$"
+RewriteRule .* - [L,R=404]
+# ErrorDocument 404 https://madhuban.com/404
+# ErrorDocument 500 https://madhuban.com/404
+ 
+#RewriteRule ^product-details/([A-Za-z0-9-]+)  product_list_detail.php?product_name=$1 [NC,L]
+RewriteRule ^seo-detail/([A-Za-z0-9-]+)  seo-detail.php?id=$1 [NC,L]
+ 
+ 

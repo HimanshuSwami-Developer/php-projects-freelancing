@@ -1,289 +1,236 @@
-<?php
-require_once './../session.php';
-require_once './../db.php';
+<?php 
+include("include/header.php");
+include("include/sidebar.php");
+include("assets/config/db.php");
 
-$conn = getDB();
-
-/* ===============================
-   AUTH CHECK
-================================ */
-if (!isset($_SESSION['user_id']) || ($_SESSION['user_role'] !== 'admin' && $_SESSION['user_role'] !== 'owner')) {
-    header("Location: ./../login.php");
+session_start();
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login");
     exit;
 }
 
-$adminId = $_SESSION['user_id'];
 
-/* ===============================
-   FETCH EMPLOYEES
-================================ */
-$employees = [];
-$empResult = $conn->query("
-    SELECT emp_id, name 
-    FROM users
-    WHERE role='user'
-    ORDER BY name
-");
-while ($row = $empResult->fetch_assoc()) {
-    $employees[] = $row;
-}
+$msg = "";
 
-/* ===============================
-   DELETE ATTENDANCE
-================================ */
-if (isset($_GET['delete'])) {
-    $id = (int)$_GET['delete'];
-    $stmt = $conn->prepare("DELETE FROM attendance WHERE id=?");
-    $stmt->bind_param("i", $id);
-    $stmt->execute();
-    $stmt->close();
-    $_SESSION['success'] = "Attendance deleted";
-    header("Location: index.php");
-    exit;
-}
+// Check if we are editing a course
+$edit_mode = false;
+$edit_data = [];
 
-/* ===============================
-   ADD / UPDATE ATTENDANCE
-================================ */
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
-    if (!empty($_POST['attendance_id'])) {
-        $stmt = $conn->prepare("
-            UPDATE attendance SET
-            emp_id=?, emp_name=?, mode=?,
-            shift_start=?, shift_end=?, status=?, updated_by=?
-            WHERE id=?
-        ");
-        $stmt->bind_param(
-            "isssssii",
-            $_POST['emp_id'],
-            $_POST['emp_name'],
-            $_POST['mode'],
-            $_POST['shift_start'],
-            $_POST['shift_end'],
-            $_POST['status'],
-            $adminId,
-            $_POST['attendance_id']
-        );
-        $_SESSION['success'] = "Attendance updated";
+if(isset($_GET['edit_id']) && is_numeric($_GET['edit_id'])){
+    $edit_mode = true;
+    $edit_id = intval($_GET['edit_id']);
+    $res = mysqli_query($con, "SELECT * FROM courses WHERE id=$edit_id");
+    if(mysqli_num_rows($res) > 0){
+        $edit_data = mysqli_fetch_assoc($res);
     } else {
-        $stmt = $conn->prepare("
-            INSERT INTO attendance
-            (emp_id, emp_name, mode, shift_start, shift_end, status, updated_by)
-            VALUES (?,?,?,?,?,?,?)
-        ");
-        $stmt->bind_param(
-            "isssssi",
-            $_POST['emp_id'],
-            $_POST['emp_name'],
-            $_POST['mode'],
-            $_POST['shift_start'],
-            $_POST['shift_end'],
-            $_POST['status'],
-            $adminId
-        );
-        $_SESSION['success'] = "Attendance added";
+        $msg = "Course not found!";
+        $edit_mode = false;
+    }
+}
+
+// ✅ Handle Delete Course
+if (isset($_GET['delete_id']) && is_numeric($_GET['delete_id'])) {
+    $delete_id = intval($_GET['delete_id']);
+    $res = mysqli_query($con, "SELECT image FROM courses WHERE id=$delete_id");
+    if (mysqli_num_rows($res) > 0) {
+        $row = mysqli_fetch_assoc($res);
+        $image_path = "uploads/" . $row['image'];
+
+        // Delete image file if exists
+        if (file_exists($image_path)) {
+            unlink($image_path);
+        }
+
+        // Delete record
+        if (mysqli_query($con, "DELETE FROM courses WHERE id=$delete_id")) {
+            echo "<script>alert('Course deleted successfully!'); window.location.href='/admin';</script>";
+            exit;
+        } else {
+            $msg = "Error deleting course: " . mysqli_error($con);
+        }
+    } else {
+        $msg = "Course not found!";
+    }
+}
+
+// Handle Add/Edit submission
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+        $title = mysqli_real_escape_string($con, $_POST['title']);
+    $point1 = mysqli_real_escape_string($con, $_POST['point1']);
+    $point2 = mysqli_real_escape_string($con, $_POST['point2']);
+    $point3 = mysqli_real_escape_string($con, $_POST['point3']);
+    $point4 = mysqli_real_escape_string($con, $_POST['point4']);
+    $point5 = mysqli_real_escape_string($con, $_POST['point5']);
+    $point6 = mysqli_real_escape_string($con, $_POST['point6']);
+    $point7 = mysqli_real_escape_string($con, $_POST['point7']);
+    $point8 = mysqli_real_escape_string($con, $_POST['point8']);
+    $point9 = mysqli_real_escape_string($con, $_POST['point9']);
+    $point10 = mysqli_real_escape_string($con, $_POST['point10']);
+    $regular_price = mysqli_real_escape_string($con, $_POST['regular_price']);
+    $sale_price = mysqli_real_escape_string($con, $_POST['sale_price']);
+    $plan_type = mysqli_real_escape_string($con, $_POST['plan_type']);
+    $info_link = mysqli_real_escape_string($con, $_POST['info_link']); // ✅ new field
+// ✅ new field
+
+    // Image handling
+    $image = $edit_mode ? $edit_data['image'] : "";
+    if(!empty($_FILES['image']['name'])){
+        $target_dir = "uploads/";
+        if(!is_dir($target_dir)) mkdir($target_dir,0777,true);
+        $image = time() . "_" . basename($_FILES["image"]["name"]);
+        move_uploaded_file($_FILES["image"]["tmp_name"], $target_dir . $image);
     }
 
-    $stmt->execute();
-    $stmt->close();
-    header("Location: index.php");
-    exit;
+    if($edit_mode){
+        // Update course
+        $sql = "UPDATE courses SET 
+        title='$title',
+                    point1='$point1',
+                    point2='$point2',
+                    point3='$point3',
+                    point4='$point4',
+                    point5='$point5',
+                    point6='$point6',
+                    point7='$point7',
+                    point8='$point8',
+                    point9='$point9',
+                    point10='$point10',
+                    regular_price='$regular_price',
+                    sale_price='$sale_price',
+                    plan_type='$plan_type',
+                    info_link='$info_link',
+                                image='$image'
+                WHERE id=$edit_id";
+        if(mysqli_query($con, $sql)){
+            $msg = "Course updated successfully!";
+        } else {
+            $msg = "Error: ".mysqli_error($con);
+        }
+    } else {
+        // Insert new course
+         $sql = "INSERT INTO courses (image, title, point1, point2, point3, point4, point5,point6,point7, point8, point9, point10, regular_price, sale_price, plan_type, info_link)
+                VALUES ('$image','$title','$point1','$point2','$point3','$point4','$point5','$point6','$point7','$point8','$point9','$point10','$regular_price','$sale_price','$plan_type','$info_link')";
+       
+        if(mysqli_query($con, $sql)){
+            $msg = "Course added successfully!";
+        } else {
+            $msg = "Error: ".mysqli_error($con);
+        }
+    }
 }
 
-/* ===============================
-   FILTERS
-================================ */
-$empFilter    = $_GET['emp_id'] ?? '';
-$statusFilter = $_GET['status'] ?? '';
-$from         = $_GET['from'] ?? '';
-$to           = $_GET['to'] ?? '';
-
-$where = "WHERE 1=1";
-$params = [];
-$types  = "";
-
-if ($empFilter !== '') {
-    $where .= " AND emp_id=?";
-    $params[] = $empFilter;
-    $types .= "i";
-}
-
-if ($statusFilter !== '') {
-    $where .= " AND status=?";
-    $params[] = $statusFilter;
-    $types .= "s";
-}
-
-if ($from && $to) {
-    $where .= " AND DATE(shift_start) BETWEEN ? AND ?";
-    $params[] = $from;
-    $params[] = $to;
-    $types .= "ss";
-}
-
-/* ===============================
-   PAGINATION
-================================ */
-$limit = 10;
-$page  = max(1, (int)($_GET['page'] ?? 1));
-$offset = ($page - 1) * $limit;
-
-/* TOTAL COUNT */
-$countSql = "SELECT COUNT(*) total FROM attendance $where";
-$countStmt = $conn->prepare($countSql);
-if ($params) $countStmt->bind_param($types, ...$params);
-$countStmt->execute();
-$total = $countStmt->get_result()->fetch_assoc()['total'];
-$countStmt->close();
-
-$totalPages = ceil($total / $limit);
-
-/* FETCH DATA */
-$sql = "
-    SELECT *
-    FROM attendance
-    $where
-    ORDER BY shift_start DESC
-    LIMIT $limit OFFSET $offset
-";
-$stmt = $conn->prepare($sql);
-if ($params) $stmt->bind_param($types, ...$params);
-$stmt->execute();
-$attendance = $stmt->get_result();
+// Fetch all courses
+$courses = mysqli_query($con,"SELECT * FROM courses ORDER BY created_at DESC");
 ?>
 
-<!DOCTYPE html>
-<html>
-<head>
-<title>Admin Attendance</title>
-<script src="https://cdn.tailwindcss.com"></script>
-</head>
+<main class="dashboard-gssecurity-main" style="padding:20px;">
+    <div class="dashboard-gssecurity-title" style="font-size:28px; margin-bottom:20px;">
+        <?php echo $edit_mode ? "Edit Course" : "Create Course"; ?>
+    </div>
 
-<body class="bg-gray-100">
+    <?php if($msg){ echo "<p style='color:green;font-weight:bold; margin-bottom:15px;'>$msg</p>"; } ?>
 
-<?php include 'navbar.php'; ?>
+    <!-- Add/Edit Form -->
+    <div style="background:#fff; padding:25px; border-radius:10px; box-shadow:0 5px 15px rgba(0,0,0,0.1); max-width:800px; margin-bottom:40px;">
+        <form action="" method="POST" enctype="multipart/form-data" style="display:grid; grid-gap:15px;">
+            <label style="font-weight:bold;">Course Image</label>
+            <input type="file" name="image" style="padding:8px; border-radius:5px; border:1px solid #ccc;">
+            <?php if($edit_mode && $edit_data['image']){ ?>
+                <img src="uploads/<?php echo $edit_data['image']; ?>" width="150" style="margin:10px 0; border-radius:5px; border:1px solid #ccc;">
+            <?php } ?>
 
-<div class="max-w-7xl mx-auto mt-4">
+            <label style="font-weight:bold;">Course Title</label>
+            <input type="text" name="title" value="<?php echo $edit_mode ? htmlspecialchars($edit_data['title']) : ''; ?>" required style="padding:8px; border-radius:5px; border:1px solid #ccc;">
 
-<!-- HEADER -->
-<div class="flex justify-between items-center mb-4">
-    <h1 class="text-2xl font-bold">Attendance Management</h1>
-    <button onclick="openModal()"
-    class="bg-blue-600 text-white px-4 py-2 rounded">
-        + Add Shift
-    </button>
-</div>
+            <?php for($i=1;$i<=10;$i++){ ?>
+                <label style="font-weight:bold;">Point <?php echo $i; ?></label>
+                <input type="text" name="point<?php echo $i; ?>" value="<?php echo $edit_mode ? htmlspecialchars($edit_data['point'.$i]) : ''; ?>" style="padding:8px; border-radius:5px; border:1px solid #ccc;">
+            <?php } ?>
 
-<?php if (!empty($_SESSION['success'])): ?>
-<div class="bg-green-100 text-green-700 p-3 rounded mb-4">
-<?= $_SESSION['success']; unset($_SESSION['success']); ?>
-</div>
-<?php endif; ?>
+            <div style="display:grid; grid-template-columns:1fr 1fr; grid-gap:15px;">
+                <div>
+                    <label style="font-weight:bold;">Regular Price</label>
+                    <input type="number" name="regular_price" step="0.01" value="<?php echo $edit_mode ? $edit_data['regular_price'] : ''; ?>" required style="padding:8px; border-radius:5px; border:1px solid #ccc;">
+                </div>
+                <div>
+                    <label style="font-weight:bold;">Sale Price</label>
+                    <input type="number" name="sale_price" step="0.01" value="<?php echo $edit_mode ? $edit_data['sale_price'] : ''; ?>" required style="padding:8px; border-radius:5px; border:1px solid #ccc;">
+                </div>
+            </div>
 
-<!-- FILTER BAR -->
-<form method="GET"
-class="bg-white p-4 rounded shadow mb-4 grid grid-cols-1 md:grid-cols-6 gap-4">
+            <label style="font-weight:bold;">Plan Type</label>
+            <input type="text" name="plan_type" value="<?php echo $edit_mode ? htmlspecialchars($edit_data['plan_type']) : ''; ?>"  style="padding:8px; border-radius:5px; border:1px solid #ccc;">
 
-<select name="emp_id" class="border p-2 rounded">
-<option value="">All Employees</option>
-<?php foreach ($employees as $emp): ?>
-<option value="<?= $emp['emp_id'] ?>"
-<?= $empFilter==$emp['emp_id']?'selected':'' ?>>
-<?= htmlspecialchars($emp['name']) ?>
-</option>
-<?php endforeach; ?>
-</select>
+            <!-- ✅ New Info Link Field -->
+            <label style="font-weight:bold;">Info Link (optional)</label>
+            <input type="text" name="info_link" placeholder="https://example.com/more-info" 
+                   value="<?php echo $edit_mode ? htmlspecialchars($edit_data['info_link']) : ''; ?>" 
+                   style="padding:8px; border-radius:5px; border:1px solid #ccc;">
 
-<select name="status" class="border p-2 rounded">
-<option value="">All Status</option>
-<option value="present" <?= $statusFilter=='present'?'selected':'' ?>>Present</option>
-<option value="half_day" <?= $statusFilter=='half_day'?'selected':'' ?>>Half Day</option>
-<option value="absent" <?= $statusFilter=='absent'?'selected':'' ?>>Absent</option>
-</select>
+            <button type="submit" style="background:#007BFF; color:#fff; padding:10px 20px; border:none; border-radius:5px; cursor:pointer; font-size:16px;">
+                <?php echo $edit_mode ? "Update Course" : "Create Course"; ?>
+            </button>
+        </form>
+    </div>
 
-<input type="date" name="from" value="<?= $from ?>" class="border p-2 rounded">
-<input type="date" name="to" value="<?= $to ?>" class="border p-2 rounded">
+    <!-- Courses Table -->
+    <div class="dashboard-gssecurity-title" style="font-size:28px; margin-bottom:15px;">All Courses</div>
+    <table style="width:100%; border-collapse:collapse; box-shadow:0 3px 10px rgba(0,0,0,0.1);">
+        <thead>
+            <tr style="background:#007BFF; color:#fff; text-align:left;">
+                <th style="padding:12px;">ID</th>
+                <th style="padding:12px;">Image</th>
+                <th style="padding:12px;">Title</th>
+                <th style="padding:12px;">Points</th>
+                <th style="padding:12px;">Regular Price</th>
+                <th style="padding:12px;">Sale Price</th>
+                <th style="padding:12px;">Plan Type</th>
+                <th style="padding:12px;">Info Link</th>
+                <th style="padding:12px;">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+        <?php if(mysqli_num_rows($courses)>0): ?>
+            <?php while($row=mysqli_fetch_assoc($courses)){ ?>
+                <tr style="border-bottom:1px solid #ccc; transition:background 0.3s;" onmouseover="this.style.background='#f1f1f1'" onmouseout="this.style.background='transparent'">
+                    <td style="padding:10px;"><?php echo $row['id']; ?></td>
+                    <td style="padding:10px;"><img src="uploads/<?php echo $row['image']; ?>" width="80" style="border-radius:5px;"></td>
+                    <td style="padding:10px;"><?php echo htmlspecialchars($row['title']); ?></td>
+                    <td style="padding:10px;">
+                        <ul style="margin:0; padding-left:15px;">
+                            <?php for($i=1;$i<=10;$i++){ ?>
+                                <li><?php echo htmlspecialchars($row['point'.$i]); ?></li>
+                            <?php } ?>
+                        </ul>
+                    </td>
+                    <td style="padding:10px;">£<?php echo $row['regular_price']; ?></td>
+                    <td style="padding:10px;">£<?php echo $row['sale_price']; ?></td>
+                    <td style="padding:10px;"><?php echo $row['plan_type']; ?></td>
+                    <td style="padding:10px;">
+                        <?php if(!empty($row['info_link'])): ?>
+                            <a href="<?php echo htmlspecialchars($row['info_link']); ?>" target="_blank" style="color:#007BFF; text-decoration:underline;">View</a>
+                        <?php else: ?>
+                            <span style="color:#999;">N/A</span>
+                        <?php endif; ?>
+                    </td>
+                   <td style="padding:10px; display:flex; flex-wrap:wrap; gap:8px;">
+                        <a href="?edit_id=<?php echo $row['id']; ?>" 
+                           style="padding:6px 12px; background:orange; color:#fff; border-radius:5px; text-decoration:none; font-weight:bold;">
+                           Edit
+                        </a>
+                    
+                        <a href="?delete_id=<?php echo $row['id']; ?>" 
+                           onclick="return confirm('Are you sure you want to delete this course?');"
+                           style="padding:6px 12px; background:red; color:#fff; border-radius:5px; text-decoration:none; font-weight:bold;">
+                           Delete
+                        </a>
+                    </td>
 
-<button class="bg-blue-600 text-white px-4 rounded">Filter</button>
-<a href="index.php"
-class="bg-gray-400 text-white px-4 py-2 rounded text-center">
-Reset
-</a>
-
-</form>
-
-<!-- TABLE -->
-<div class="bg-white rounded shadow overflow-x-auto">
-<table class="w-full border text-sm">
-<thead class="bg-gray-200">
-<tr>
-<th class="border p-2">Emp ID</th>
-<th class="border p-2">Name</th>
-<th class="border p-2">Mode</th>
-<th class="border p-2">Shift Start</th>
-<th class="border p-2">Shift End</th>
-<th class="border p-2">Status</th>
-<th class="border p-2">Action</th>
-</tr>
-</thead>
-<tbody>
-
-<?php if ($attendance->num_rows == 0): ?>
-<tr>
-<td colspan="7" class="text-center p-4 text-gray-500">
-No attendance found
-</td>
-</tr>
-<?php endif; ?>
-
-<?php while ($row = $attendance->fetch_assoc()): ?>
-<tr class="text-center">
-<td class="border p-2"><?= $row['emp_id'] ?></td>
-<td class="border p-2"><?= htmlspecialchars($row['emp_name']) ?></td>
-<td class="border p-2"><?= ucfirst($row['mode']) ?></td>
-<td class="border p-2"><?= date("d M Y, g:i a", strtotime($row['shift_start'])) ?></td>
-<td class="border p-2"><?= date("d M Y, g:i a", strtotime($row['shift_end'])) ?></td>
-<td class="border p-2">
-<span class="px-2 py-1 rounded text-white
-<?= $row['status']=='present'?'bg-green-600':
-($row['status']=='half_day'?'bg-yellow-500':'bg-red-600') ?>">
-<?= ucfirst(str_replace('_',' ',$row['status'])) ?>
-</span>
-</td>
-<td class="border p-2 space-x-2">
-<button onclick='editAttendance(<?= json_encode($row) ?>)'
-class="bg-yellow-500 text-white px-3 py-1 rounded">Edit</button>
-<a href="?delete=<?= $row['id'] ?>"
-onclick="return confirm('Delete record?')"
-class="bg-red-600 text-white px-3 py-1 rounded">Delete</a>
-</td>
-</tr>
-<?php endwhile; ?>
-
-</tbody>
-</table>
-</div>
-
-<!-- PAGINATION -->
-<?php if ($totalPages > 1): ?>
-<div class="flex justify-center gap-2 mt-6 flex-wrap">
-<?php
-$q = $_GET;
-unset($q['page']);
-$qStr = http_build_query($q);
-?>
-<?php for ($i=1; $i<=$totalPages; $i++): ?>
-<a href="?<?= $qStr ?>&page=<?= $i ?>"
-class="px-3 py-1 border rounded
-<?= $i==$page?'bg-blue-600 text-white':'bg-white' ?>">
-<?= $i ?>
-</a>
-<?php endfor; ?>
-</div>
-<?php endif; ?>
-
-</div>
-
-</body>
-</html>
+                </tr>
+            <?php } ?>
+        <?php else: ?>
+            <tr><td colspan="9" style="text-align:center; padding:15px;">No courses found</td></tr>
+        <?php endif; ?>
+        </tbody>
+    </table>
+</main>

@@ -1,0 +1,103 @@
+[27-Oct-2025 06:48:02 UTC] PHP Warning:  Undefined array key "title" in /home/gsecrckn/public_html/admin/index.php on line 26
+[27-Oct-2025 06:48:02 UTC] PHP Warning:  Undefined array key "point1" in /home/gsecrckn/public_html/admin/index.php on line 27
+[27-Oct-2025 06:48:02 UTC] PHP Warning:  Undefined array key "point2" in /home/gsecrckn/public_html/admin/index.php on line 28
+[27-Oct-2025 06:48:02 UTC] PHP Warning:  Undefined array key "point3" in /home/gsecrckn/public_html/admin/index.php on line 29
+[27-Oct-2025 06:48:02 UTC] PHP Warning:  Undefined array key "point4" in /home/gsecrckn/public_html/admin/index.php on line 30
+[27-Oct-2025 06:48:02 UTC] PHP Warning:  Undefined array key "point5" in /home/gsecrckn/public_html/admin/index.php on line 31
+[27-Oct-2025 06:48:02 UTC] PHP Warning:  Undefined array key "regular_price" in /home/gsecrckn/public_html/admin/index.php on line 32
+[27-Oct-2025 06:48:02 UTC] PHP Warning:  Undefined array key "sale_price" in /home/gsecrckn/public_html/admin/index.php on line 33
+[27-Oct-2025 06:48:02 UTC] PHP Warning:  Undefined array key "plan_type" in /home/gsecrckn/public_html/admin/index.php on line 34
+[27-Oct-2025 06:48:02 UTC] PHP Warning:  Undefined array key "info_link" in /home/gsecrckn/public_html/admin/index.php on line 35
+[27-Oct-2025 09:12:05 UTC] PHP Warning:  unlink(uploads/): Is a directory in /home/gsecrckn/public_html/admin/index.php on line 34
+[27-Oct-2025 09:17:08 UTC] PHP Warning:  unlink(uploads/): Is a directory in /home/gsecrckn/public_html/admin/index.php on line 34
+[27-Oct-2025 10:26:54 UTC] PHP Warning:  Undefined array key "title" in /home/gsecrckn/public_html/admin/index.php on line 51
+[27-Oct-2025 10:26:54 UTC] PHP Warning:  Undefined array key "point1" in /home/gsecrckn/public_html/admin/index.php on line 52
+[27-Oct-2025 10:26:54 UTC] PHP Warning:  Undefined array key "point2" in /home/gsecrckn/public_html/admin/index.php on line 53
+[27-Oct-2025 10:26:54 UTC] PHP Warning:  Undefined array key "point3" in /home/gsecrckn/public_html/admin/index.php on line 54
+[27-Oct-2025 10:26:54 UTC] PHP Warning:  Undefined array key "point4" in /home/gsecrckn/public_html/admin/index.php on line 55
+[27-Oct-2025 10:26:54 UTC] PHP Warning:  Undefined array key "point5" in /home/gsecrckn/public_html/admin/index.php on line 56
+[27-Oct-2025 10:26:54 UTC] PHP Warning:  Undefined array key "regular_price" in /home/gsecrckn/public_html/admin/index.php on line 57
+[27-Oct-2025 10:26:54 UTC] PHP Warning:  Undefined array key "sale_price" in /home/gsecrckn/public_html/admin/index.php on line 58
+[27-Oct-2025 10:26:54 UTC] PHP Warning:  Undefined array key "plan_type" in /home/gsecrckn/public_html/admin/index.php on line 59
+[27-Oct-2025 10:26:54 UTC] PHP Warning:  Undefined array key "info_link" in /home/gsecrckn/public_html/admin/index.php on line 60
+[27-Oct-2025 13:03:10 UTC] PHP Warning:  unlink(uploads/): Is a directory in /home/gsecrckn/public_html/admin/index.php on line 34
+[01-Nov-2025 18:34:35 UTC] PHP Fatal error:  Uncaught TypeError: mysqli_real_escape_string(): Argument #2 ($string) must be of type string, array given in /home/gsecrckn/public_html/admin/subscription.php:76
+Stack trace:
+#0 /home/gsecrckn/public_html/admin/subscription.php(76): mysqli_real_escape_string()
+#1 {main}
+  thrown in /home/gsecrckn/public_html/admin/subscription.php on line 76
+[04-Nov-2025 18:33:19 UTC] PHP Warning:  include(header.php): Failed to open stream: No such file or directory in /home/gsecrckn/public_html/admin/subscription.php on line 2
+[04-Nov-2025 18:33:19 UTC] PHP Warning:  include(): Failed opening 'header.php' for inclusion (include_path='.:/opt/alt/php81/usr/share/pear:/opt/alt/php81/usr/share/php:/usr/share/pear:/usr/share/php') in /home/gsecrckn/public_html/admin/subscription.php on line 2
+[04-Nov-2025 18:33:19 UTC] PHP Warning:  Undefined variable $con in /home/gsecrckn/public_html/admin/subscription.php on line 8
+[04-Nov-2025 18:33:19 UTC] PHP Fatal error:  Uncaught TypeError: mysqli_query(): Argument #1 ($mysql) must be of type mysqli, null given in /home/gsecrckn/public_html/admin/subscription.php:8
+Stack trace:
+#0 /home/gsecrckn/public_html/admin/subscription.php(8): mysqli_query()
+#1 {main}
+  thrown in /home/gsecrckn/public_html/admin/subscription.php on line 8
+[04-Nov-2025 18:33:25 UTC] PHP Warning:  include(header.php): Failed to open stream: No such file or directory in /home/gsecrckn/public_html/admin/subscription.php on line 2
+[04-Nov-2025 18:33:25 UTC] PHP Warning:  include(): Failed opening 'header.php' for inclusion (include_path='.:/opt/alt/php81/usr/share/pear:/opt/alt/php81/usr/share/php:/usr/share/pear:/usr/share/php') in /home/gsecrckn/public_html/admin/subscription.php on line 2
+[04-Nov-2025 18:33:25 UTC] PHP Warning:  Undefined variable $con in /home/gsecrckn/public_html/admin/subscription.php on line 8
+[04-Nov-2025 18:33:25 UTC] PHP Fatal error:  Uncaught TypeError: mysqli_query(): Argument #1 ($mysql) must be of type mysqli, null given in /home/gsecrckn/public_html/admin/subscription.php:8
+Stack trace:
+#0 /home/gsecrckn/public_html/admin/subscription.php(8): mysqli_query()
+#1 {main}
+  thrown in /home/gsecrckn/public_html/admin/subscription.php on line 8
+[04-Nov-2025 18:35:03 UTC] PHP Warning:  include(header.php): Failed to open stream: No such file or directory in /home/gsecrckn/public_html/admin/subscription.php on line 2
+[04-Nov-2025 18:35:03 UTC] PHP Warning:  include(): Failed opening 'header.php' for inclusion (include_path='.:/opt/alt/php81/usr/share/pear:/opt/alt/php81/usr/share/php:/usr/share/pear:/usr/share/php') in /home/gsecrckn/public_html/admin/subscription.php on line 2
+[04-Nov-2025 18:35:03 UTC] PHP Warning:  Undefined variable $con in /home/gsecrckn/public_html/admin/subscription.php on line 8
+[04-Nov-2025 18:35:03 UTC] PHP Fatal error:  Uncaught TypeError: mysqli_query(): Argument #1 ($mysql) must be of type mysqli, null given in /home/gsecrckn/public_html/admin/subscription.php:8
+Stack trace:
+#0 /home/gsecrckn/public_html/admin/subscription.php(8): mysqli_query()
+#1 {main}
+  thrown in /home/gsecrckn/public_html/admin/subscription.php on line 8
+[04-Nov-2025 18:35:04 UTC] PHP Warning:  include(header.php): Failed to open stream: No such file or directory in /home/gsecrckn/public_html/admin/subscription.php on line 2
+[04-Nov-2025 18:35:04 UTC] PHP Warning:  include(): Failed opening 'header.php' for inclusion (include_path='.:/opt/alt/php81/usr/share/pear:/opt/alt/php81/usr/share/php:/usr/share/pear:/usr/share/php') in /home/gsecrckn/public_html/admin/subscription.php on line 2
+[04-Nov-2025 18:35:04 UTC] PHP Warning:  Undefined variable $con in /home/gsecrckn/public_html/admin/subscription.php on line 8
+[04-Nov-2025 18:35:04 UTC] PHP Fatal error:  Uncaught TypeError: mysqli_query(): Argument #1 ($mysql) must be of type mysqli, null given in /home/gsecrckn/public_html/admin/subscription.php:8
+Stack trace:
+#0 /home/gsecrckn/public_html/admin/subscription.php(8): mysqli_query()
+#1 {main}
+  thrown in /home/gsecrckn/public_html/admin/subscription.php on line 8
+[04-Nov-2025 18:35:11 UTC] PHP Warning:  include(header.php): Failed to open stream: No such file or directory in /home/gsecrckn/public_html/admin/subscription.php on line 2
+[04-Nov-2025 18:35:11 UTC] PHP Warning:  include(): Failed opening 'header.php' for inclusion (include_path='.:/opt/alt/php81/usr/share/pear:/opt/alt/php81/usr/share/php:/usr/share/pear:/usr/share/php') in /home/gsecrckn/public_html/admin/subscription.php on line 2
+[04-Nov-2025 18:35:11 UTC] PHP Warning:  Undefined variable $con in /home/gsecrckn/public_html/admin/subscription.php on line 8
+[04-Nov-2025 18:35:11 UTC] PHP Fatal error:  Uncaught TypeError: mysqli_query(): Argument #1 ($mysql) must be of type mysqli, null given in /home/gsecrckn/public_html/admin/subscription.php:8
+Stack trace:
+#0 /home/gsecrckn/public_html/admin/subscription.php(8): mysqli_query()
+#1 {main}
+  thrown in /home/gsecrckn/public_html/admin/subscription.php on line 8
+[04-Nov-2025 18:36:28 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'name' in 'SELECT' in /home/gsecrckn/public_html/admin/subscription.php:15
+Stack trace:
+#0 /home/gsecrckn/public_html/admin/subscription.php(15): mysqli_query()
+#1 {main}
+  thrown in /home/gsecrckn/public_html/admin/subscription.php on line 15
+[04-Nov-2025 18:37:18 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'name' in 'ORDER BY' in /home/gsecrckn/public_html/admin/subscription.php:15
+Stack trace:
+#0 /home/gsecrckn/public_html/admin/subscription.php(15): mysqli_query()
+#1 {main}
+  thrown in /home/gsecrckn/public_html/admin/subscription.php on line 15
+[04-Nov-2025 18:38:05 UTC] PHP Warning:  Undefined array key "name" in /home/gsecrckn/public_html/admin/subscription.php on line 78
+[04-Nov-2025 18:38:05 UTC] PHP Warning:  Undefined array key "name" in /home/gsecrckn/public_html/admin/subscription.php on line 78
+[04-Nov-2025 18:38:05 UTC] PHP Warning:  Undefined array key "name" in /home/gsecrckn/public_html/admin/subscription.php on line 78
+[04-Nov-2025 18:38:05 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'c.name' in 'SELECT' in /home/gsecrckn/public_html/admin/subscription.php:148
+Stack trace:
+#0 /home/gsecrckn/public_html/admin/subscription.php(148): mysqli_query()
+#1 {main}
+  thrown in /home/gsecrckn/public_html/admin/subscription.php on line 148
+[04-Nov-2025 18:40:39 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'name' in 'SELECT' in /home/gsecrckn/public_html/admin/subscription.php:20
+Stack trace:
+#0 /home/gsecrckn/public_html/admin/subscription.php(20): mysqli_query()
+#1 {main}
+  thrown in /home/gsecrckn/public_html/admin/subscription.php on line 20
+[04-Nov-2025 18:41:08 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'c.name' in 'SELECT' in /home/gsecrckn/public_html/admin/subscription.php:187
+Stack trace:
+#0 /home/gsecrckn/public_html/admin/subscription.php(187): mysqli_query()
+#1 {main}
+  thrown in /home/gsecrckn/public_html/admin/subscription.php on line 187
+[04-Nov-2025 18:42:52 UTC] PHP Warning:  Undefined array key "name" in /home/gsecrckn/public_html/admin/subscription.php on line 216
+[04-Nov-2025 18:42:52 UTC] PHP Warning:  Undefined array key "name" in /home/gsecrckn/public_html/admin/subscription.php on line 216
+[04-Nov-2025 18:42:52 UTC] PHP Warning:  Undefined array key "name" in /home/gsecrckn/public_html/admin/subscription.php on line 216
+[05-Nov-2025 18:00:31 UTC] PHP Warning:  Undefined array key "course_id" in /home/gsecrckn/public_html/admin/subscription.php on line 49
+[05-Nov-2025 18:00:38 UTC] PHP Warning:  Undefined array key "course_id" in /home/gsecrckn/public_html/admin/subscription.php on line 49
+[05-Nov-2025 18:00:47 UTC] PHP Warning:  Undefined array key "course_id" in /home/gsecrckn/public_html/admin/subscription.php on line 49
+[05-Nov-2025 18:01:05 UTC] PHP Warning:  Undefined array key "course_id" in /home/gsecrckn/public_html/admin/subscription.php on line 49
