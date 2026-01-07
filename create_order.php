@@ -81,10 +81,11 @@ if ($httpcode != 201) {
 $result = json_decode($response, true);
 foreach ($result['links'] as $link) {
   if ($link['rel'] === 'approve') {
-    
+    $paypal_order_id = $result['id'];
+
        $sql = "
   INSERT INTO orders 
-  (name, contact, email, course_id, course_date_id, subscription_plan_id, payment_status, created_at)
+  (name, contact, email, course_id, course_date_id, subscription_plan_id,paypal_order_id ,payment_status, created_at)
   VALUES (
     '" . mysqli_real_escape_string($con, $data['full_name']) . "',
     '" . mysqli_real_escape_string($con, $data['phone']) . "',
@@ -92,6 +93,7 @@ foreach ($result['links'] as $link) {
     " . (int)$data['course_id'] . ",
     " . (int)$data['course_date_id'] . ",
     " . (int)$data['subscription_plan_id'] . ",
+    '$paypal_order_id',
     '" . mysqli_real_escape_string($con, $data['payment_status']) . "',
     NOW()
   )

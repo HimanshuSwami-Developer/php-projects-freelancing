@@ -1,42 +1,13 @@
 <?php
 session_start();
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // --- PHP LOGIC PRESERVED FROM LIVE CODE ---
-    $name = $_POST['Name'];
-    $_SESSION['Name'] = $name;
-    $email = $_POST['Email'];
-    $_SESSION['Email'] = $email;
-    $phone = $_POST['Phone'];
-    $_SESSION['Phone'] = $phone;
-    $_SESSION['Course_Price'] = $_POST['course_p'];
-    $_SESSION['course_name'] = $_POST['course_name'];
-    // The following line was duplicated in the live code, preserving the effect
-    $_SESSION['course_name'] = $_POST['course_name'];
-    $_SESSION['course_id'] = $_POST['course_id'];
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+     $_SESSION['course_name']  = $_POST['course_name'] ?? '';
+    $_SESSION['course_price'] = $_POST['course_p'] ?? '';
+    $_SESSION['course_id']    = $_POST['course_id'] ?? '';
 
-    // Email details
-    $to = "bookings@gsecurityandtraining.co.uk";
-    $subject = "🚀 New Lead: Client Interested in Your Course!";
-
-    $body = "You have received a new message from your website form.\n\n";
-    $body .= "FullName: $name\n";
-    $body .= "Phone: $phone\n";
-    $body .= "Email: $email\n\n";
-
-    $headers = "From: $email\r\n";
-    $headers .= "Reply-To: $email\r\n";
-
-    // Send email
-    if (mail($to, $subject, $body, $headers)) {
-        // Redirect to select-option.php
-        header("Location: date-select");
-        exit();
-    } else {
-        echo "Sorry, something went wrong. Please try again later.";
-    }
-} else {
-    // echo "Invalid access.";
+    header("Location: date-select");
+    exit; 
 }
 ?>
 <?php
@@ -52,10 +23,10 @@ $query_run = mysqli_query($con, $query);
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>SIA Security Training Courses Leeds | SIA Security Courses Leeds​</title>
+    <title>SIA Security Training Courses in Leeds & Bradford | G Security & Training</title>
     <link rel="canonical" href="https://gsecurityandtraining.co.uk/" />
     <meta name="description"
-        content="Enhance your career with a professional security training courses Leeds. Learn security courses leeds​ like risk assessment, and leadership in security operations.">
+        content="Join SIA-approved security, door supervisor & first aid training courses in Leeds & Bradford. Get licensed fast. Book today.">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
 
@@ -184,11 +155,13 @@ $query_run = mysqli_query($con, $query);
                         <p class="text-lg font-semibold text-[#00C1EC] mb-2">Join the 400,000+ people already working in security!
                         </p>
                         <h1 class="text-4xl md:text-5xl lg:text-6xl font-black mb-6 leading-tight">
-                            Get trained, licensed, and <span class="text-[#00C1EC]">start earning in just 3 weeks</span>.
+                            Get trained, licensed, and <span class="text">start earning in just 3 weeks</span>.
                         </h1>
-                        <p class="text-xl md:text-[13px] font-semibold mb-8 max-w-lg lg:mx-0 mx-auto">
-                          Earn £14 to £25 an hour with consistently in-demand, flexible, and stable-paying security jobs. No prior experience needed. We teach you everything.
-                        </p>
+                        <p class="text-xl md:text-[13px] font-semibold mb-2 max-w-lg lg:mx-0 mx-auto">
+                        If you’re thinking about working in security, you’re probably asking the same questions everyone does. How long does it take? Do I need experience? Will it actually pay well? Fair questions.</p>
+    <p class="text-xl md:text-[13px] font-semibold mb-2 max-w-lg lg:mx-0 mx-auto">At <b>G Security & Training</b>, we provide <b>SIA-approved security training courses in Leeds and Bradford</b> that help you get trained, licensed, and earning without dragging the process out. You don’t need prior experience. You don’t need to figure things out on your own. We guide you from training all the way through to applying for your SIA licence — step by step.</p>
+    <p class="text-xl md:text-[13px] font-semibold mb-5 max-w-lg lg:mx-0 mx-auto">Security work is consistently in demand across the UK, and with the right training, you could be ready to earn in as little as <b>three weeks</b>.</p>
+                        
 
                         <!-- Hero CTAs -->
                         <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
@@ -208,13 +181,13 @@ $query_run = mysqli_query($con, $query);
   class="flex flex-wrap mt-10 justify-center lg:justify-start text-sm text-gray-300 font-medium border-t border-gray-700 pt-4"
 >
   <div class="flex items-center gap-1 w-1/2 px-3 py-2 box-border">
-    <span class="text-[#00C1EC] text-xl">⚡</span>
+    <span class="text-[#00C1EC] text-xl">⚡️</span>
     Highly-rated, experienced trainers
   </div>
 
   <div class="flex items-center gap-1 w-1/2 px-3 py-2 box-border">
     <span class="text-[#00C1EC] text-xl">🌈</span>
-    SIA-approved training & certification
+   SIA-approved training & certification
   </div>
 
   <div class="flex items-center gap-1 w-1/2 px-3 py-2 box-border">
@@ -254,7 +227,7 @@ $query_run = mysqli_query($con, $query);
             <!-- --- IMAGE SLIDER SECTION (Glide.js) --- -->
             <div class="full-width-slider-section bg-white">
                 <div class="lg:w-[1280px] mx-auto px-4">
-                    <h2 class="text-4xl font-bold text-center text-gray-900 mb-2">Get your SIA license to work in security</h2>
+                    <h2 class="text-4xl font-bold text-center text-[#00C1EC] mb-2">Get your SIA license <span class="text-black">to work in security</span></h2>
                         <!--Four Steps To Get Employed In The-->
                         <!--Security Industry</h2>-->
                     <!--<p class="text-2xl font-bold text-center text-[#00C1EC] my-8">Get your SIA license to work in security-->
@@ -312,6 +285,20 @@ $query_run = mysqli_query($con, $query);
                 </div>
             </div>
             <!-- --- END IMAGE SLIDER SECTION --- -->
+            
+            
+            <div class="text-center my-10 max-w-4xl mx-auto">
+                <h2 class="text-4xl font-bold text-center text-[#00C1EC] mb-2 ">Here’s how it usually works for most of our learners.</h2>
+                <p class="md:text-lg text-[13px]  mb-2  lg:mx-0 mx-auto text-black mt-5">
+                    First, you complete your training. Depending on the course you choose, this takes <b>between 3 and 7 days</b>. During this time, you’ll build the core skills needed to work safely, confidently, and legally in security roles.
+                </p>
+                <p class="md:text-lg text-[13px]  mb-2  lg:mx-0 mx-auto text-black">
+                   Next, you pass a short exam and receive your training certificate. After that, you apply for your SIA licence. This part typically takes <b>7–10 days</b>.
+                </p>
+                <p class="md:text-lg text-[13px]  mb-2  lg:mx-0 mx-auto text-black">
+              Once your licence is approved, you can start applying for jobs straight away. Many of our learners go on to earn <b>£14 to £25 per hour</b>, with monthly earnings of up to <b>£3,000</b>, depending on the role and hours you choose to work.
+                </p>
+            </div>
 
            <!-- 3. COURSE CATEGORY LISTING SECTION (STATIC DATA WITH POPUP INTEGRATION) -->
 <!-- 3. COURSE CATEGORY LISTING SECTION (STATIC DATA WITH POPUP INTEGRATION) -->
@@ -321,6 +308,10 @@ $query_run = mysqli_query($con, $query);
             Pick the right <span class="text-[#00C1EC]">training course</span>
             & get started
         </h2>
+        
+        <p class="md:text-lg text-[13px]  mb-2  lg:mx-0 mx-auto text-black text-center">
+              All of our courses are fully approved by the <b>Security Industry Authority (SIA)</b> and designed to be beginner-friendly. Even if you’re completely new to security, the training is structured for you to follow along comfortably.
+        </p>
 
         <!-- MOBILE/TABLET SCROLL -->
         <div class="block lg:hidden mt-8">
@@ -390,7 +381,7 @@ $isDoorSupervision = (
 <?php else: ?>
     <div class="flex flex-col gap-1 mb-4">
         <span class="text-gray-700 font-semibold text-base">
-            Starting at just £<?php echo $row['sale_price']; ?>
+            Starts from just £<?php echo $row['sale_price']; ?>
         </span>
     </div>
 <?php endif; ?>
@@ -398,13 +389,21 @@ $isDoorSupervision = (
                                     <div class="flex items-center justify-between space-x-2">
                                         <a href="<?php echo $row['info_link']; ?>"
                                             class="text-[#00C1EC] font-semibold hover:underline">More Info</a>
-                                        <button
-                                            class="book-now-btn bg-[#00C1EC] text-white px-4 py-2 text-sm font-bold rounded-lg"
+                                             <form method="post" class="space-y-4 sharedForm" >
+                                         <input type="hidden" name="course_name" value="<?php echo htmlspecialchars($row['title']); ?>">
+                <input type="hidden" name="course_p" value="<?php echo $row['sale_price']; ?>">
+                <input type="hidden" name="course_id" value="<?php echo $row['id']; ?>">
+               
+                                     <button
+                                            class=" bg-[#00C1EC] text-white px-4 py-2 text-sm font-bold rounded-lg"
                                             data-course-name="<?php echo htmlspecialchars($row['title']); ?>"
                                             data-course-price="<?php echo $row['sale_price']; ?>"
                                             data-course-id="<?php echo $row['id']; ?>">
-                                            Book Now
-                                        </button>
+                                            
+                                        Book Now
+                                    </button>
+                                    </form>
+                                       
                                     </div>
                                 </div>
                             </div>
@@ -484,7 +483,7 @@ $isDoorSupervision = (
 <?php else: ?>
     <div class="flex flex-col gap-1 mb-6 mt-4">
         <span class="text-gray-700 font-semibold text-lg">
-            Starting at just £<?php echo $row['sale_price']; ?>
+            Starts from just £<?php echo $row['sale_price']; ?>
         </span>
     </div>
 <?php endif; ?>
@@ -492,13 +491,20 @@ $isDoorSupervision = (
                                 <div class="flex items-center justify-between space-x-2">
                                     <a href="<?php echo $row['info_link']; ?>"
                                         class="text-[#00C1EC] font-semibold hover:underline transition-colors">More Info</a>
-                                    <button
-                                        class="book-now-btn bg-[#00C1EC] text-white px-5 py-3 font-bold text-base rounded-lg transition duration-200"
+                                        <form method="post" class="space-y-4 sharedForm">
+                                       <input type="hidden" name="course_name" value="<?php echo htmlspecialchars($row['title']); ?>">
+                <input type="hidden" name="course_p" value="<?php echo $row['sale_price']; ?>">
+                <input type="hidden" name="course_id" value="<?php echo $row['id']; ?>">
+               
+               
+                                    <button type="submit" name="submit"
+                                        class="bg-[#00C1EC] text-white px-5 py-3 font-bold text-base rounded-lg transition duration-200"
                                         data-course-name="<?php echo htmlspecialchars($row['title']); ?>"
                                         data-course-price="<?php echo $row['sale_price']; ?>"
                                         data-course-id="<?php echo $row['id']; ?>">
                                         Book Now
                                     </button>
+                                    </form>
                                 </div>
                             </div>
                         </div>
@@ -510,17 +516,34 @@ $isDoorSupervision = (
 
 
 
-
+ <div class=" my-10 max-w-4xl mx-auto">
+                <h2 class="text-4xl font-bold text-center text-[#00C1EC] mb-2 ">SIA licenses <span class="text-black">you can apply post-training</span></h2>
+                <div class=" my-5 md:max-w-2xl mx-auto mx-6">
+                <p class="md:text-lg text-[13px]  mb-2  lg:mx-0 mx-auto text-black mt-5">
+                   After completing your training, you’ll be eligible to apply for an official SIA licence, which is a mandatory requirement to work legally in the UK security industry.
+                </p>
+                <p class="md:text-lg text-[13px]  mb-2   mx-auto text-black">
+                   Common licences candidates choose are:
+                </p>
+                <ul class="md:text-lg text-[13px]  mb-2   mx-auto text-black mt-5 ml-6" style="list-style:disc">
+                    <li><b>Door Supervisor Licence</b> (also valid for security guard roles)</li>
+                    <li><b>Security Guard Licence</b></li>
+                </ul>
+                <p class="md:text-lg text-[13px]  mb-2  mx-auto text-black">
+                  These licences are recognised nationwide and reputable employers check if you have one before hiring you for a particular role.
+                </p>
+            </div>
+            </div>
 
 
 
             <!-- 4. CAREER PATHS SECTION -->
             <div class="py-16 md:py-24 bg-[#f8f8f8]">
                 <div class="lg:w-[1280px] mx-auto px-4">
-                    <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 text-center mb-12">
-                       Popular careers/opportunities after security training
+                    <h2 class="text-3xl md:text-4xl font-extrabold text-[#00C1EC] text-center mb-12">
+                       Popular careers/opportunities <span class="text-black">after security training</span>
                     </h2>
-                    <p class="text-xl text-center text-[#00C1EC] mb-8">A sneak peek into the roles you’ll be able to work in after your Door Supervisor Training.</p>
+                    <p class="text-xl text-center text-[#000] mb-8">Our trainers have <b>over three decades of combined experience</b> in frontline security and professional training. They’ve done the job themselves, so they understand what employers look for and how to prepare you properly. You won’t just learn how to pass an exam, you’ll learn how to work confidently once you’re licensed! Meet out team.</p>
 
                     <!-- Career Cards -->
                     <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -590,163 +613,137 @@ $isDoorSupervision = (
 
 
             <!-- 6. TRAINER PROFILES SECTION (DARK BACKGROUND) -->
-            <div class="py-16 md:py-24 bg-[#1a1a1a]">
-                <div class="lg:w-[1280px] mx-auto px-4 grid lg:grid-cols-2 gap-12 items-center">
+          <div class="py-16 md:py-24 bg-[#1a1a1a]">
+    <div class="lg:w-[1280px] mx-auto px-4 grid lg:grid-cols-2 gap-12 items-center">
 
-                    <!-- Left Column: Trainers Grid -->
-                    <div class="grid grid-cols-2 gap-4">
-                        <!-- Trainer Profile 1 -->
-                        <div class="bg-gray-800 rounded-xl overflow-hidden shadow-lg border border-gray-700">
-                            <img src="https://res.cloudinary.com/dgalk9xcx/image/upload/v1761595701/WhatsApp_Image_2025-10-25_at_00.23.32_kak7v0.jpg"
-                                alt="Trainer Profile 1" class="w-full h-48 object-cover">
-                            <div class="p-3 text-white">
-                                <p class="font-semibold text-lg">Luzuko Mgaga</p>
-                                <span class="text-yellow-500 text-sm">⭐⭐⭐⭐⭐</span>
-                            </div>
-                        </div>
-                        <!-- Trainer Profile 2 -->
-                        <div class="bg-gray-800 rounded-xl overflow-hidden shadow-lg border border-gray-700">
-                            <img src="https://res.cloudinary.com/dgalk9xcx/image/upload/v1761595701/WhatsApp_Image_2025-10-25_at_00.23.32_1_qmxxod.jpg"
-                                alt="Trainer Profile 2" class="w-full h-48 object-cover">
-                            <div class="p-3 text-white">
-                                <p class="font-semibold text-lg">Muhammad Pervaiz</p>
-                                <span class="text-yellow-500 text-sm">⭐⭐⭐⭐⭐</span>
-                            </div>
-                        </div>
-                        <!-- Trainer Profile 3 -->
-                        <!--<div class="bg-gray-800 rounded-xl overflow-hidden shadow-lg border border-gray-700">-->
-                        <!--    <img src="https://placehold.co/300x300/444444/ffffff?text=Trainer+Dave"-->
-                        <!--        alt="Trainer Profile 3" class="w-full h-48 object-cover">-->
-                        <!--    <div class="p-3 text-white">-->
-                        <!--        <p class="font-semibold text-lg">Dave Watts</p>-->
-                        <!--        <span class="text-yellow-500 text-sm">⭐⭐⭐⭐⭐</span>-->
-                        <!--    </div>-->
-                        <!--</div>-->
-                        <!-- Trainer Profile 4 -->
-                        <!--<div class="bg-gray-800 rounded-xl overflow-hidden shadow-lg border border-gray-700">-->
-                        <!--    <img src="https://placehold.co/300x300/444444/ffffff?text=Trainer+Zowie"-->
-                        <!--        alt="Trainer Profile 4" class="w-full h-48 object-cover">-->
-                        <!--    <div class="p-3 text-white">-->
-                        <!--        <p class="font-semibold text-lg">Zowie Jennings</p>-->
-                        <!--        <span class="text-yellow-500 text-sm">⭐⭐⭐⭐⭐</span>-->
-                        <!--    </div>-->
-                        <!--</div>-->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            
+            <div class="bg-gray-800 rounded-xl overflow-hidden shadow-lg border border-gray-700 flex flex-col hover:border-[#00C1EC] transition duration-300">
+                <img src="https://res.cloudinary.com/dgalk9xcx/image/upload/v1761595701/WhatsApp_Image_2025-10-25_at_00.23.32_kak7v0.jpg"
+                    alt="Luzuko Mgaga" class="w-full h-56 object-cover">
+                <div class="p-5 text-white">
+                    <div class="flex justify-between items-center mb-2">
+                        <p class="font-semibold text-xl">Luzuko Mgaga</p>
+                        <span class="text-yellow-500 text-sm">⭐⭐⭐⭐⭐</span>
                     </div>
-
-                    <!-- Right Column: CTA -->
-                    <div class="text-white lg:text-left text-center">
-                        <h2 class="text-4xl md:text-5xl text-[#00C1EC] mb-6">
-                           A Qualified team<span class="text-white">, to help you every step of the way</span>
-                        </h2>
-                        <p class="text-xl text-gray-300 mb-8">
-                          They’ve done it themselves. So they know what it takes to make you competent. Simply lean on 3+ decades of industry expertise for your security training and licensure.
-                        </p>
-                        <a href="/meet-our-team"
-                            class="inline-block bg-[#00C1EC] text-white px-8 py-3 rounded-lg font-bold  transition duration-200 shadow-md text-lg">
-                            View all trainers
-                        </a>
-                    </div>
+                    <p class="text-gray-300 text-sm leading-relaxed">
+                        With over 10 years of front-line security experience, Luzuko brings hands-on expertise to the classroom. Based in Manchester and Dynamisis PI certified, his <b>conflict management classes</b> are a must-attend for any aspiring professional.
+                    </p>
                 </div>
             </div>
+
+            <div class="bg-gray-800 rounded-xl overflow-hidden shadow-lg border border-gray-700 flex flex-col hover:border-[#00C1EC] transition duration-300">
+                <img src="https://res.cloudinary.com/dgalk9xcx/image/upload/v1761595701/WhatsApp_Image_2025-10-25_at_00.23.32_1_qmxxod.jpg"
+                    alt="Muhammad Pervaiz" class="w-full h-56 object-cover">
+                <div class="p-5 text-white">
+                    <div class="flex justify-between items-center mb-2">
+                        <p class="font-semibold text-xl">Muhammad Pervaiz</p>
+                        <span class="text-yellow-500 text-sm">⭐⭐⭐⭐⭐</span>
+                    </div>
+                    <p class="text-gray-300 text-sm leading-relaxed">
+                        A versatile Manchester-based trainer and Dynamisis PI license holder. Muhammad specializes in <b>First Aid Training</b> and career coaching, helping students master security skills while learning how to <b>land jobs quickly</b>.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="text-white lg:text-left text-center">
+            <h2 class="text-4xl md:text-5xl text-[#00C1EC] mb-6 font-bold">
+                A Qualified team<span class="text-white">, to help you every step of the way</span>
+            </h2>
+            <p class="text-xl text-gray-400 mb-8 leading-relaxed">
+                Our trainers have over three decades of combined experience in frontline security and professional training. They’ve done the job themselves, so they understand what employers look for and how to prepare you properly. You won’t just learn how to pass an exam, you’ll learn how to work confidently once you’re licensed!
+            </p>
+            <a href="/meet-our-team"
+                class="inline-block bg-[#00C1EC] hover:bg-[#00a8cc] text-white px-8 py-3 rounded-lg font-bold transition duration-200 shadow-md text-lg">
+                View all trainers
+            </a>
+        </div>
+    </div>
+</div>
 
             <!-- 7. REAL STORIES / REVIEWS SECTION (USES SWIPER FOR TESTIMONIALS) -->
-            <div class="py-16 md:py-24 bg-white">
-                <div class="lg:w-[1280px] mx-auto px-4">
-                    <h2 class="text-3xl sm:text-4xl font-extrabold text-black mb-3">
-                        Don’t trust us blindly,
-                        <span class="text-accent-blue">
-                            hear it from our happy customers!
-                        </span>
-                    </h2>
-                    <div class="flex items-center gap-4 mb-10">
-                        <span class="text-yellow-500 text-2xl font-bold">Excellent</span>
-                        <span class="text-yellow-500 text-3xl">⭐⭐⭐⭐⭐</span>
-                        <p class="text-gray-600">We are rated 5/5 on Google Reviews by 120+ people.</p>
-                    </div>
+           <div class="py-16 md:py-24 bg-white">
+    <div class="lg:w-[1280px] mx-auto px-4">
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-black mb-3">
+            Don’t trust us blindly,
+            <span class="text-[#00C1EC]">
+                hear it from our happy customers!
+            </span>
+        </h2>
+        <div class="flex flex-wrap items-center gap-4 mb-10">
+            <span class="text-yellow-500 text-2xl font-bold">Excellent</span>
+            <span class="text-yellow-500 text-3xl">⭐⭐⭐⭐⭐</span>
+            <p class="text-gray-600">We’re proud to be rated 5/5 on Google Reviews by over 120+ learners.</p>
+        </div>
 
-                    <!-- Testimonial Swiper Container -->
-                    <div class="swiper mySwiper">
-                        <div class="swiper-wrapper">
+        <div class="swiper mySwiper pb-12">
+            <div class="swiper-wrapper">
 
-                            <!-- Slide 1 (Yash - Content Mapped from live code testimonial) -->
-                            <div class="swiper-slide h-auto">
-                                <div
-                                    class="bg-gray-50 p-6 rounded-xl shadow-lg border-t-4 border-[#00C1EC] h-full flex flex-col justify-between">
-                                    <div class="flex items-start mb-4">
-                                        <div
-                                            class="w-12 h-12 bg-red-600 rounded-full flex items-center justify-center mr-4">
-                                            <span class="text-white text-xl font-bold">R</span>
-                                        </div>
-                                        <div>
-                                            <p class="font-bold text-gray-900">Richard owusu Afriyie</p>
-                                            <!--<span class="text-yellow-500">⭐⭐⭐⭐⭐</span>-->
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <!--<h4 class="font-bold text-lg text-gray-900 mb-2">Excellent experience with G-->
-                                        <!--    Security</h4>-->
-                                        <p class="text-gray-700 text-sm ">"I just completed a door supervisor training, and it was really informative. The course covered essential skills like conflict resolution and effective communication, which are crucial for the role. I particularly enjoyed the practical scenarios we worked through, as they helped me understand how to handle real-life situations. Overall, it was a valuable experience that has prepared me well for my responsibilities as a door supervisor."</p>
-                                    </div>
-                                </div>
+                <div class="swiper-slide h-auto">
+                    <div class="bg-gray-50 p-6 rounded-xl shadow-lg border-t-4 border-[#00C1EC] h-full flex flex-col">
+                        <div class="flex items-start mb-4">
+                            <div class="w-12 h-12 bg-red-600 rounded-full flex items-center justify-center mr-4 flex-shrink-0">
+                                <span class="text-white text-xl font-bold">R</span>
                             </div>
-
-                            <!-- Slide 2 (Richard - Content Mapped from live code testimonial) -->
-                            <div class="swiper-slide h-auto">
-                                <div
-                                    class="bg-gray-50 p-6 rounded-xl shadow-lg border-t-4 border-gray-300 h-full flex flex-col ">
-                                    <div class="flex items-start mb-4">
-                                        <div
-                                            class="w-12 h-12 bg-red-600 rounded-full flex items-center justify-center mr-4">
-                                            <span class="text-white text-xl font-bold">A</span>
-                                        </div>
-                                        <div>
-                                            <p class="font-bold text-gray-900">Amir Abbas</p>
-                                            <!--<span class="text-yellow-500">⭐⭐⭐⭐⭐</span>-->
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <!--<h4 class="font-bold text-lg text-gray-900 mb-2">Really informative door-->
-                                        <!--    supervisor training</h4>-->
-                                        <p class="text-gray-700 text-sm leading-relaxed">"I had a positive experience. The staff were friendly and supportive, and the teaching methods were effective in helping me understand the material. The course was well-structured, and I appreciated the opportunities to ask questions and engage with the instructors."</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Slide 3 (Moussa Jawara - Content Mapped from live code testimonial) -->
-                            <div class="swiper-slide h-auto">
-                                <div
-                                    class="bg-gray-50 p-6 rounded-xl shadow-lg border-t-4 border-gray-300 h-full flex flex-col justify-between">
-                                    <div class="flex items-start mb-4">
-                                        <div
-                                            class="w-12 h-12 bg-teal-600 rounded-full flex items-center justify-center mr-4">
-                                            <span class="text-white text-xl font-bold">J</span>
-                                        </div>
-                                        <div>
-                                            <p class="font-bold text-gray-900">Jahed Shohag</p>
-                                            <!--<span class="text-yellow-500">⭐⭐⭐⭐⭐</span>-->
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <!--<h4 class="font-bold text-lg text-gray-900 mb-2">Highly recommend this company-->
-                                        <!--</h4>-->
-                                        <p class="text-gray-700 text-sm leading-relaxed">"I had a great experience with G Security and Training Center. The tutor taught clearly and gave strong focus to practical training, which really helped my learning. The classroom environment was supportive, and the course covered all key areas of door supervision. I am very satisfied and would recommend this center to friends and family."</p>
-                                    </div>
-                                </div>
+                            <div>
+                                <p class="font-bold text-gray-900">Richard Owusu Afriyie</p>
+                                <span class="text-yellow-500 text-sm">⭐⭐⭐⭐⭐</span>
                             </div>
                         </div>
-
-                        <!-- Pagination/Bullets -->
-                        <div class="swiper-pagination mt-10"></div>
+                        <div>
+                            <p class="text-gray-700 text-sm leading-relaxed italic">
+                                "I just completed a door supervisor training, and it was really informative. The course covered essential skills like conflict resolution and effective communication, which are crucial for the role. I particularly enjoyed the practical scenarios we worked through, as they helped me understand how to handle real-life situations. Overall, it was a valuable experience that has prepared me well for my responsibilities as a door supervisor."
+                            </p>
+                        </div>
                     </div>
-
-                    <!--<div class="text-center mt-12">-->
-                    <!--    <a href="/about-us"-->
-                    <!--        class="inline-block border-2 border-[#00C1EC] text-gray-900 px-8 py-3 rounded-lg font-bold hover:bg-[#00C1EC] hover:text-white transition duration-200 shadow-md text-lg">-->
-                    <!--        Read more reviews-->
-                    <!--    </a>-->
-                    <!--</div>-->
                 </div>
+
+                <div class="swiper-slide h-auto">
+                    <div class="bg-gray-50 p-6 rounded-xl shadow-lg border-t-4 border-[#00C1EC] h-full flex flex-col">
+                        <div class="flex items-start mb-4">
+                            <div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mr-4 flex-shrink-0">
+                                <span class="text-white text-xl font-bold">A</span>
+                            </div>
+                            <div>
+                                <p class="font-bold text-gray-900">Amir Abbas</p>
+                                <span class="text-yellow-500 text-sm">⭐⭐⭐⭐⭐</span>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="text-gray-700 text-sm leading-relaxed italic">
+                                "I had a positive experience. The staff were friendly and supportive, and the teaching methods were effective in helping me understand the material. The course was well-structured, and I appreciated the opportunities to ask questions and engage with the instructors."
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="swiper-slide h-auto">
+                    <div class="bg-gray-50 p-6 rounded-xl shadow-lg border-t-4 border-[#00C1EC] h-full flex flex-col">
+                        <div class="flex items-start mb-4">
+                            <div class="w-12 h-12 bg-teal-600 rounded-full flex items-center justify-center mr-4 flex-shrink-0">
+                                <span class="text-white text-xl font-bold">J</span>
+                            </div>
+                            <div>
+                                <p class="font-bold text-gray-900">Jahed Shohag</p>
+                                <span class="text-yellow-500 text-sm">⭐⭐⭐⭐⭐</span>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="text-gray-700 text-sm leading-relaxed italic">
+                                "I had a great experience with G Security and Training Center. The tutor taught clearly and gave strong focus to practical training, which really helped my learning. The classroom environment was supportive, and the course covered all key areas of door supervision. I am very satisfied and would recommend this center to friends and family."
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
             </div>
+
+            <div class="swiper-pagination"></div>
+        </div>
+    </div>
+</div>
 
 
             <!-- 8. FAQ AND CONTACT SECTION -->
@@ -754,227 +751,205 @@ $isDoorSupervision = (
                 <div class="lg:w-[1280px] mx-auto px-4 grid lg:grid-cols-2 gap-12 items-start">
 
                     <!-- Left Column: FAQ Accordion (Reused component from previous file) -->
-                    <div class="w-full p-4 lg:p-0 order-2 lg:order-1">
-                        <h2 class="text-4xl  text-[#00C1EC] mb-10 text-center lg:text-left">
-                            Still got questions? <span class=" text-gray-900 ">We’re here to clear them up for you.</span>
-                        </h2>
-                        <div class="space-y-4">
-                            <!-- FAQ 1 -->
-                            <div class="rounded-xl overflow-hidden shadow-lg border border-gray-200">
-                                <button
-                                    class="w-full text-left p-4 bg-white text-gray-900  focus:outline-none flex justify-between items-center transition-all"
-                                    data-toggle="collapsess" data-target="#faq-home-1">
-                                    <span class="font-semibold">What exactly is the Door Supervision course?</span>
-                                    <svg class="w-5 h-5 transition-transform duration-300" fill="none"
-                                        stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M19 9l-7 7-7-7"></path>
-                                    </svg>
-                                </button>
-                                <div id="faq-home-1" class="collapsess hidden bg-gray-50 text-gray-700">
-                                    <p class="p-4 border-t border-gray-200">An G-Security and Training’s Door Supervision course is a sure-short way you can gain the necessary skills that help you legally qualify and obtain an SIA license for working in security roles.</p>
-                                </div>
-                            </div>
+                   <div class="w-full p-4 lg:p-0 order-2 lg:order-1">
+    <h2 class="text-4xl text-[#00C1EC] mb-10 text-center lg:text-left font-bold">
+        Still got questions? <span class="text-gray-900">We’re here to clear them up for you.</span>
+    </h2>
+    
+    <div class="space-y-4">
+        <div class="rounded-xl overflow-hidden shadow-lg border border-gray-200">
+            <button class="w-full text-left p-4 bg-white text-gray-900 focus:outline-none flex justify-between items-center transition-all hover:bg-gray-50"
+                data-toggle="collapsess" data-target="#faq-home-1">
+                <span class="font-semibold">What exactly is the Door Supervision course?</span>
+                <svg class="w-5 h-5 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
+            </button>
+            <div id="faq-home-1" class="collapsess hidden bg-gray-50 text-gray-700">
+                <p class="p-4 border-t border-gray-200">G-Security and Training’s Door Supervision course is a sure-fire way you can gain the necessary skills that help you legally qualify and obtain an SIA license for working in security roles.</p>
+            </div>
+        </div>
 
-                            <!-- FAQ 2 -->
-                            <div class="rounded-xl overflow-hidden shadow-lg border border-gray-200">
-                                <button
-                                    class="w-full text-left p-4 bg-white text-gray-900  focus:outline-none flex justify-between items-center transition-all"
-                                    data-toggle="collapsess" data-target="#faq-home-2">
-                                    <span class="font-semibold">Do I need any experience to join?</span>
-                                    <svg class="w-5 h-5 transition-transform duration-300" fill="none"
-                                        stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M19 9l-7 7-7-7"></path>
-                                    </svg>
-                                </button>
-                                <div id="faq-home-2" class="collapsess hidden bg-gray-50 text-gray-700">
-                                    <p class="p-4 border-t border-gray-200">Luckily, you don’t. We’ve trained thousands of freshers who had zero experience in the industry, who are now earning to their highest potential in security.</p>
-                                </div>
-                            </div>
+        <div class="rounded-xl overflow-hidden shadow-lg border border-gray-200">
+            <button class="w-full text-left p-4 bg-white text-gray-900 focus:outline-none flex justify-between items-center transition-all hover:bg-gray-50"
+                data-toggle="collapsess" data-target="#faq-home-2">
+                <span class="font-semibold">Do I need any experience to join?</span>
+                <svg class="w-5 h-5 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
+            </button>
+            <div id="faq-home-2" class="collapsess hidden bg-gray-50 text-gray-700">
+                <p class="p-4 border-t border-gray-200">Luckily, you don’t. We’ve trained thousands of freshers who had zero experience in the industry, who are now earning to their highest potential in security.</p>
+            </div>
+        </div>
 
-                            <!-- FAQ 3 -->
-                            <div class="rounded-xl overflow-hidden shadow-lg border border-gray-200">
-                                <button
-                                    class="w-full text-left p-4 bg-white text-gray-900  focus:outline-none flex justify-between items-center transition-all"
-                                    data-toggle="collapsess" data-target="#faq-home-3">
-                                    <span class="font-semibold">How long does the course take?</span>
-                                    <svg class="w-5 h-5 transition-transform duration-300" fill="none"
-                                        stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M19 9l-7 7-7-7"></path>
-                                    </svg>
-                                </button>
-                                <div id="faq-home-3" class="collapsess hidden bg-gray-50 text-gray-700">
-                                    <p class="p-4 border-t border-gray-200"> The actual training part only takes 3-7 days. So, you’ll be able to manage it with other commitments or jobs on the side. Once you’re ready, giving a small exam would let you go ahead with applying for a licence. The entire process usually takes three weeks.  </p>
-                                </div>
-                            </div>
-                            
-                              <!-- FAQ 4 -->
-                            <div class="rounded-xl overflow-hidden shadow-lg border border-gray-200">
-                                <button
-                                    class="w-full text-left p-4 bg-white text-gray-900  focus:outline-none flex justify-between items-center transition-all"
-                                    data-toggle="collapsess" data-target="#faq-home-4">
-                                    <span class="font-semibold">How much does it cost?</span>
-                                    <svg class="w-5 h-5 transition-transform duration-300" fill="none"
-                                        stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M19 9l-7 7-7-7"></path>
-                                    </svg>
-                                </button>
-                                <div id="faq-home-4" class="collapsess hidden bg-gray-50 text-gray-700">
-                                    <p class="p-4 border-t border-gray-200">If you’re going to be applying for a license for the first time, the Door Supervision course is for you. It costs £350, and pays for itself in nearly 10 days once you start earning. </p>
-                                </div>
-                            </div>
-                            
-                              <!-- FAQ 5 -->
-                            <div class="rounded-xl overflow-hidden shadow-lg border border-gray-200">
-                                <button
-                                    class="w-full text-left p-4 bg-white text-gray-900  focus:outline-none flex justify-between items-center transition-all"
-                                    data-toggle="collapsess" data-target="#faq-home-5">
-                                    <span class="font-semibold">What jobs can I get after this?</span>
-                                    <svg class="w-5 h-5 transition-transform duration-300" fill="none"
-                                        stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M19 9l-7 7-7-7"></path>
-                                    </svg>
-                                </button>
-                                <div id="faq-home-5" class="collapsess hidden bg-gray-50 text-gray-700">
-                                    <p class="p-4 border-t border-gray-200"> There are multiple roles available once you finish your security training in Leeds. Jobs in this industry are always in demand, and you would be able to expect stable pay. The most common pathways are -
-                                    <ul class="mt-1 ml-10 list-disc" >
+        <div class="rounded-xl overflow-hidden shadow-lg border border-gray-200">
+            <button class="w-full text-left p-4 bg-white text-gray-900 focus:outline-none flex justify-between items-center transition-all hover:bg-gray-50"
+                data-toggle="collapsess" data-target="#faq-home-3">
+                <span class="font-semibold">How long does the course take?</span>
+                <svg class="w-5 h-5 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
+            </button>
+            <div id="faq-home-3" class="collapsess hidden bg-gray-50 text-gray-700">
+                <p class="p-4 border-t border-gray-200">The actual training part only takes 3-7 days. The entire process, including exams and license application, usually takes about three weeks.</p>
+            </div>
+        </div>
 
-<li>Door Supervisor / Bouncer</li>
-<li>Event Security / Steward</li>
-<li>Corporate Security Officer</li>
-<li>Retail Security Guard</li>
-<li>Construction Site Security</li>
-<li>Concierge / Reception Security</li>
-<li>Mobile Patrol Officer</li>
-<li>Keyholding Services</li>
-</ul>
-  </p>
-                                </div>
-                            </div>
-                            
-                              <!-- FAQ 6 -->
-                            <div class="rounded-xl overflow-hidden shadow-lg border border-gray-200">
-                                <button
-                                    class="w-full text-left p-4 bg-white text-gray-900  focus:outline-none flex justify-between items-center transition-all"
-                                    data-toggle="collapsess" data-target="#faq-home-6">
-                                    <span class="font-semibold">Is this qualification actually recognised by employers?</span>
-                                    <svg class="w-5 h-5 transition-transform duration-300" fill="none"
-                                        stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M19 9l-7 7-7-7"></path>
-                                    </svg>
-                                </button>
-                                <div id="faq-home-6" class="collapsess hidden bg-gray-50 text-gray-700">
-                                    <p class="p-4 border-t border-gray-200">Yes! As mentioned, the security training lets you apply for an SIA license, which is widely recognised and in fact the most common requirement of reputed employers.</p>
-                                </div>
-                            </div>
-                            
-                              <!-- FAQ 7 -->
-                            <div class="rounded-xl overflow-hidden shadow-lg border border-gray-200">
-                                <button
-                                    class="w-full text-left p-4 bg-white text-gray-900  focus:outline-none flex justify-between items-center transition-all"
-                                    data-toggle="collapsess" data-target="#faq-home-7">
-                                    <span class="font-semibold">What if I fail the exam?
-</span>
-                                    <svg class="w-5 h-5 transition-transform duration-300" fill="none"
-                                        stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M19 9l-7 7-7-7"></path>
-                                    </svg>
-                                </button>
-                                <div id="faq-home-7" class="collapsess hidden bg-gray-50 text-gray-700">
-                                    <p class="p-4 border-t border-gray-200">It’s okay, we know that sometimes mishaps happen. To safeguard you against such situations, we have plans that offer multiple free resits/retakes. With the guidance and support of our expert trainers, you’ll be able to clear the exam with no problems.   </p>
-                                </div>
-                            </div>
-                            
-                              <!-- FAQ 8 -->
-                            <div class="rounded-xl overflow-hidden shadow-lg border border-gray-200">
-                                <button
-                                    class="w-full text-left p-4 bg-white text-gray-900  focus:outline-none flex justify-between items-center transition-all"
-                                    data-toggle="collapsess" data-target="#faq-home-8">
-                                    <span class="font-semibold">Do you include first aid training or is that separate?</span>
-                                    <svg class="w-5 h-5 transition-transform duration-300" fill="none"
-                                        stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M19 9l-7 7-7-7"></path>
-                                    </svg>
-                                </button>
-                                <div id="faq-home-8" class="collapsess hidden bg-gray-50 text-gray-700">
-                                    <p class="p-4 border-t border-gray-200">Free first aid training is included in Gold and Diamond plans of the Door Supervision course and also for the Top-Up Refresher course. That gives you an extra edge and helps you stand out in the eyes of potential employers. </p>
-                                </div>
-                            </div>
-                            
-                              <!-- FAQ 9 -->
-                            <div class="rounded-xl overflow-hidden shadow-lg border border-gray-200">
-                                <button
-                                    class="w-full text-left p-4 bg-white text-gray-900 focus:outline-none flex justify-between items-center transition-all"
-                                    data-toggle="collapsess" data-target="#faq-home-9">
-                                    <span class="font-semibold">What’s the Top-Up Refresher course for?</span>
-                                    <svg class="w-5 h-5 transition-transform duration-300" fill="none"
-                                        stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M19 9l-7 7-7-7"></path>
-                                    </svg>
-                                </button>
-                                <div id="faq-home-9" class="collapsess hidden bg-gray-50 text-gray-700">
-                                    <p class="p-4 border-t border-gray-200">The <b>SIA Top-Up Refresher For Door Supervision</b> course is for people who have already worked in security but wish to renew their license after its 3-year tenure. In this course, they can easily gain any new skills that have entered the market since they last took their security training.  </p>
-                                </div>
-                            </div>
-                            
-                              <!-- FAQ 10 -->
-                            <div class="rounded-xl overflow-hidden shadow-lg border border-gray-200">
-                                <button
-                                    class="w-full text-left p-4 bg-white text-gray-900  focus:outline-none flex justify-between items-center transition-all"
-                                    data-toggle="collapsess" data-target="#faq-home-10">
-                                    <span class="font-semibold">
-How quickly can I start earning after I pass?
-</span>
-                                    <svg class="w-5 h-5 transition-transform duration-300" fill="none"
-                                        stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M19 9l-7 7-7-7"></path>
-                                    </svg>
-                                </button>
-                                <div id="faq-home-10" class="collapsess hidden bg-gray-50 text-gray-700">
-                                    <p class="p-4 border-t border-gray-200">Once you pass, you’ll be able to apply for a license with the SIA immediately. Once your license is approved, which usually takes 7-10 days, you can begin to apply for security jobs and start earning. Overall, anywhere between 3-4 weeks.</p>
-                                </div>
-                            </div>
-                            
+        <div class="rounded-xl overflow-hidden shadow-lg border border-gray-200">
+            <button class="w-full text-left p-4 bg-white text-gray-900 focus:outline-none flex justify-between items-center transition-all hover:bg-gray-50"
+                data-toggle="collapsess" data-target="#faq-home-4">
+                <span class="font-semibold">How much does it cost?</span>
+                <svg class="w-5 h-5 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
+            </button>
+            <div id="faq-home-4" class="collapsess hidden bg-gray-50 text-gray-700">
+                <p class="p-4 border-t border-gray-200">The Door Supervision course costs £350. It’s a great investment that often pays for itself in nearly 10 days once you start working.</p>
+            </div>
+        </div>
 
-                            <div class="text-center pt-6">
-                                <a href="/faqs"
-                                    class="inline-block border-2 border-[#00C1EC] text-gray-900 px-6 py-3 rounded-lg font-bold hover:bg-[#00C1EC] hover:text-white transition duration-200 shadow-md">
-                                    View All FAQs
-                                </a>
-                            </div>
-                        </div>
-                    </div>
+        <div class="rounded-xl overflow-hidden shadow-lg border border-gray-200">
+            <button class="w-full text-left p-4 bg-white text-gray-900 focus:outline-none flex justify-between items-center transition-all hover:bg-gray-50"
+                data-toggle="collapsess" data-target="#faq-home-5">
+                <span class="font-semibold">What jobs can I get after this?</span>
+                <svg class="w-5 h-5 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
+            </button>
+            <div id="faq-home-5" class="collapsess hidden bg-gray-50 text-gray-700">
+                <div class="p-4 border-t border-gray-200">
+                    <p class="mb-3 font-medium">Common pathways include:</p>
+                    <ul class="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+                        <li class="flex items-center"><span class="w-2 h-2 bg-[#00C1EC] rounded-full mr-2"></span> Door Supervisor / Bouncer</li>
+                        <li class="flex items-center"><span class="w-2 h-2 bg-[#00C1EC] rounded-full mr-2"></span> Event Security / Steward</li>
+                        <li class="flex items-center"><span class="w-2 h-2 bg-[#00C1EC] rounded-full mr-2"></span> Corporate Security Officer</li>
+                        <li class="flex items-center"><span class="w-2 h-2 bg-[#00C1EC] rounded-full mr-2"></span> Retail Security Guard</li>
+                        <li class="flex items-center"><span class="w-2 h-2 bg-[#00C1EC] rounded-full mr-2"></span> Construction Site Security</li>
+                        <li class="flex items-center"><span class="w-2 h-2 bg-[#00C1EC] rounded-full mr-2"></span> Concierge / Reception</li>
+                        <li class="flex items-center"><span class="w-2 h-2 bg-[#00C1EC] rounded-full mr-2"></span> Mobile Patrol Officer</li>
+                        <li class="flex items-center"><span class="w-2 h-2 bg-[#00C1EC] rounded-full mr-2"></span> Keyholding Services</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="rounded-xl overflow-hidden shadow-lg border border-gray-200">
+            <button class="w-full text-left p-4 bg-white text-gray-900 focus:outline-none flex justify-between items-center transition-all hover:bg-gray-50"
+                data-toggle="collapsess" data-target="#faq-home-6">
+                <span class="font-semibold">Is this qualification actually recognised?</span>
+                <svg class="w-5 h-5 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
+            </button>
+            <div id="faq-home-6" class="collapsess hidden bg-gray-50 text-gray-700">
+                <p class="p-4 border-t border-gray-200">Yes! This training allows you to apply for an SIA license, which is the legal requirement and the most common qualification requested by UK security employers.</p>
+            </div>
+        </div>
+
+        <div class="rounded-xl overflow-hidden shadow-lg border border-gray-200">
+            <button class="w-full text-left p-4 bg-white text-gray-900 focus:outline-none flex justify-between items-center transition-all hover:bg-gray-50"
+                data-toggle="collapsess" data-target="#faq-home-7">
+                <span class="font-semibold">What if I fail the exam?</span>
+                <svg class="w-5 h-5 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
+            </button>
+            <div id="faq-home-7" class="collapsess hidden bg-gray-50 text-gray-700">
+                <p class="p-4 border-t border-gray-200">Don't worry—mishaps happen. We offer plans with multiple free resits and provide expert guidance to ensure you pass comfortably on your next attempt.</p>
+            </div>
+        </div>
+
+        <div class="rounded-xl overflow-hidden shadow-lg border border-gray-200">
+            <button class="w-full text-left p-4 bg-white text-gray-900 focus:outline-none flex justify-between items-center transition-all hover:bg-gray-50"
+                data-toggle="collapsess" data-target="#faq-home-8">
+                <span class="font-semibold">Is First Aid training included?</span>
+                <svg class="w-5 h-5 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
+            </button>
+            <div id="faq-home-8" class="collapsess hidden bg-gray-50 text-gray-700">
+                <p class="p-4 border-t border-gray-200">Free first aid training is included in our Gold and Diamond plans, as well as our Top-Up courses, giving you an extra edge with employers.</p>
+            </div>
+        </div>
+
+        <div class="rounded-xl overflow-hidden shadow-lg border border-gray-200">
+            <button class="w-full text-left p-4 bg-white text-gray-900 focus:outline-none flex justify-between items-center transition-all hover:bg-gray-50"
+                data-toggle="collapsess" data-target="#faq-home-9">
+                <span class="font-semibold">What’s the Top-Up Refresher course for?</span>
+                <svg class="w-5 h-5 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
+            </button>
+            <div id="faq-home-9" class="collapsess hidden bg-gray-50 text-gray-700">
+                <p class="p-4 border-t border-gray-200">This is for existing license holders who need to renew their 3-year license. It covers new industry standards and skills developed since your last training.</p>
+            </div>
+        </div>
+
+        <div class="rounded-xl overflow-hidden shadow-lg border border-gray-200">
+            <button class="w-full text-left p-4 bg-white text-gray-900 focus:outline-none flex justify-between items-center transition-all hover:bg-gray-50"
+                data-toggle="collapsess" data-target="#faq-home-10">
+                <span class="font-semibold">How quickly can I start earning?</span>
+                <svg class="w-5 h-5 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
+            </button>
+            <div id="faq-home-10" class="collapsess hidden bg-gray-50 text-gray-700">
+                <p class="p-4 border-t border-gray-200">Once you pass and apply for your SIA license (which takes 7-10 days to approve), you can start working immediately. Usually, you're earning within 3-4 weeks.</p>
+            </div>
+        </div>
+
+        <div class="text-center pt-6">
+            <a href="/faqs" class="inline-block border-2 border-[#00C1EC] text-gray-900 px-6 py-3 rounded-lg font-bold hover:bg-[#00C1EC] hover:text-white transition duration-200 shadow-md">
+                View All FAQs
+            </a>
+        </div>
+    </div>
+</div>
 
                     <!-- Right Column: Priority/Help Message (Reused component from previous file) -->
-                    <div class="w-full p-4 lg:p-0 text-center lg:text-left order-1 lg:order-2">
-                        <div class="bg-gray-100 p-8 rounded-xl shadow-xl border-t-8 border-[#00C1EC]">
-                            <h2 class="text-3xl font-black text-gray-900 mb-4">Do you need help?</h2>
-                            <p class="text-xl text-gray-700 mb-6">Our team's got your back.</p>
-                            <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                                <a href="https://wa.me/447736540149"
-                                    class="text-white bg-green-500 py-3 px-6 rounded-lg font-bold hover:bg-green-600 shadow-md">
-                                    Chat with us
-                                </a>
-                                <a href="/faqs"
-                                    class="text-gray-900 bg-white py-3 px-6 rounded-lg font-bold hover:bg-gray-50 shadow-md border border-gray-200">
-                                    Help centre
-                                </a>
-                                <a href="mailto:Info@gsecurityandtraining.co.uk"
-                                    class="text-gray-900 bg-white py-3 px-6 rounded-lg font-bold hover:bg-gray-50 shadow-md border border-gray-200">
-                                    Email us
-                                </a>
-                            </div>
-                        </div>
-                    </div>
+                    <div class="w-full p-4 lg:p-0 text-center lg:order-2">
+    <div class="bg-gray-100 p-8 rounded-xl shadow-xl border-t-8 border-[#00C1EC]">
+        <h2 class="text-3xl font-black text-gray-900 mb-4">Do you need help?</h2>
+        <p class="text-xl text-gray-700 mb-6">Our team's got your back.</p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="https://wa.me/447736540149"
+                class="text-white bg-green-500 py-3 px-6 rounded-lg font-bold hover:bg-green-600 shadow-md transition duration-200">
+                Chat with us
+            </a>
+            <a href="/faqs"
+                class="text-gray-900 bg-white py-3 px-6 rounded-lg font-bold hover:bg-gray-50 shadow-md border border-gray-200 transition duration-200">
+                Help centre
+            </a>
+            <a href="mailto:Info@gsecurityandtraining.co.uk"
+                class="text-gray-900 bg-white py-3 px-6 rounded-lg font-bold hover:bg-gray-50 shadow-md border border-gray-200 transition duration-200">
+                Email us
+            </a>
+        </div>
+    </div>
+
+    <div class="mt-12 py-10 px-6 bg-white rounded-xl border-2 border-dashed border-gray-200">
+        <h2 class="text-3xl md:text-4xl font-black text-gray-900 mb-4">
+            Book Your SIA Training Course Today
+        </h2>
+        <p class="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
+If you’re ready to get started, the next step is simple. <a href="/courses" class="text-blue-600">Choose the course</a> that suits you, book your place, and we’ll guide you through the rest. 
+<br>
+With <b>G Security & Training</b>, you get <b>SIA security training courses in Leeds and Bradford</b> that prepare you for real work. For more doubts, feel free to contact us anytime.
+        </p>
+        <!--<div class="flex flex-col sm:flex-row gap-4 justify-center">-->
+        <!--    <a href="/courses" -->
+        <!--        class="inline-block bg-[#00C1EC] text-white px-10 py-4 rounded-lg font-bold hover:bg-[#00a8cc] transition duration-200 shadow-lg text-xl">-->
+        <!--        View All Courses-->
+        <!--    </a>-->
+        <!--    <a href="/contact" -->
+        <!--        class="inline-block bg-gray-900 text-white px-10 py-4 rounded-lg font-bold hover:bg-black transition duration-200 shadow-lg text-xl">-->
+        <!--        Contact Us-->
+        <!--    </a>-->
+        <!--</div>-->
+        <!--<p class="mt-6 text-sm text-gray-400">Still have doubts? We're available 24/7 to help you decide.</p>-->
+    </div>
+</div>
                 </div>
             </div>
 
@@ -1011,92 +986,23 @@ How quickly can I start earning after I pass?
         // POPUP LOGIC: Dynamically targets ONE shared popup
         document.addEventListener('DOMContentLoaded', () => {
 
-            // 1. Get the body element to apply the scroll lock class
-            const bodyElement = document.getElementById('main-body');
 
-            // 2. Create and append the single, shared overlay and form container
-            const sharedOverlay = document.createElement('div');
-            sharedOverlay.className = 'popup-overlay fixed inset-0 bg-black bg-opacity-70 z-[9998] hidden';
-            document.body.appendChild(sharedOverlay);
+           
+              // Retained: Logic to save data to localStorage before form submission
+        document.querySelectorAll('.sharedForm').forEach(form => {
+            form.addEventListener('submit', function (e) {
+                  const courseName  = this.querySelector('input[name="course_name"]').value;
+        const coursePrice = this.querySelector('input[name="course_p"]').value;
+        const courseId    = this.querySelector('input[name="course_id"]').value;
 
-            const sharedFormContainer = document.createElement('div');
-            sharedFormContainer.className = 'popup-form fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-8 rounded-xl shadow-2xl z-[9999] w-11/12 max-w-md hidden';
-            sharedFormContainer.innerHTML = `
-            <h3 class="text-xl font-bold text-gray-900 mb-4 text-center">Enter your details to Buy Now!</h3>
-            <form method="post" class="space-y-4" id="sharedForm">
-                <div class="absolute top-4 right-4 cursor-pointer text-gray-500 hover:text-gray-900 close-popup-btn">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
-                </div>
-                <input type="text" name="Name" placeholder="Your Name" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-[#00C1EC] focus:border-[#00C1EC]">
-                <input type="email" name="Email" placeholder="Your Email" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-[#00C1EC] focus:border-[#00C1EC]">
-                <input type="tel" name="Phone" placeholder="Phone Number" maxlength="12" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-[#00C1EC] focus:border-[#00C1EC]">
-                <input type="hidden" name="course_name" value="">
-                <input type="hidden" name="course_p" value="">
-                <input type="hidden" name="course_id" value="">
-                <button type="submit" name="submit" class="w-full bg-[#00C1EC] text-white font-bold p-3 rounded-lg shadow-md  transition-opacity">
-                    Submit & Continue
-                </button>
-            </form>
-        `;
-            document.body.appendChild(sharedFormContainer);
-            const sharedForm = document.getElementById('sharedForm');
+        localStorage.setItem('course_name', courseName);
+        localStorage.setItem('course_price', coursePrice);
+        localStorage.setItem('course_id', courseId);
 
-            // 3. Functions to control popup state (with SCROLL LOCK FIX)
-            const showPopup = (title, price, id) => {
-                // Update shared form fields with course data
-                sharedForm.querySelector('input[name="course_name"]').value = title;
-                sharedForm.querySelector('input[name="course_p"]').value = price;
-                sharedForm.querySelector('input[name="course_id"]').value = id;
-
-                // Show popup and overlay
-                sharedOverlay.classList.remove('hidden');
-                sharedFormContainer.classList.remove('hidden');
-
-                // **SCROLL LOCK FIX: Apply the class**
-                if (bodyElement) {
-                    bodyElement.classList.add('no-scroll');
-                }
-            };
-
-            const hidePopup = () => {
-                sharedOverlay.classList.add('hidden');
-                sharedFormContainer.classList.add('hidden');
-
-                // **SCROLL LOCK FIX: Remove the class**
-                if (bodyElement) {
-                    bodyElement.classList.remove('no-scroll');
-                }
-            };
-
-            // 4. Event listeners for all "Book Now" buttons to open the *shared* popup
-            document.querySelectorAll('.book-now-btn').forEach((btn) => {
-                btn.addEventListener('click', function () {
-                    const title = this.getAttribute('data-course-name') || this.getAttribute('data-course-title');
-                    const price = this.getAttribute('data-course-price');
-                    const id = this.getAttribute('data-course-id');
-                    showPopup(title, price, id);
-                });
             });
+        });
 
-            // 5. Event listeners for closing the popup
-            sharedOverlay.addEventListener('click', hidePopup);
-            sharedFormContainer.querySelector('.close-popup-btn').addEventListener('click', hidePopup);
-
-            // 6. Form submission logic (Saves to localStorage)
-            sharedForm.addEventListener('submit', function (e) {
-                // Get input values
-                const name = sharedForm.elements['Name'].value;
-                const email = sharedForm.elements['Email'].value;
-                const phone = sharedForm.elements['Phone'].value;
-
-                // Save in localStorage before submission
-                localStorage.setItem('Name', name);
-                localStorage.setItem('Email', email);
-                localStorage.setItem('Phone', phone);
-
-                // PHP handles the actual submission and redirection
-            });
-
+   
         });
     </script>
 

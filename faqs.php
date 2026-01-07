@@ -60,134 +60,137 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <!--    General FAQs-->
             <!--</h2>-->
 
-            <div class="mx-auto  mt-8">
-                <div x-data="{ open: false }" class="bg-white">
-                    <button @click="open = !open" class="w-full text-left px-4 py-3 block">
-                        <span class="font-medium capatalize flex justify-between items-center">
-                            What is an SIA licence and why do I need it?
-                            <span :class="{'rotate-45': open}" class="text-xl transform transition-transform duration-300 text-[#00C1EC]">
-                                +
-                            </span>
-                        </span>
-                    </button>
-                    <div x-show="open" x-transition class="px-4 pb-4 text-gray-700">
-                       Anyone who wishes to work in private security in the UK would need to first get licensed by the Security Industry Authority (SIA). That permits you to legally take up security jobs and proves to the employers that you’ve completed approved training while also passing background checks. Without it, you won’t be able to work as a door supervisor, security guard, or CCTV operator.
-                    </div>
-                </div>
+            <div class="mx-auto mt-8 border-t border-gray-200">
+    <div x-data="{ open: false }" class="bg-white border-b border-gray-200">
+        <button @click="open = !open" class="w-full text-left px-4 py-4 block hover:bg-gray-50 transition-colors">
+            <span class="font-semibold capitalize flex justify-between items-center text-gray-900">
+                What is an SIA licence and why do I need it?
+                <span :class="{'rotate-45': open}" class="text-2xl transform transition-transform duration-300 text-[#00C1EC] leading-none">
+                    +
+                </span>
+            </span>
+        </button>
+        <div x-show="open" 
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0 transform scale-95"
+             x-transition:enter-end="opacity-100 transform scale-100" 
+             class="px-4 pb-4 text-gray-600 leading-relaxed">
+            Anyone who wishes to work in private security in the UK would need to first get licensed by the Security Industry Authority (SIA). That permits you to legally take up security jobs and proves to the employers that you’ve completed approved training while also passing background checks. Without it, you won’t be able to work as a door supervisor, security guard, or CCTV operator.
+        </div>
+    </div>
 
-                <div x-data="{ open: false }" class="bg-white">
-                    <button @click="open = !open" class="w-full text-left px-4 py-3 block">
-                        <span class="font-medium capatalize flex justify-between items-center">
-                            Is G-Security’s training SIA-approved?
-                            <span :class="{'rotate-45': open}" class="text-xl transform transition-transform duration-300 text-[#00C1EC]">
-                                +
-                            </span>
-                        </span>
-                    </button>
-                    <div x-show="open" x-transition class="px-4 pb-4 text-gray-700">
-                      Yes, G Security’s courses are completely accredited by SIA-approved awarding bodies (Highfield, Pearson Edexcel, and City & Guilds). Once you finish our training, pass a small exam, and get approved for your SIA license, employers across the UK would deem you qualified for security roles.
-                    </div>
-                </div>
+    <div x-data="{ open: false }" class="bg-white border-b border-gray-200">
+        <button @click="open = !open" class="w-full text-left px-4 py-4 block hover:bg-gray-50 transition-colors">
+            <span class="font-semibold capitalize flex justify-between items-center text-gray-900">
+                Is G-Security’s training SIA-approved?
+                <span :class="{'rotate-45': open}" class="text-2xl transform transition-transform duration-300 text-[#00C1EC] leading-none">
+                    +
+                </span>
+            </span>
+        </button>
+        <div x-show="open" x-transition class="px-4 pb-4 text-gray-600 leading-relaxed">
+            Yes, G Security’s courses are completely accredited by SIA-approved awarding bodies (Highfield, Pearson Edexcel, and City & Guilds). Once you finish our training, pass a small exam, and get approved for your SIA license, employers across the UK would deem you qualified for security roles.
+        </div>
+    </div>
 
-                <div x-data="{ open: false }" class="bg-white">
-                    <button @click="open = !open" class="w-full text-left px-4 py-3 block">
-                        <span class="font-medium capatalize flex justify-between items-center">
-                           How long does it take to get an SIA licence after completing the course?
-                            <span :class="{'rotate-45': open}" class="text-xl transform transition-transform duration-300 text-[#00C1EC]">
-                                +
-                            </span>
-                        </span>
-                    </button>
-                    <div x-show="open" x-transition class="px-4 pb-4 text-gray-700">
-                       Once you’ve finished the course and passed the exam, you can move on to applying for your license. The process usually takes 7-10 days. So please plan accordingly.
-                    </div>
-                </div>
+    <div x-data="{ open: false }" class="bg-white border-b border-gray-200">
+        <button @click="open = !open" class="w-full text-left px-4 py-4 block hover:bg-gray-50 transition-colors">
+            <span class="font-semibold capitalize flex justify-between items-center text-gray-900">
+                How long does it take to get an SIA licence after the course?
+                <span :class="{'rotate-45': open}" class="text-2xl transform transition-transform duration-300 text-[#00C1EC] leading-none">
+                    +
+                </span>
+            </span>
+        </button>
+        <div x-show="open" x-transition class="px-4 pb-4 text-gray-600 leading-relaxed">
+            Once you’ve finished the course and passed the exam, you can move on to applying for your license. The process usually takes 7-10 days. So please plan accordingly.
+        </div>
+    </div>
 
-                <div x-data="{ open: false }" class="bg-white">
-                    <button @click="open = !open" class="w-full text-left px-4 py-3 block">
-                        <span class="font-medium capatalize flex justify-between items-center">
-                            What jobs can I get after completing the Door Supervisor course?
-                            <span :class="{'rotate-45': open}" class="text-xl transform transition-transform duration-300 text-[#00C1EC]">
-                                +
-                            </span>
-                        </span>
-                    </button>
-                    <div x-show="open" x-transition class="px-4 pb-4 text-gray-700">
-                       You’ll be qualified to work in pubs, clubs, events, retail security, and corporate settings. Many graduates go on to roles like Door Supervisor, Security Officer, Event Steward, or Concierge.
-                    </div>
-                </div>
+    <div x-data="{ open: false }" class="bg-white border-b border-gray-200">
+        <button @click="open = !open" class="w-full text-left px-4 py-4 block hover:bg-gray-50 transition-colors">
+            <span class="font-semibold capitalize flex justify-between items-center text-gray-900">
+                What jobs can I get after completing the Door Supervisor course?
+                <span :class="{'rotate-45': open}" class="text-2xl transform transition-transform duration-300 text-[#00C1EC] leading-none">
+                    +
+                </span>
+            </span>
+        </button>
+        <div x-show="open" x-transition class="px-4 pb-4 text-gray-600 leading-relaxed">
+            You’ll be qualified to work in pubs, clubs, events, retail security, and corporate settings. Many graduates go on to roles like Door Supervisor, Security Officer, Event Steward, or Concierge.
+        </div>
+    </div>
 
-                <div x-data="{ open: false }" class="bg-white">
-                    <button @click="open = !open" class="w-full text-left px-4 py-3 block">
-                        <span class="font-medium capatalize flex justify-between items-center">
-                           How much can I earn with an SIA Door Supervisor licence?
-                            <span :class="{'rotate-45': open}" class="text-xl transform transition-transform duration-300 text-[#00C1EC]">
-                                +
-                            </span>
-                        </span>
-                    </button>
-                    <div x-show="open" x-transition class="px-4 pb-4 text-gray-700">
-                       Entry-level security roles usually pay between £12–£15 per hour. But once you’re more experienced, your earning potential may go up to £25 per hour. Most of our learners were able to recover the cost of the course in just 10 days once they started earning.
-                    </div>
-                </div>
-                
-                <div x-data="{ open: false }" class="bg-white">
-                    <button @click="open = !open" class="w-full text-left px-4 py-3 block">
-                        <span class="font-medium capatalize flex justify-between items-center">
-                           What happens if I fail the SIA exam?
-                            <span :class="{'rotate-45': open}" class="text-xl transform transition-transform duration-300 text-[#00C1EC]">
-                                +
-                            </span>
-                        </span>
-                    </button>
-                    <div x-show="open" x-transition class="px-4 pb-4 text-gray-700">
-                      No stress at all! With our courses, you are given free retakes upon failing the exam. That safeguards you against losing your money. Moreover, our trainers would also personally mentor you, give you that extra support and feedback to make sure you are able to clear it the next time around.
-                    </div>
-                </div>
-                
-                <div x-data="{ open: false }" class="bg-white">
-                    <button @click="open = !open" class="w-full text-left px-4 py-3 block">
-                        <span class="font-medium capatalize flex justify-between items-center">
-                          Do I need any previous experience to join the course?
-                            <span :class="{'rotate-45': open}" class="text-xl transform transition-transform duration-300 text-[#00C1EC]">
-                                +
-                            </span>
-                        </span>
-                    </button>
-                    <div x-show="open" x-transition class="px-4 pb-4 text-gray-700">
-                     None at all. Our courses are designed in such a way that anyone who’s completely clueless about working in security, too, would pass out ready and prepared with the necessary skillset.
-                    </div>
-                </div>
-                
-                <div x-data="{ open: false }" class="bg-white">
-                    <button @click="open = !open" class="w-full text-left px-4 py-3 block">
-                        <span class="font-medium capatalize flex justify-between items-center">
-                          Is first aid training included in the course?
-                            <span :class="{'rotate-45': open}" class="text-xl transform transition-transform duration-300 text-[#00C1EC]">
-                                +
-                            </span>
-                        </span>
-                    </button>
-                    <div x-show="open" x-transition class="px-4 pb-4 text-gray-700">
-                      Yes. First Aid training is included for free, at no extra cost in all of our courses except the Bronze option in Door Supervision. You’ll be completing it before your main security modules, since it’s now a mandatory part of SIA licensing.
-                    </div>
-                </div>
-                
-                <div x-data="{ open: false }" class="bg-white">
-                    <button @click="open = !open" class="w-full text-left px-4 py-3 block">
-                        <span class="font-medium capatalize flex justify-between items-center">
-                         How do I enroll in a G-Security training course?
-                            <span :class="{'rotate-45': open}" class="text-xl transform transition-transform duration-300 text-[#00C1EC]">
-                                +
-                            </span>
-                        </span>
-                    </button>
-                    <div x-show="open" x-transition class="px-4 pb-4 text-gray-700">
-                       You can simply book your spot online. That too in just a few minutes. All you’ll need is to navigate to the course page and select the one you’d like to opt for, select the dates, and then provide a few details. Our team would reach out to you and guide you from there. 
-                    </div>
-                </div>
+    <div x-data="{ open: false }" class="bg-white border-b border-gray-200">
+        <button @click="open = !open" class="w-full text-left px-4 py-4 block hover:bg-gray-50 transition-colors">
+            <span class="font-semibold capitalize flex justify-between items-center text-gray-900">
+                How much can I earn with an SIA Door Supervisor licence?
+                <span :class="{'rotate-45': open}" class="text-2xl transform transition-transform duration-300 text-[#00C1EC] leading-none">
+                    +
+                </span>
+            </span>
+        </button>
+        <div x-show="open" x-transition class="px-4 pb-4 text-gray-600 leading-relaxed">
+            Entry-level security roles usually pay between £12–£15 per hour. But once you’re more experienced, your earning potential may go up to £25 per hour. Most of our learners were able to recover the cost of the course in just 10 days once they started earning.
+        </div>
+    </div>
 
-            </div>
+    <div x-data="{ open: false }" class="bg-white border-b border-gray-200">
+        <button @click="open = !open" class="w-full text-left px-4 py-4 block hover:bg-gray-50 transition-colors">
+            <span class="font-semibold capitalize flex justify-between items-center text-gray-900">
+                What happens if I fail the SIA exam?
+                <span :class="{'rotate-45': open}" class="text-2xl transform transition-transform duration-300 text-[#00C1EC] leading-none">
+                    +
+                </span>
+            </span>
+        </button>
+        <div x-show="open" x-transition class="px-4 pb-4 text-gray-600 leading-relaxed">
+            No stress at all! With our courses, you are given free retakes upon failing the exam. That safeguards you against losing your money. Moreover, our trainers would also personally mentor you to ensure you clear it the next time around.
+        </div>
+    </div>
+
+    <div x-data="{ open: false }" class="bg-white border-b border-gray-200">
+        <button @click="open = !open" class="w-full text-left px-4 py-4 block hover:bg-gray-50 transition-colors">
+            <span class="font-semibold capitalize flex justify-between items-center text-gray-900">
+                Do I need any previous experience to join the course?
+                <span :class="{'rotate-45': open}" class="text-2xl transform transition-transform duration-300 text-[#00C1EC] leading-none">
+                    +
+                </span>
+            </span>
+        </button>
+        <div x-show="open" x-transition class="px-4 pb-4 text-gray-600 leading-relaxed">
+            None at all. Our courses are designed so that anyone, even those with zero experience in security, will finish ready and prepared with the necessary skillset.
+        </div>
+    </div>
+
+    <div x-data="{ open: false }" class="bg-white border-b border-gray-200">
+        <button @click="open = !open" class="w-full text-left px-4 py-4 block hover:bg-gray-50 transition-colors">
+            <span class="font-semibold capitalize flex justify-between items-center text-gray-900">
+                Is first aid training included in the course?
+                <span :class="{'rotate-45': open}" class="text-2xl transform transition-transform duration-300 text-[#00C1EC] leading-none">
+                    +
+                </span>
+            </span>
+        </button>
+        <div x-show="open" x-transition class="px-4 pb-4 text-gray-600 leading-relaxed">
+            Yes. First Aid training is included for free in all of our courses except the Bronze option. Since it is now a mandatory part of SIA licensing, you’ll complete it before your main security modules.
+        </div>
+    </div>
+
+    <div x-data="{ open: false }" class="bg-white border-b border-gray-200">
+        <button @click="open = !open" class="w-full text-left px-4 py-4 block hover:bg-gray-50 transition-colors">
+            <span class="font-semibold capitalize flex justify-between items-center text-gray-900">
+                How do I enroll in a G-Security training course?
+                <span :class="{'rotate-45': open}" class="text-2xl transform transition-transform duration-300 text-[#00C1EC] leading-none">
+                    +
+                </span>
+            </span>
+        </button>
+        <div x-show="open" x-transition class="px-4 pb-4 text-gray-600 leading-relaxed">
+            You can book your spot online in just a few minutes. Navigate to the course page, select your dates, and provide a few details. Our team will reach out to guide you from there.
+        </div>
+    </div>
+</div>
 
 
         </div>

@@ -1,52 +1,14 @@
 <?php
 session_start();
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $name = $_POST['Name'];
-    $_SESSION['Name'] = $name;
-    $email = $_POST['Email'];
-    $_SESSION['Email'] = $email;
-    $phone = $_POST['Phone'];
-    $_SESSION['Phone'] = $phone;
-    $_SESSION['Course_Price'] = $_POST['course_p'];
-    $_SESSION['course_id'] = $_POST['course_id'];
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+     $_SESSION['course_name']  = $_POST['course_name'] ?? '';
+    $_SESSION['course_price'] = $_POST['course_p'] ?? '';
+    $_SESSION['course_id']    = $_POST['course_id'] ?? '';
 
-    // Email details
-    $to = "bookings@gsecurityandtraining.co.uk";
-    $subject = "ðŸš€ New Lead: Client Interested in Your Course!";
-
-    $body = "You have received a new message from your website form.\n\n";
-    $body .= "FullName: $name\n";
-    $body .= "Phone: $phone\n";
-    $body .= "Email: $email\n\n";
-    // Including course context for the recipient
-    if (isset($_POST['course_name'])) {
-        $body .= "Course Name: " . $_POST['course_name'] . "\n";
-    }
-    if (isset($_POST['course_p'])) {
-        $body .= "Price: Â£" . $_POST['course_p'] . "\n";
-    }
-
-
-    $headers = "From: $email\r\n";
-    $headers .= "Reply-To: $email\r\n";
-
-    // Send email
-    if (mail($to, $subject, $body, $headers)) {
-        // Redirect to date-select page on successful submission
-        header("Location: date-select");
-        exit();
-    } else {
-        // Display an error message if mail fails (preserved from original logic)
-        echo "Sorry, something went wrong. Please try again later.";
-    }
-} else {
-    // echo "Invalid access.";
+    header("Location: date-select");
+    exit; 
 }
-
-// Add variable to track success of redirection/email send for the $msg notification logic
-$msg_success = isset($_SESSION['message']) ? $_SESSION['message'] : '';
-unset($_SESSION['message']);
 ?>
 <?php
 include('admin/assets/config/db.php');
@@ -184,6 +146,26 @@ if ($course_count > 0) {
   <h1 class="sm:text-[48px] text-[36px] font-bold text-center text-black">
     Our Security Training Courses
   </h1>
+  <div class="bg-[#f8f8f8] py-12 md:py-20">
+        
+        <div class="max-w-[1280px] mx-auto px-4 sm:px-6">
+            <div class="mb-4">
+                <span class="text-accent-blue font-bold tracking-widest uppercase text-sm">Expert Training</span>
+                <h1 class="text-3xl md:text-5xl font-black text-black mt-2 mb-6 leading-tight">
+                    Rely on 20+ years of Security Training expertise to get licensed
+                </h1>
+            </div>
+
+            <div class="text-lg text-gray-700 leading-relaxed space-y-6">
+                <p>
+                  Choosing the right security training course can feel confusing at first, specifically when there are so many different packages, requirements, and timelines to compare and pick from. That's exactly why we have kept things clear and straightforward
+                </p>
+                
+                <p class="border-l-4 border-accent-blue pl-6 italic bg-white py-6 rounded-r-xl shadow-sm">
+                    At <b>G Security & Training</b>, we offer <b>SIA-approved security training courses in Leeds and Bradford</b>, built using over <b>30 years of combined industry experience</b>. It doesn't matter if you're completely new to security or renewing your licence, our courses are designed in such a way that they will help you get trained, certified, and ready to work as quickly as possible.
+                </p>
+            </div>
+        </div>
 
   <div
     x-data="{ 
@@ -305,13 +287,23 @@ $isDoorSupervision = (
 
               <div class="flex items-center justify-between mt-8">
                 <div class="w-1/2 pr-2">
-                  <button
+                    
+              <form method="post" class="courseForm space-y-4">
+               
+                <input type="hidden" name="course_name"
+                  value="<?php echo htmlspecialchars($row['title']); ?>">
+                <input type="hidden" name="course_p" value="<?php echo $row['sale_price'] ?>">
+                <input type="hidden" name="course_id" value="<?php echo $row['id'] ?>">
+
+ <button type="submit" name="submit"
                     data-course-index="<?php echo $counter; ?>"
-                    class="book-now-btn w-full text-black rounded-lg bg-accent-blue p-3 shadow-lg hover:bg-opacity-90 transition-opacity"
+                    class=" w-full text-black rounded-lg bg-accent-blue p-3 shadow-lg hover:bg-opacity-90 transition-opacity"
                   >
                     BOOK NOW
                   </button>
-                </div>
+                
+                </form>
+                 </div>
                 <div class="w-1/2 pl-2 text-right">
                   <a
                     href="<?php echo htmlspecialchars($row['info_link']); ?>"
@@ -327,42 +319,6 @@ $isDoorSupervision = (
               </div>
             </div>
 
-            <!-- Popup Section -->
-            <div id="popup-overlay-<?php echo $counter; ?>" class="popup-overlay hidden"></div>
-            <div id="popup-form-<?php echo $counter; ?>"
-              class="popup-form bg-white p-6 rounded-xl shadow-2xl hidden w-11/12 max-w-sm">
-              <div class="flex justify-end mb-2">
-                <button
-                  data-course-index="<?php echo $counter; ?>"
-                  class="close-popup-btn-<?php echo $counter; ?> text-gray-500 hover:text-gray-900">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24"
-                    stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-              <h3 class="text-xl font-semibold text-charcoal mb-4 text-center">
-                Enter your details to Buy Now!
-              </h3>
-              <form method="post" class="courseForm space-y-4">
-                <input type="text" name="Name" placeholder="Your Name" required
-                  class="w-full p-3 border border-gray-300 rounded-lg focus:ring-accent-blue focus:border-accent-blue">
-                <input type="email" name="Email" placeholder="Your Email" required
-                  class="w-full p-3 border border-gray-300 rounded-lg focus:ring-accent-blue focus:border-accent-blue">
-                <input type="tel" name="Phone" placeholder="Phone Number" maxlength="12" required
-                  class="w-full p-3 border border-gray-300 rounded-lg focus:ring-accent-blue focus:border-accent-blue">
-
-                <input type="hidden" name="course_name"
-                  value="<?php echo htmlspecialchars($row['title']); ?>">
-                <input type="hidden" name="course_p" value="<?php echo $row['sale_price'] ?>">
-                <input type="hidden" name="course_id" value="<?php echo $row['id'] ?>">
-
-                <button type="submit" name="submit"
-                  class="w-full bg-accent-blue text-white font-bold p-3 rounded-lg shadow-md hover:bg-opacity-90 transition-opacity">
-                  Submit & Continue
-                </button>
-              </form>
-            </div>
           </div>
 
           <?php $counter++; ?>
@@ -404,80 +360,6 @@ $isDoorSupervision = (
             document.body.classList.remove('no-scroll');
         }
         
-        // Helper function to close specific popup
-        function closePopup(courseIndex) {
-            const overlay = document.getElementById(`popup-overlay-${courseIndex}`);
-            const form = document.getElementById(`popup-form-${courseIndex}`);
-
-            if (overlay && form) {
-                overlay.classList.add('hidden');
-                form.classList.add('hidden');
-                enableScroll(); // 🚨 Enable scrolling when closed
-                console.log('Popup closed for course:', courseIndex);
-            }
-        }
-
-        // Helper function to close all popups (for ESC key/open-click)
-        function closeAllPopups() {
-            const openOverlays = document.querySelectorAll('.popup-overlay:not(.hidden)');
-            
-            if(openOverlays.length > 0) {
-                enableScroll(); // 🚨 Ensure scrolling is re-enabled if any popup was open
-            }
-
-            openOverlays.forEach(overlay => {
-                overlay.classList.add('hidden');
-            });
-
-            document.querySelectorAll('.popup-form:not(.hidden)').forEach(form => {
-                form.classList.add('hidden');
-            });
-
-            console.log('All popups closed');
-        }
-
-        // Add event listeners to all book now buttons
-        const bookNowButtons = document.querySelectorAll('.book-now-btn');
-
-        bookNowButtons.forEach(button => {
-            button.addEventListener('click', function (e) {
-                e.preventDefault();
-                const courseIndex = this.getAttribute('data-course-index');
-                console.log('Opening popup for course:', courseIndex);
-
-                const overlay = document.getElementById(`popup-overlay-${courseIndex}`);
-                const form = document.getElementById(`popup-form-${courseIndex}`);
-
-                if (overlay && form) {
-                    closeAllPopups(); // Ensure only one is open at a time
-                    overlay.classList.remove('hidden');
-                    form.classList.remove('hidden');
-                    disableScroll(); // 🚨 Disable scrolling when opened
-                }
-            });
-        });
-
-        // Event delegation for ALL close buttons and overlay click
-        document.addEventListener('click', function (e) {
-            // Check if clicked element is a close button
-            const closeBtn = e.target.closest('[class*="close-popup-btn"]');
-            if (closeBtn) {
-                e.preventDefault();
-                const courseIndex = closeBtn.getAttribute('data-course-index');
-                closePopup(courseIndex);
-                return;
-            }
-
-            // Check if clicked on overlay
-            if (e.target.classList.contains('popup-overlay')) {
-                const courseIndexMatch = e.target.id.match(/popup-overlay-(\d+)/);
-                if (courseIndexMatch) {
-                    const courseIndex = courseIndexMatch[1];
-                    closePopup(courseIndex);
-                }
-            }
-        });
-
         // Close with ESC key
         document.addEventListener('keydown', function (e) {
             if (e.key === 'Escape') {

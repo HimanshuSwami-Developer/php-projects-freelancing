@@ -22,17 +22,45 @@ $total_records = $total_row['total'];
 $total_pages = ceil($total_records / $limit);
 
 // Fetch paginated results
+// $query = "
+//     SELECT 
+//         o.id AS order_id, 
+//         o.name AS user_name, 
+//         o.contact, 
+//         o.email, 
+//         o.paypal_order_id, 
+//         c.title AS course_title, 
+//         cd.start_date, 
+//         cd.end_date, 
+//         sp.name AS subscription_plan, 
+//         sp.sale_price AS subscription_price, 
+//         o.payment_status, 
+//         o.created_at AS order_created
+//     FROM orders o
+//     LEFT JOIN courses c ON o.course_id = c.id
+//     LEFT JOIN course_dates cd ON o.course_date_id = cd.id
+//     LEFT JOIN subscription_plans sp ON o.subscription_plan_id = sp.id
+//     ORDER BY o.created_at DESC
+//     LIMIT $limit OFFSET $offset
+// ";
+
+// Fetch paginated results
 $query = "
-    SELECT 
+ SELECT 
         o.id AS order_id, 
         o.name AS user_name, 
         o.contact, 
         o.email, 
+        o.paypal_order_id, 
         c.title AS course_title, 
         cd.start_date, 
         cd.end_date, 
         sp.name AS subscription_plan, 
-        sp.sale_price AS subscription_price, 
+         CASE 
+    WHEN sp.sale_price = 0 OR sp.sale_price IS NULL 
+    THEN c.sale_price
+    ELSE sp.sale_price 
+END AS subscription_price,
         o.payment_status, 
         o.created_at AS order_created
     FROM orders o
@@ -83,6 +111,7 @@ $orders = mysqli_fetch_all($result, MYSQLI_ASSOC);
                         <th>Name</th>
                         <th>Contact</th>
                         <th>Email</th>
+                        <th>Transaction ID</th>
                         <th>Course</th>
                         <th>Course Start</th>
                         <th>Course End</th>
@@ -100,6 +129,7 @@ $orders = mysqli_fetch_all($result, MYSQLI_ASSOC);
                                 <td><?= htmlspecialchars($order['user_name']) ?></td>
                                 <td><?= htmlspecialchars($order['contact']) ?></td>
                                 <td><?= htmlspecialchars($order['email']) ?></td>
+                                <td><?= htmlspecialchars($order['paypal_order_id']) ?></td>
                                 <td><?= htmlspecialchars($order['course_title'] ?? 'N/A') ?></td>
                                 <td><?= htmlspecialchars($order['start_date'] ? date('d M Y', strtotime($order['start_date'])) : 'N/A') ?></td>
                                 <td><?= htmlspecialchars($order['end_date'] ? date('d M Y', strtotime($order['end_date'])) : 'N/A') ?></td>

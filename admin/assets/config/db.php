@@ -1,14 +1,9 @@
 <?php
 
 $host = "localhost";
-$username= "root";
-$password = "";
-$database = "gssecurity_box";
-
-// $host = "localhost";
-// $username= "gsecrckn_gssecurity";
-// $password = "Gssecurity@312";
-// $database = "gsecrckn_gssecurity";
+$username= "gsecrckn_gssecurity";
+$password = "Gssecurity@312";
+$database = "gsecrckn_gssecurity";
 
 // Creating Database
 

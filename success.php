@@ -1,4 +1,6 @@
 <?php
+include("admin/assets/config/db.php");
+
 if (!isset($_GET['token'])) {
   die("Order token missing.");
 }
@@ -35,9 +37,9 @@ $response = curl_exec($ch);
 $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 curl_close($ch);
 
-if ($httpcode !== 201) {
-  die("<h2>Failed to capture payment.</h2><pre>$response</pre>");
-}
+// if ($httpcode !== 201) {
+//   die("<h2>Failed to capture payment.</h2><pre>$response</pre>");
+// }
 
 $data = json_decode($response, true);
 $capture = $data['purchase_units'][0]['payments']['captures'][0] ?? null;
@@ -48,13 +50,176 @@ $payer_email = $data['payer']['email_address'];
 $payer_name = $data['payer']['name']['given_name'] . ' ' . $data['payer']['name']['surname'];
 $email = $data['payer']['email_address'];
 
+$query = "SELECT email_sent FROM orders WHERE paypal_order_id='$order_id' LIMIT 1";
+$query_run = mysqli_query($con, $query);
 
-if ($status !== 'COMPLETED') {
-  $course = $data['purchase_units'][0]['description'] ?? 'N/A';
-  $price = $data['purchase_units'][0]['amount']['value'] ?? 'N/A';
+if (!$query_run) {
+    die("Query failed: " . mysqli_error($con));
+}
+$order = mysqli_fetch_assoc($query_run);
+        
+if ($status === 'COMPLETED' && $order['email_sent'] == 0) {
+//           $sql = "
+//         UPDATE orders 
+//         SET payment_status='completed'
+//         WHERE paypal_order_id='$order_id'
+//         LIMIT 1
+//     ";
+
+//   if (mysqli_query($con, $sql)) {
+//     $msg = "payment status updated successfully!";
+//   } else {
+//     $msg = "Error: " . mysqli_error($con);
+//   }
+
+  // Payment success
+  $user_subject = "✅ Payment Successful";
+  $user_body = "
+<html>
+<head>
+  <meta charset='UTF-8'>
+  <style>
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background-color: #f3f4f6;
+      margin: 0;
+      padding: 20px;
+    }
+    .email-wrapper {
+      max-width: 650px;
+      margin: auto;
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 25px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+    }
+    .header {
+      background: #16a34a;
+      color: #ffffff;
+      padding: 15px;
+      border-radius: 8px;
+      text-align: center;
+      font-size: 22px;
+      font-weight: bold;
+    }
+    p {
+      color: #333333;
+      line-height: 1.6;
+      font-size: 15px;
+      margin: 14px 0;
+    }
+    ul {
+      margin: 10px 0 10px 20px;
+      padding: 0;
+    }
+    li {
+      margin-bottom: 8px;
+      font-size: 14.5px;
+      color: #333;
+    }
+    .highlight {
+      background: #f0fdf4;
+      border-left: 5px solid #16a34a;
+      padding: 15px;
+      margin: 20px 0;
+      border-radius: 6px;
+    }
+    .footer {
+      margin-top: 30px;
+      text-align: center;
+      font-size: 13px;
+      color: #6b7280;
+    }
+    .footer img {
+      max-width: 100%;
+      margin-top: 20px;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class='email-wrapper'>
+    <div class='header'>Payment Successful 🎉</div>
+
+    <p><strong>Dear Applicant,</strong></p>
+
+    <p>
+      Thank you for booking your <strong>SIA Security Course</strong> with 
+      <strong>G Security & Training</strong>. We are pleased to confirm that 
+      your place on the course has been successfully secured.
+    </p>
+
+    <p>
+      A member of our team will contact you shortly via call or message to provide 
+      all relevant course information, including training arrangements and requirements.
+      Please ensure your contact details are correct and keep an eye out for further communication from us.
+    </p>
+
+    <p><strong>Important Information:</strong></p>
+    <ul>
+      <li>Attendance on all training days is mandatory. Training hours are set by the SIA and learners must remain for the full duration of each day.</li>
+      <li>Please avoid booking any travel before the scheduled course finishing time.</li>
+      <li>If your course includes physical intervention training, suitable clothing (trainers & joggers) must be worn.</li>
+    </ul>
+
+    <p><strong>Additional Support:</strong></p>
+    <p>
+      If you have any learning difficulties, medical conditions, or specific learning needs,
+      please inform us in advance. All information shared will be treated confidentially.
+    </p>
+
+    <p>
+      If you have any questions, please feel free to contact us.
+      We look forward to welcoming you to <strong>G Security & Training</strong>.
+    </p>
+
+    <div class='footer'>
+      <p>
+        <strong>G Security & Training</strong><br>
+        Email: info@gsecurityandtraining.co.uk<br>
+        Phone: 07736 540149
+      </p>
+
+      <!-- Footer Image -->
+      <img src='https://res.cloudinary.com/df0mvniha/image/upload/v1767375669/change_badge_prizvq.png'
+           alt='G Security & Training Footer'>
+    </div>
+  </div>
+</body>
+</html>
+";
+
+
+  $headers_user = "MIME-Version: 1.0" . "\r\n";
+  $headers_user .= "Content-type:text/html;charset=UTF-8" . "\r\n";
+  $headers_user .= "From: Info@gsecurityandtraining.co.uk\r\n";
+  $headers_user .= "Reply-To: Info@gsecurityandtraining.co.uk\r\n";
+
+//   mail($payer_email, $user_subject, $user_body, $headers_user);
+
+$mailSent = mail($payer_email, $user_subject, $user_body, $headers_user);
+
+if ($mailSent) {
+             $sql = "
+        UPDATE orders 
+        SET payment_status='completed'
+        WHERE paypal_order_id='$order_id'
+        LIMIT 1
+    ";
+
+  if (mysqli_query($con, $sql)) {
+    $msg = "payment status updated successfully!";
+  } else {
+    $msg = "Error: " . mysqli_error($con);
+  }
+}
+
+}
+else{
 
   // Payment failed
-  $user_subject = "⚠️ Payment Not Completed - $course";
+  $user_subject = "⚠️ Payment Not Completed ";
   $user_body = "
 <html>
 <head>
@@ -116,6 +281,15 @@ We noticed that you recently tried to purchase a course from G Security and Trai
 
     <div class='footer'>
       This is an automated message. Please do not reply directly to this email.
+        <p>
+        <strong>G Security & Training</strong><br>
+        Email: info@gsecurityandtraining.co.uk<br>
+        Phone: 07736540149
+      </p>
+
+      <!-- Footer Image -->
+      <img src='https://res.cloudinary.com/df0mvniha/image/upload/v1767375669/change_badge_prizvq.png'
+           alt='G Security & Training Footer'>
     </div>
   </div>
 </body>
@@ -128,76 +302,49 @@ We noticed that you recently tried to purchase a course from G Security and Trai
   $headers_user .= "From: Info@gsecurityandtraining.co.uk\r\n";
   $headers_user .= "Reply-To: Info@gsecurityandtraining.co.uk\r\n";
 
-  mail($email, $user_subject, $user_body, $headers_user);
+  mail($payer_email, $user_subject, $user_body, $headers_user);
 
   // Redirect to failed page
   header("Location: payment-failed");
   exit;
-}
-
-if ($status == 'COMPLETED') {
-  $sql = "UPDATE orders SET 
-                    payment_status='$status' 
-                WHERE email='$email'";
-  if (mysqli_query($con, $sql)) {
-    $msg = "payment status updated successfully!";
-  } else {
-    $msg = "Error: " . mysqli_error($con);
-  }
-
-  $course = $data['purchase_units'][0]['description'] ?? 'N/A';
-  $price = $data['purchase_units'][0]['amount']['value'] ?? 'N/A';
-
-  // Payment success
-  $user_subject = "✅ Payment Successful";
-  $user_body = "
-    <html>
-    <head>
-    <style>
-      body { font-family: Arial, sans-serif; background: #f8f8f8; margin: 0; padding: 20px; }
-      .email-container { background: #fff; border-radius: 10px; padding: 20px; max-width: 600px; margin: auto; box-shadow: 0 3px 8px rgba(0,0,0,0.05); }
-      .header { background: #16a34a; color: #fff; padding: 10px; border-radius: 8px; text-align: center; font-size: 20px; }
-      p { color: #333; line-height: 1.5; }
-      .footer { margin-top: 20px; font-size: 13px; color: #777; text-align: center; }
-    </style>
-    </head>
-    <body>
-    <div class='email-container'>
-      <div class='header'>Payment Successful 🎉</div>
-      <p>Hello There</strong>,</p>
-      <p>Thank you for purchasing the course $course.</p>
-      <p>Your payment of <strong>£$price</strong> has been successfully received.</p>
-      <p><strong>Transaction ID:</strong> $transaction_id</p>
-      <p>We’re excited to have you with us. You’ll receive your course access details soon.</p>
-      <p>— The G Security and Training Team</p>
-      <div class='footer'>This email confirms your payment. Please retain it for your records.</div>
-    </div>
-    </body>
-    </html>
-    ";
-
-  $headers_user = "MIME-Version: 1.0" . "\r\n";
-  $headers_user .= "Content-type:text/html;charset=UTF-8" . "\r\n";
-  $headers_user .= "From: Info@gsecurityandtraining.co.uk\r\n";
-  $headers_user .= "Reply-To: Info@gsecurityandtraining.co.uk\r\n";
-
-  mail($email, $user_subject, $user_body, $headers_user);
 
 }
 
-
-
-// Email to user
-$user_subject = "Payment Confirmation - Your Order";
-$user_message = "Hi $payer_name,\n\nThank you for your payment.\nTransaction ID: $transaction_id\nStatus: $status\n\nRegards,\nYour Company";
-$user_headers = "From: Info@gsecurityandtraining.co.uk\r\n";
-
-mail($payer_email, $user_subject, $user_message, $user_headers);
 
 // Email to owner
 $owner_email = "Info@gsecurityandtraining.co.uk";
 $owner_subject = "New Payment Received";
-$owner_message = "New payment received:\n\nName: $payer_name\nEmail: $payer_email\nTransaction ID: $transaction_id\nStatus: $status";
+$owner_message = "
+<html>
+  <body style='font-family: Arial, sans-serif; color: #000;'>
+
+    <p>
+      <strong>New payment received:</strong><br><br>
+      <strong>Name:</strong> {$payer_name}<br>
+      <strong>Email:</strong> {$payer_email}<br>
+      <strong>Transaction ID:</strong> {$transaction_id}<br>
+      <strong>Status:</strong> {$status}
+    </p>
+
+    <hr style='margin:20px 0;'>
+
+    <!-- Footer -->
+    <p>
+      <strong>G Security & Training</strong><br>
+      Email: info@gsecurityandtraining.co.uk<br>
+      Phone: 07736 540149
+    </p>
+
+    <img
+      src='https://res.cloudinary.com/df0mvniha/image/upload/v1767375669/change_badge_prizvq.png'
+      alt='G Security & Training Footer'
+      style='max-width:200px; margin-top:10px;'
+    >
+
+  </body>
+</html>
+";
+
 $owner_headers = "From: Info@gsecurityandtraining.co.uk\r\n";
 
 mail($owner_email, $owner_subject, $owner_message, $owner_headers);

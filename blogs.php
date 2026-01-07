@@ -133,7 +133,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                 <!-- New Design Metadata -->
                                 <div class="flex items-center justify-between text-sm pt-2 border-t border-gray-100 mt-4">
                                     <p class="text-[#313137] font-[400] text-sm">GET TRAINING</p>
-                                    <p class="text-[#313137] font-[400] text-sm">24th July 2025</p>
+                                    <p class="text-[#313137] font-[400] text-sm">18th August 2025</p>
                                 </div>
                             </div>
                         </div>
@@ -156,7 +156,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                 <!-- New Design Metadata -->
                                 <div class="flex items-center justify-between text-sm pt-2 border-t border-gray-100 mt-4">
                                     <p class="text-[#313137] font-[400] text-sm">GET TRAINING</p>
-                                    <p class="text-[#313137] font-[400] text-sm">24th July 2025</p>
+                                    <p class="text-[#313137] font-[400] text-sm">5th September 2025</p>
                                 </div>
                             </div>
                         </div>
@@ -179,7 +179,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                 <!-- New Design Metadata -->
                                 <div class="flex items-center justify-between text-sm pt-2 border-t border-gray-100 mt-4">
                                     <p class="text-[#313137] font-[400] text-sm">GET TRAINING</p>
-                                    <p class="text-[#313137] font-[400] text-sm">24th July 2025</p>
+                                    <p class="text-[#313137] font-[400] text-sm">26th September 2025</p>
                                 </div>
                             </div>
                         </div>
@@ -211,7 +211,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                 <!-- New Design Metadata -->
                                 <div class="flex items-center justify-between text-sm pt-2 border-t border-gray-100 mt-4">
                                     <p class="text-[#313137] font-[400] text-sm">GET TRAINING</p>
-                                    <p class="text-[#313137] font-[400] text-sm">24th July 2025</p>
+                                    <p class="text-[#313137] font-[400] text-sm">15th October 2025</p>
                                 </div>
                             </div>
                         </div>
@@ -234,7 +234,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                 <!-- New Design Metadata -->
                                 <div class="flex items-center justify-between text-sm pt-2 border-t border-gray-100 mt-4">
                                     <p class="text-[#313137] font-[400] text-sm">GET TRAINING</p>
-                                    <p class="text-[#313137] font-[400] text-sm">24th July 2025</p>
+                                    <p class="text-[#313137] font-[400] text-sm">27th October 2025</p>
                                 </div>
                             </div>
                         </div>
@@ -257,7 +257,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                 <!-- New Design Metadata -->
                                 <div class="flex items-center justify-between text-sm pt-2 border-t border-gray-100 mt-4">
                                     <p class="text-[#313137] font-[400] text-sm">GET TRAINING</p>
-                                    <p class="text-[#313137] font-[400] text-sm">24th July 2025</p>
+                                    <p class="text-[#313137] font-[400] text-sm">4th November 2025</p>
                                 </div>
                             </div>
                         </div>

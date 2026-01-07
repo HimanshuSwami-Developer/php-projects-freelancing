@@ -107,7 +107,7 @@
           <?= $key === 'bronze' ? 'bg-gray-700 text-white' : ($key === 'gold' ? 'bg-yellow-500 text-white' : 'bg-purple-600 text-white') ?>"
                 data-date="<?= htmlspecialchars($formattedDate) ?>"
                 data-package="<?= htmlspecialchars($package['name']) ?>"
-                data-package-id="<?= htmlspecialchars($plan_id) ?>"
+                data-package-id="<?= htmlspecialchars($package['id']) ?>"
                 data-package-price="<?= htmlspecialchars($package['sale_price']) ?>"
                 data-original-price="<?= htmlspecialchars($package['original_price']) ?>"
                 data-course="<?= htmlspecialchars($course_name) ?>" data-price="<?= htmlspecialchars($d['price']) ?>"

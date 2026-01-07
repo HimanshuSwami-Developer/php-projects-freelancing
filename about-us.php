@@ -53,20 +53,22 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     
                     <div class="order-2 sm:order-1">
                         <h3 class="text-[20px] text-[#00C1EC] font-[600]">
-                            What We Do
+                           About G Security & Training
                         </h3>
-                        <h4 class="text-[28px] text-black font-[700]">
-                            Affordable, Accessible, and Life-Changing Security Training
-                        </h4>
+                        <!--<h4 class="text-[28px] text-black font-[700]">-->
+                        <!--    Affordable, Accessible, and Life-Changing Security Training-->
+                        <!--</h4>-->
                         <p class="mt-3 text-black text-justify">
-                            G Security and Training exists so security training is <b>affordable, accessible, and life-changing</b> for anyone who is looking to build their career in the industry.
+                          G Security and Training exists so security training is affordable, accessible, and life-changing for anyone who is looking to build their career in the industry. 
                         </p>
                         <p class="mt-3 text-black text-justify">
-                            We believe that every learner deserves a clear path, with someone to guide them every step of the way, because let’s be honest, it gets easy to learn something new when you’re surrounded with the right set of mentors and trainers. People who have worked in security themselves and bring their own expertise to the table.
+                           We believe that every learner deserves a clear path, with someone to guide them every step of the way. Because let’s be honest, it gets easy to learn something new when you’re surrounded with the right set of mentors and trainers. People who have worked in security themselves and bring their own expertise to the table. 
                         </p>
                         <p class="mt-3 text-black text-justify ">
-                            Our vision is to close the gap that exists between “I want to get certified,” and “That company just hired me!” and for that, our trainers have made their training practical, to actually apply them in the real world. We want to shape a future where every door supervisor, and security professional feels prepared, respected, and proud of what they do.
+                           Our vision is to close the gap that exists between “I want to get certified,” and “That company just hired me!” And for that, our trainers have made their training practical, to actually apply them in the real world. We want to shape a future where every door supervisor, CCTV operator, and security professional feels prepared, respected, and proud of what they do. 
                         </p>
+                        
+                                <p class="mt-3 text-black text-justify ">Because safety isn’t just a job, it’s a responsibility.</p>
                     </div>
                     
                     <div class="order-1 sm:order-2 overflow-hidden rounded-lg shadow-xl">
@@ -78,20 +80,21 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             </div>
             <div class="bg-[#f8f8f8]">
                 <div class="container mx-auto sm:w-[1024px] py-16">
-                    <h3 class="text-[32px] font-[700] text-black text-center">The Story Behind <span class="text-[#00C1EC]">G Security & Training</span></h3>
-                    <div class="mt-2 flex items-center justify-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="52" height="52" viewBox="0 0 24 24">
-                            <path fill="none" stroke="#00C1EC" stroke-linecap="round" stroke-linejoin="round"
-                                stroke-width="2" d="M4 12v.01M8 12v.01m4-.01v.01m4-.01v.01m4-.01v.01" />
-                        </svg>
-                    </div>
+                    <h3 class="text-[32px] font-[700] text-black text-center">What’s the story behind <span class="text-[#00C1EC]">G Security & Training?</span></h3>
+                    <!--<div class="mt-2 flex items-center justify-center">-->
+                    <!--    <svg xmlns="http://www.w3.org/2000/svg" width="52" height="52" viewBox="0 0 24 24">-->
+                    <!--        <path fill="none" stroke="#00C1EC" stroke-linecap="round" stroke-linejoin="round"-->
+                    <!--            stroke-width="2" d="M4 12v.01M8 12v.01m4-.01v.01m4-.01v.01m4-.01v.01" />-->
+                    <!--    </svg>-->
+                    <!--</div>-->
                     
                     <p class="text-black text-center max-w-[800px] mx-auto">
-                        You would be surprised to know that G Security did not start as a business plan. In fact, it was never on the list when our founders, working in long security shifts themselves, got to see first-hand what good training looked like. And what happened when it was missing. <b>One small gap in judgment could mean big risks for people, property, and careers.</b>
+                       You would be surprised to know that G Security did not start as a business plan.
                     </p>
                     <p class="text-black text-center max-w-[800px] mx-auto mt-4 mb-10">
-                        Looking back, we’ve now trained <b>hundreds of professionals across Leeds</b>, who could get their SIA license quickly, and start working at jobs that pay well and last. Because safety isn’t just a job, it’s a responsibility.
+                   In fact, it was never on the list when our founders, working in long security shifts themselves, got to see first-hand what good training looked like. And what happened when it was missing. One small gap in judgment could mean big risks for people, property, and careers. 
                     </p>
+                     <p class="text-black text-center max-w-[800px] mx-auto mt-4 mb-10">Looking back, we’ve now trained hundreds of professionals across Leeds, who could get their SIA license quickly, and start working at jobs that pay well and last.</p>
 
                     <h3 class="text-[32px] font-[700] text-black text-center">We are here to support you at every step</h3>
                     <!--<p class="text-black text-center">At <strong class="text-[#00C1EC]">G Security & Training,</strong> we specialize in-->

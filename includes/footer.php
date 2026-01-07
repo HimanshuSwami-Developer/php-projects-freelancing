@@ -32,13 +32,11 @@
                     <!-- Text color changed for contrast on light background -->
                     <p class="text-[16px] mt-4 text-gray-600 leading-normal">
                        
-                      We have been a trusted provider of professional security<br> 
-                      training in Leeds, UK for years. For anybody who dreams
-                      <br>
-                      for a great career in the security industry, relying on
-                      <br>
-                      G Security and Training for the needed skills and
-                      <br>
+                  
+                      We have been a trusted provider of professional security <br>
+                      training in Leeds, UK for years. For anybody who dreams <br>
+                      for a great career in the security industry, relying on <br>
+                      G Security and Training for the needed skills and <br>
                       certificates is by comparison the best route to take.
 
 

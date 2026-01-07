@@ -101,3 +101,23 @@ Stack trace:
 [05-Nov-2025 18:00:38 UTC] PHP Warning:  Undefined array key "course_id" in /home/gsecrckn/public_html/admin/subscription.php on line 49
 [05-Nov-2025 18:00:47 UTC] PHP Warning:  Undefined array key "course_id" in /home/gsecrckn/public_html/admin/subscription.php on line 49
 [05-Nov-2025 18:01:05 UTC] PHP Warning:  Undefined array key "course_id" in /home/gsecrckn/public_html/admin/subscription.php on line 49
+[27-Dec-2025 03:35:05 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'c.price' in 'SELECT' in /home/gsecrckn/public_html/admin/order.php:54
+Stack trace:
+#0 /home/gsecrckn/public_html/admin/order.php(54): mysqli_query()
+#1 {main}
+  thrown in /home/gsecrckn/public_html/admin/order.php on line 54
+[27-Dec-2025 03:35:12 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'c.price' in 'SELECT' in /home/gsecrckn/public_html/admin/order.php:54
+Stack trace:
+#0 /home/gsecrckn/public_html/admin/order.php(54): mysqli_query()
+#1 {main}
+  thrown in /home/gsecrckn/public_html/admin/order.php on line 54
+[27-Dec-2025 03:35:16 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'c.price' in 'SELECT' in /home/gsecrckn/public_html/admin/order.php:54
+Stack trace:
+#0 /home/gsecrckn/public_html/admin/order.php(54): mysqli_query()
+#1 {main}
+  thrown in /home/gsecrckn/public_html/admin/order.php on line 54
+[27-Dec-2025 03:35:23 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'c.price' in 'SELECT' in /home/gsecrckn/public_html/admin/order.php:54
+Stack trace:
+#0 /home/gsecrckn/public_html/admin/order.php(54): mysqli_query()
+#1 {main}
+  thrown in /home/gsecrckn/public_html/admin/order.php on line 54
