@@ -493,9 +493,9 @@ $isDoorSupervision = (
                                         class="text-[#00C1EC] font-semibold hover:underline transition-colors">More Info</a>
                                         <form method="post" class="space-y-4 sharedForm">
                                        <input type="hidden" name="course_name" value="<?php echo htmlspecialchars($row['title']); ?>">
-                <input type="hidden" name="course_p" value="<?php echo $row['sale_price']; ?>">
-                <input type="hidden" name="course_id" value="<?php echo $row['id']; ?>">
-               
+                                        <input type="hidden" name="course_p" value="<?php echo $row['sale_price']; ?>">
+                                        <input type="hidden" name="course_id" value="<?php echo $row['id']; ?>">
+                                    
                
                                     <button type="submit" name="submit"
                                         class="bg-[#00C1EC] text-white px-5 py-3 font-bold text-base rounded-lg transition duration-200"

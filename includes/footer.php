@@ -80,6 +80,7 @@
                     <li class="mt-2"><a class="hover:text-[#00C1EC] transition-colors block py-1" href="contact-us">Contact Us</a></li>
                     <li class="mt-2"><a class="hover:text-[#00C1EC] transition-colors block py-1" href="faqs">FAQs</a></li>
                     <li class="mt-2"><a class="hover:text-[#00C1EC] transition-colors block py-1" href="blogs">Our Blogs</a></li>
+                    <li class="mt-2"><a class="hover:text-[#00C1EC] transition-colors block py-1" href="refund-policy">Refund Policy</a></li>
                 </ul>
             </div>
 
