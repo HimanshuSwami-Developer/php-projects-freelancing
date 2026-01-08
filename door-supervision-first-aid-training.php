@@ -317,7 +317,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         </h3>
                         <p style="text-align:center; color:gray; margin-bottom: 20px;">Secure your spot and proceed to select a date.</p>
 
-                        <form method="post">
+                        <form method="post" onsubmit="saveCourseToLocalStorage()">
                             <!-- Input styling adapted from new code pop-up while preserving inline style structure -->
                             <input type="text" name="Name" placeholder="Your Name" required
                                 style="width:100%; padding:12px; margin-bottom:15px; border-radius:6px; border:1px solid #ddd; font-size:16px;">
@@ -542,6 +542,17 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
     <!-- Pop-up Script (Preserved logic from live code) -->
     <script>
+function saveCourseToLocalStorage() {
+     const courseName = document.querySelector('input[name="course_name"]').value;
+    const coursePrice = document.querySelector('input[name="course_p"]').value;
+    const courseId = document.querySelector('input[name="course_id"]').value;
+
+
+    localStorage.setItem('course_id', courseId);
+    localStorage.setItem('course_name', courseName);
+    localStorage.setItem('course_price', coursePrice);
+}
+
         // Show popup on button click
         document.getElementById("book-now-btn").addEventListener("click", function (e) {
             e.preventDefault();
