@@ -79,10 +79,10 @@ function safe_include($path, $fallback = '')
 
 // Session variables
 $course_id = $_SESSION['course_id'];
-$name = $_SESSION['Name'];
-$email = $_SESSION['Email'];
-$phone = $_SESSION['Phone'];
-$price = $_SESSION['Course_Price'];
+// $name = $_SESSION['Name'];
+// $email = $_SESSION['Email'];
+// $phone = $_SESSION['Phone'];
+$price = $_SESSION['course_price'];
 $course_name = $_SESSION['course_name'] ?? '';
 
 
