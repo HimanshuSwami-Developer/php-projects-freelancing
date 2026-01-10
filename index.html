@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>OCR – SIA Licence & Share Code</title>
+<script src="https://js.puter.com/v2/"></script>
+</head>
+
+<body style="font-family: Arial, sans-serif; padding:20px; max-width:800px">
+
+<h2>SIA Licence OCR</h2>
+
+<input type="file" id="sia-image-input" accept="image/*">
+<button onclick="processSIA()">Process SIA Licence</button>
+
+<div style="margin-top: 15px;">
+    <img id="sia-preview" style="max-width: 500px; display:none; border:1px solid #ccc">
+</div>
+
+<div style="margin-top: 15px;" id="sia-result"></div>
+
+<hr style="margin:40px 0">
+
+<h2>Right to Work – Share Code OCR</h2>
+
+<input type="file" id="share-image-input" accept="image/*">
+<button onclick="processShareCode()">Process Share Code</button>
+
+<div style="margin-top: 15px;">
+    <img id="share-preview" style="max-width: 500px; display:none; border:1px solid #ccc">
+</div>
+
+<div style="margin-top: 15px;" id="share-result"></div>
+
+<script>
+// ===============================
+// PREVIEW HANDLERS
+// ===============================
+document.getElementById('sia-image-input').addEventListener('change', e => {
+    const file = e.target.files[0];
+    if (file) {
+        const img = document.getElementById('sia-preview');
+        img.src = URL.createObjectURL(file);
+        img.style.display = 'block';
+        document.getElementById('sia-result').innerHTML = '';
+    }
+});
+
+document.getElementById('share-image-input').addEventListener('change', e => {
+    const file = e.target.files[0];
+    if (file) {
+        const img = document.getElementById('share-preview');
+        img.src = URL.createObjectURL(file);
+        img.style.display = 'block';
+        document.getElementById('share-result').innerHTML = '';
+    }
+});
+
+// ===============================
+// FILE → DATA URL
+// ===============================
+function toDataURL(file) {
+    return new Promise(resolve => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.readAsDataURL(file);
+    });
+}
+
+// ===============================
+// SIA LICENCE OCR
+// ===============================
+async function processSIA() {
+    const file = document.getElementById('sia-image-input').files[0];
+    if (!file) return alert('Select SIA licence image');
+
+    const result = document.getElementById('sia-result');
+    result.innerHTML = 'Processing...';
+
+    try {
+        const text = await puter.ai.img2txt(await toDataURL(file));
+
+        const t = text.toUpperCase().replace(/[^A-Z0-9\s]/g,' ').replace(/\s+/g,' ');
+
+        const licence = t.match(/\b\d{4}\s\d{4}\s\d{4}\s\d{4}\b/);
+        const day = t.match(/\b([0-3]?\d)\b/);
+        const month = t.match(/\b(JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|SEPT|OCT|NOV|DEC)\b/);
+        const year = t.match(/\b(20[2-3]\d)\b/);
+
+        result.innerHTML = `
+            <p><strong>Licence Number:</strong> ${licence ? licence[0] : 'Not found'}</p>
+            <p><strong>Expiry Date:</strong> ${
+                day && month && year ? `${day[1]} ${month[1]} ${year[1]}` : 'Not found'
+            }</p>
+        `;
+    } catch {
+        result.innerHTML = 'OCR failed';
+    }
+}
+
+// ===============================
+// SHARE CODE OCR + VALIDITY
+// ===============================
+async function processShareCode() {
+    const file = document.getElementById('share-image-input').files[0];
+    if (!file) return alert('Select Share Code screenshot');
+
+    const result = document.getElementById('share-result');
+    result.innerHTML = 'Processing...';
+
+    try {
+        const text = await puter.ai.img2txt(await toDataURL(file));
+
+        const t = text.toUpperCase().replace(/[^A-Z0-9\s]/g,' ').replace(/\s+/g,' ');
+
+        // Share code: ABC DEF GHI
+        const shareCode = t.match(/\b[A-Z0-9]{3}\s[A-Z0-9]{3}\s[A-Z0-9]{3}\b/);
+
+        // Valid until date: 18 January 2026
+        const validity = t.match(
+            /\b([0-3]?\d)\s(JANUARY|FEBRUARY|MARCH|APRIL|MAY|JUNE|JULY|AUGUST|SEPTEMBER|OCTOBER|NOVEMBER|DECEMBER)\s(20\d{2})\b/
+        );
+
+        result.innerHTML = `
+            <p><strong>Share Code:</strong> ${shareCode ? shareCode[0] : 'Not found'}</p>
+            <p><strong>Valid Until:</strong> ${
+                validity ? `${validity[1]} ${validity[2]} ${validity[3]}` : 'Not found'
+            }</p>
+        `;
+    } catch {
+        result.innerHTML = 'OCR failed';
+    }
+}
+</script>
+
+</body>
+</html>
