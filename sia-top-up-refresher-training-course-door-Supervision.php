@@ -6,7 +6,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $_SESSION['Name'] = $_POST['Name'];
     $_SESSION['Email'] = $_POST['Email'];
     $_SESSION['Phone'] = $_POST['Phone'];
-    $_SESSION['Course_Price'] = $_POST['course_p'];
+    $_SESSION['course_price'] = $_POST['course_p'];
     $_SESSION['course_name'] = $_POST['course_name'];
     $_SESSION['course_id'] = $_POST['course_id'];
 
@@ -45,7 +45,7 @@ $course = mysqli_fetch_assoc($result); // Get single row as associative array
     <!-- Canonical URL and Metadata preserved from the live code -->
     <title>SIA top-up refresher training course for Door Supervision in Leeds</title>
     <link rel="canonical" href="https://gsecurityandtraining.co.uk/sia-top-up-refresher-training-course-door-supervision" />
-    <meta name="description" content="Join our 3-day SIA top-up refresher training course for door supervision in Leeds with First Aid for £250, includes SIA security guard refresher training to help you.">
+    <meta name="description" content="Join our 3-day SIA top-up refresher training course for door supervision in Leeds with First Aid for £<?= isset($course['sale_price']) ? number_format((float)$course['sale_price'], 2) : '0.00' ?>, includes SIA security guard refresher training to help you.">
     
     <!-- Load required scripts and styles from the new code -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -235,7 +235,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                 <div class="mb-4 sm:mb-0">
                                     <p class="text-gray-700 text-sm">Course Fee From:</p>
                                     <p class="text-4xl font-extrabold text-green-600">
-                                        £250 <span class="text-xl font-normal text-gray-500">Incl. VAT</span>
+                                        £<?= isset($course['sale_price']) ? number_format((float)$course['sale_price'], 2) : '0.00' ?>
+                                        <span class="text-xl font-normal text-gray-500">Incl. VAT</span>
                                     </p>
                                 </div>
 
