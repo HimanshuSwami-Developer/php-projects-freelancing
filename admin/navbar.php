@@ -2,6 +2,13 @@
 require_once './../session.php';
 require_once './../db.php';
 
+/* ===============================
+   AUTO TRIGGER EXPIRY CHECK
+   (RUNS ONCE PER DAY ONLY)
+================================ */
+require_once './../document_expiry_mail.php';
+
+
 if (
     !isset($_SESSION['user_id']) ||
     !in_array($_SESSION['user_role'], ['admin', 'owner'])
