@@ -49,6 +49,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $_SESSION['user_id']   = $user['emp_id'];
         $_SESSION['user_name'] = $user['name'];
         $_SESSION['user_role'] = $user['role'];
+        $_SESSION['email']     = $user['email'];
 
         ?>
         <!DOCTYPE html>
@@ -58,6 +59,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 localStorage.setItem("user_role", "<?= $user['role'] ?>");
                 localStorage.setItem("user_name", "<?= htmlspecialchars($user['name']) ?>");
                 localStorage.setItem("user_id", "<?= $user['emp_id'] ?>");
+                localStorage.setItem("email", "<?= $user['email'] ?>");
             </script>
         </head>
         </html>

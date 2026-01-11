@@ -88,7 +88,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $allowedMime = ['image/jpeg', 'image/png'];
 
+    $submitAllowedDocs = ['act_doc', 'first_aid_doc'];
+
     foreach ($docs as $column => $label) {
+
+        // 🚫 BLOCK SIA & SHARE CODE ON SUBMIT
+        // if (!in_array($column, $submitAllowedDocs)) {
+        //     continue;
+        // }
+
         /* BLOCK RE-UPLOAD FOR FIRST AID */
         if ($column === 'first_aid_doc' && !empty($user['first_aid_doc'])) {
             continue;
@@ -293,12 +301,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </form>
         </div>
 
+<!-- OCR LOADER -->
+<div id="ocrLoader"
+     class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg p-6 flex flex-col items-center gap-4 shadow-lg">
+        <div class="animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-transparent"></div>
+        <p class="text-sm font-semibold text-gray-700">
+            Extracting document details, please wait...
+        </p>
+    </div>
+</div>
+
     </div>
 <script src="https://js.puter.com/v2/"></script>
 
 
     <!-- BLUR DETECTION + PREVIEW -->
     <script>
+function showOCRLoader() {
+    document.getElementById('ocrLoader').classList.remove('hidden');
+}
+
+function hideOCRLoader() {
+    document.getElementById('ocrLoader').classList.add('hidden');
+}
 
         async function toDataURL(file) {
     return new Promise(resolve => {
@@ -310,70 +336,81 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 async function runOCR(file, type) {
 
-    const rawText = await puter.ai.img2txt(await toDataURL(file));
+    showOCRLoader(); // 🔥 SHOW OVERLAY
 
-    const t = rawText
-        .toUpperCase()
-        .replace(/[^A-Z0-9\s]/g, ' ')
-        .replace(/\s+/g, ' ');
+    try {
+        const rawText = await puter.ai.img2txt(await toDataURL(file));
 
-    let payload = { type };
+        const t = rawText
+            .toUpperCase()
+            .replace(/[^A-Z0-9\s]/g, ' ')
+            .replace(/\s+/g, ' ');
 
-    /* =======================
-       SIA
-    ======================= */
-    if (type === 'sia') {
+        let payload = { type };
 
-        const licence = t.match(/\b\d{4}\s\d{4}\s\d{4}\s\d{4}\b/);
+        /* =======================
+           SIA
+        ======================= */
+        if (type === 'sia') {
 
-         const day = t.match(/\b([0-3]?\d)\b/);
-        const month = t.match(/\b(JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|SEPT|OCT|NOV|DEC)\b/);
-        const year = t.match(/\b(20[2-3]\d)\b/);
-        const date = (day && month && year) ? [null, day[1], month[1], year[1]] : null;
+            const licence = t.match(/\b\d{4}\s\d{4}\s\d{4}\s\d{4}\b/);
 
-        const licenceNo = licence ? licence[0] : 'Not detected';
-        const expiry = date
-            ? new Date(`${date[1]} ${date[2]} ${date[3]}`).toISOString().split('T')[0]
-            : 'Not detected';
+            const day = t.match(/\b([0-3]?\d)\b/);
+            const month = t.match(/\b(JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|SEPT|OCT|NOV|DEC)\b/);
+            const year = t.match(/\b(20[2-3]\d)\b/);
 
-        document.getElementById('siaLicence').innerText = licenceNo;
-        document.getElementById('siaExpiry').innerText = expiry;
-        document.getElementById('siaResult').classList.remove('hidden');
+            const licenceNo = licence ? licence[0] : 'Not detected';
+            const expiry = (day && month && year)
+                ? new Date(`${day[1]} ${month[1]} ${year[1]}`).toISOString().split('T')[0]
+                : 'Not detected';
 
-        payload.licence = licenceNo !== 'Not detected' ? licenceNo : null;
-        payload.expiry = expiry !== 'Not detected' ? expiry : null;
+            document.getElementById('siaLicence').innerText = licenceNo;
+            document.getElementById('siaExpiry').innerText = expiry;
+            document.getElementById('siaResult').classList.remove('hidden');
+
+            payload.licence = licenceNo !== 'Not detected' ? licenceNo : null;
+            payload.expiry  = expiry !== 'Not detected' ? expiry : null;
+        }
+
+        /* =======================
+           SHARE CODE
+        ======================= */
+        if (type === 'share') {
+
+            const code = t.match(/\b[A-Z0-9]{3}\s[A-Z0-9]{3}\s[A-Z0-9]{3}\b/);
+
+            const date = t.match(
+                /\b([0-3]?\d)\s(JANUARY|FEBRUARY|MARCH|APRIL|MAY|JUNE|JULY|AUGUST|SEPTEMBER|OCTOBER|NOVEMBER|DECEMBER)\s(20\d{2})\b/
+            );
+
+            const shareCode = code ? code[0] : 'Not detected';
+            const expiry = date
+                ? new Date(`${date[1]} ${date[2]} ${date[3]}`).toISOString().split('T')[0]
+                : 'Not detected';
+
+            document.getElementById('shareCode').innerText = shareCode;
+            document.getElementById('shareExpiry').innerText = expiry;
+            document.getElementById('shareResult').classList.remove('hidden');
+
+            payload.code   = shareCode !== 'Not detected' ? shareCode : null;
+            payload.expiry = expiry !== 'Not detected' ? expiry : null;
+        }
+
+        // SAVE OCR DATA
+        await fetch("save_ocr.php", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        });
+
+    } catch (err) {
+        alert("OCR failed. Please try a clearer image.");
+        console.error(err);
+    } finally {
+        hideOCRLoader(); // 🔥 ALWAYS HIDE OVERLAY
     }
-
-    /* =======================
-       SHARE CODE
-    ======================= */
-    if (type === 'share') {
-
-        const code = t.match(/\b[A-Z0-9]{3}\s[A-Z0-9]{3}\s[A-Z0-9]{3}\b/);
-
-        const date = t.match(
-            /\b([0-3]?\d)\s(JANUARY|FEBRUARY|MARCH|APRIL|MAY|JUNE|JULY|AUGUST|SEPTEMBER|OCTOBER|NOVEMBER|DECEMBER)\s(20\d{2})\b/
-        );
-
-        const shareCode = code ? code[0] : 'Not detected';
-        const expiry = date
-            ? new Date(`${date[1]} ${date[2]} ${date[3]}`).toISOString().split('T')[0]
-            : 'Not detected';
-
-        document.getElementById('shareCode').innerText = shareCode;
-        document.getElementById('shareExpiry').innerText = expiry;
-        document.getElementById('shareResult').classList.remove('hidden');
-
-        payload.code = shareCode !== 'Not detected' ? shareCode : null;
-        payload.expiry = expiry !== 'Not detected' ? expiry : null;
-    }
-
-    await fetch("save_ocr.php", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-    });
 }
+
 
         let blurStatus = {
             act_doc: false,
