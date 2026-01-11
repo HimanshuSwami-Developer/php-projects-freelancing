@@ -14,10 +14,12 @@ $emp_id = $_SESSION['user_id'];
 ================================ */
 $stmt = $conn->prepare("
     SELECT emp_id, name, role, email, contact, address,
-       act_doc, act_expirey,
-       sia_doc, sia_expirey,
-       share_code_doc, share_code_expirey,
-       first_aid_doc
+   act_doc, act_expirey,
+   sia_doc, sia_expirey,
+   sia_licence_number,
+   share_code_doc, share_code_expirey,
+   share_code_text,
+   first_aid_doc
 FROM users
 WHERE emp_id = ?
 ");
@@ -132,7 +134,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
 
             $expiryColumn = $expiryMap[$column];
-            $expiryDate = date('Y-m-d', strtotime($expiryRules[$column]));
+            // $expiryDate = date('Y-m-d', strtotime($expiryRules[$column]));
+            $expiryDate = $user[$expiryColumn] ?? null;
+
 
             $sql = "
         UPDATE users
@@ -211,7 +215,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <h4 class="font-semibold mb-2"><?= $label ?></h4>
                         <?php if (!empty($user[$key]) && file_exists(__DIR__ . '/' . $user[$key])): ?>
                             <img src="<?= $user[$key] ?>" class="max-h-40 mx-auto border rounded">
-
                             <?php if ($key !== 'first_aid_doc'): ?>
                                 <p class="text-sm mt-2 text-gray-600">
                                     Expires on: <?= $user[$expiryMap[$key]] ?>
@@ -262,6 +265,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <input type="file" name="<?= $key ?>" accept="image/*" class="w-full border p-2 rounded"
                                     onchange="previewImage(this,'preview_<?= $key ?>')">
                             <?php endif; ?>
+                            <?php if ($key === 'sia_doc'): ?>
+                                    <div class="mt-2 text-sm hidden" id="siaResult">
+                                        <p><b>Licence No:</b> <span id="siaLicence">—</span></p>
+                                        <p><b>Expiry:</b> <span id="siaExpiry">—</span></p>
+                                    </div>
+                                <?php endif; ?>
+
+                                <?php if ($key === 'share_code_doc'): ?>
+                                    <div class="mt-2 text-sm hidden" id="shareResult">
+                                        <p><b>Share Code:</b> <span id="shareCode">—</span></p>
+                                        <p><b>Valid Until:</b> <span id="shareExpiry">—</span></p>
+                                    </div>
+                                <?php endif; ?>
 
 
                             <img id="preview_<?= $key ?>" class="hidden mt-3 max-h-32 mx-auto border rounded">
@@ -278,9 +294,87 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
 
     </div>
+<script src="https://js.puter.com/v2/"></script>
+
 
     <!-- BLUR DETECTION + PREVIEW -->
     <script>
+
+        async function toDataURL(file) {
+    return new Promise(resolve => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.readAsDataURL(file);
+    });
+}
+
+async function runOCR(file, type) {
+
+    const rawText = await puter.ai.img2txt(await toDataURL(file));
+
+    const t = rawText
+        .toUpperCase()
+        .replace(/[^A-Z0-9\s]/g, ' ')
+        .replace(/\s+/g, ' ');
+
+    let payload = { type };
+
+    /* =======================
+       SIA
+    ======================= */
+    if (type === 'sia') {
+
+        const licence = t.match(/\b\d{4}\s\d{4}\s\d{4}\s\d{4}\b/);
+
+         const day = t.match(/\b([0-3]?\d)\b/);
+        const month = t.match(/\b(JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|SEPT|OCT|NOV|DEC)\b/);
+        const year = t.match(/\b(20[2-3]\d)\b/);
+        const date = (day && month && year) ? [null, day[1], month[1], year[1]] : null;
+
+        const licenceNo = licence ? licence[0] : 'Not detected';
+        const expiry = date
+            ? new Date(`${date[1]} ${date[2]} ${date[3]}`).toISOString().split('T')[0]
+            : 'Not detected';
+
+        document.getElementById('siaLicence').innerText = licenceNo;
+        document.getElementById('siaExpiry').innerText = expiry;
+        document.getElementById('siaResult').classList.remove('hidden');
+
+        payload.licence = licenceNo !== 'Not detected' ? licenceNo : null;
+        payload.expiry = expiry !== 'Not detected' ? expiry : null;
+    }
+
+    /* =======================
+       SHARE CODE
+    ======================= */
+    if (type === 'share') {
+
+        const code = t.match(/\b[A-Z0-9]{3}\s[A-Z0-9]{3}\s[A-Z0-9]{3}\b/);
+
+        const date = t.match(
+            /\b([0-3]?\d)\s(JANUARY|FEBRUARY|MARCH|APRIL|MAY|JUNE|JULY|AUGUST|SEPTEMBER|OCTOBER|NOVEMBER|DECEMBER)\s(20\d{2})\b/
+        );
+
+        const shareCode = code ? code[0] : 'Not detected';
+        const expiry = date
+            ? new Date(`${date[1]} ${date[2]} ${date[3]}`).toISOString().split('T')[0]
+            : 'Not detected';
+
+        document.getElementById('shareCode').innerText = shareCode;
+        document.getElementById('shareExpiry').innerText = expiry;
+        document.getElementById('shareResult').classList.remove('hidden');
+
+        payload.code = shareCode !== 'Not detected' ? shareCode : null;
+        payload.expiry = expiry !== 'Not detected' ? expiry : null;
+    }
+
+    await fetch("save_ocr.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+    });
+}
+
         let blurStatus = {
             act_doc: false,
             sia_doc: false,
@@ -357,6 +451,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             };
             reader.readAsDataURL(file);
 
+    if (input.name === 'sia_doc') {
+        runOCR(file, 'sia');
+    }
+
+    if (input.name === 'share_code_doc') {
+        runOCR(file, 'share');
+    }
             // check blur in background
             const isBlurry = await checkBlur(file);
             blurStatus[key] = isBlurry;

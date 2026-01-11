@@ -50,6 +50,7 @@ $stmt = $conn->prepare("
            act_doc, act_expirey,
            sia_doc, sia_expirey,
            share_code_doc, share_code_expirey
+           , sia_licence_number, share_code_text, first_aid_doc
     FROM users where role != 'owner'
     ORDER BY emp_id ASC
 ");
@@ -168,6 +169,11 @@ $expiryMap = [
 <th class="p-3 border"><?= $label ?></th>
 <th class="p-3 border">Expiry</th>
 <?php endforeach; ?>
+<th class="p-3 border">First Aid DOC</th>
+<th class="p-3 border">SIA Licence No</th>
+<th class="p-3 border">Share Code</th>
+<th class="p-3 border">Gallery</th>
+
 </tr>
 </thead>
 
@@ -235,6 +241,29 @@ if (!empty($user[$key]) && file_exists($path)): ?>
 <?php endif; ?>
 
 <?php endforeach; ?>
+<td class="p-2 border">
+<?php 
+$docPath = __DIR__ . '../../user/' . $user['first_aid_doc'];
+if(!empty("../../user/$user[first_aid_doc]") && file_exists($docPath)): ?>
+<img src="<?= htmlspecialchars("../../user/$user[first_aid_doc]") ?>" class="mx-auto max-h-16 border rounded">
+<?php else: ?>
+<span class="text-red-600 text-sm">Not uploaded</span>
+<?php endif; ?>
+</td>
+<td class="p-2 border font-semibold text-blue-700">
+    <?= !empty($user['sia_licence_number']) ? $user['sia_licence_number'] : '-' ?>
+</td>
+
+<td class="p-2 border font-semibold text-purple-700">
+    <?= !empty($user['share_code_text']) ? $user['share_code_text'] : '-' ?>
+</td>
+<td class="p-2 border">
+    <button
+        onclick="openGallery('<?= htmlspecialchars($user['email']) ?>')"
+        class="bg-indigo-600 text-white px-3 py-1 rounded text-sm hover:bg-indigo-700">
+        View Gallery
+    </button>
+</td>
 
 </tr>
 <?php endforeach; ?>
@@ -242,6 +271,55 @@ if (!empty($user[$key]) && file_exists($path)): ?>
 </table>
 </div>
 </div>
+
+<div id="galleryModal"
+     class="hidden fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
+  <div class="bg-white rounded p-6 h-[70%] w-[80%] relative">
+    <button onclick="closeGallery()"
+            class="absolute top-2 right-2 text-xl font-bold">&times;</button>
+
+    <h3 class="text-lg font-semibold mb-4">User Documents</h3>
+
+    <div id="galleryContent"
+         class="grid grid-cols-2 md:grid-cols-3 gap-4">
+    </div>
+  </div>
+</div>
+
+<script>
+function openGallery(email) {
+
+    const modal = document.getElementById('galleryModal');
+    const content = document.getElementById('galleryContent');
+
+    content.innerHTML = 'Loading...';
+
+    fetch(`gallery.php?email=${encodeURIComponent(email)}`)
+        .then(res => res.json())
+        .then(files => {
+
+            content.innerHTML = '';
+
+            if (!files.length) {
+                content.innerHTML = '<p>No documents uploaded</p>';
+                return;
+            }
+
+            files.forEach(src => {
+                const img = document.createElement('img');
+                img.src = src;
+                img.className = 'border rounded h-[50%] w-full object-contain';
+                content.appendChild(img);
+            });
+        });
+
+    modal.classList.remove('hidden');
+}
+
+function closeGallery() {
+    document.getElementById('galleryModal').classList.add('hidden');
+}
+</script>
 
 <script>
 function filterExpiry(type) {
