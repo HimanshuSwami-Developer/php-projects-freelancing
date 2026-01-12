@@ -334,6 +334,26 @@ function hideOCRLoader() {
     });
 }
 
+let ocrStatus = {
+    sia_doc: { valid: false },
+    share_code_doc: { valid: false }
+};
+
+function updateSubmitState() {
+    const submitBtn = document.getElementById("submitBtn");
+
+    const siaInvalid =
+        document.querySelector("input[name='sia_doc']")?.files.length &&
+        !ocrStatus.sia_doc.valid;
+
+    const shareInvalid =
+        document.querySelector("input[name='share_code_doc']")?.files.length &&
+        !ocrStatus.share_code_doc.valid;
+
+    submitBtn.disabled = siaInvalid || shareInvalid;
+}
+
+
 async function runOCR(file, type) {
 
     showOCRLoader(); // 🔥 SHOW OVERLAY
@@ -370,6 +390,8 @@ async function runOCR(file, type) {
 
             payload.licence = licenceNo !== 'Not detected' ? licenceNo : null;
             payload.expiry  = expiry !== 'Not detected' ? expiry : null;
+            
+            ocrStatus.sia_doc.valid = !!(payload.licence && payload.expiry);
         }
 
         /* =======================
@@ -394,6 +416,8 @@ async function runOCR(file, type) {
 
             payload.code   = shareCode !== 'Not detected' ? shareCode : null;
             payload.expiry = expiry !== 'Not detected' ? expiry : null;
+            
+            ocrStatus.share_code_doc.valid = !!(payload.code && payload.expiry);
         }
 
         // SAVE OCR DATA
@@ -402,6 +426,8 @@ async function runOCR(file, type) {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload)
         });
+
+        updateSubmitState();
 
     } catch (err) {
         alert("OCR failed. Please try a clearer image.");
@@ -513,6 +539,31 @@ async function runOCR(file, type) {
             if (msg) msg.remove();
         }, 1500);
     </script>
+
+<script>
+document.querySelector("form").addEventListener("submit", function (e) {
+
+    // SIA validation
+    if (
+        document.querySelector("input[name='sia_doc']")?.files.length &&
+        !ocrStatus.sia_doc.valid
+    ) {
+        alert("SIA document is missing Licence Number or Expiry date.");
+        e.preventDefault();
+        return;
+    }
+
+    // Share code validation
+    if (
+        document.querySelector("input[name='share_code_doc']")?.files.length &&
+        !ocrStatus.share_code_doc.valid
+    ) {
+        alert("Share Code document is missing Code or Expiry date.");
+        e.preventDefault();
+        return;
+    }
+});
+</script>
 
 </body>
 
