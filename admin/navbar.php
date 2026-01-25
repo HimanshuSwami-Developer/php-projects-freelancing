@@ -69,6 +69,9 @@ $role = $_SESSION['user_role'];
         <a href="payment.php" class="hover:text-gray-300">
             Payments
         </a>
+          <a href="contractor.php" class="hover:text-gray-300">
+            Contractors
+        </a>
         <form method="POST" action="./../download_folder.php">
     <button
         type="submit"
