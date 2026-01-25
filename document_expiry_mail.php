@@ -51,7 +51,7 @@ $today = new DateTime();
 ====================================================== */
 $sql = "
 SELECT 
-    emp_id, name, email,
+    id, name, email,
 
     sia_expirey,
     sia_mail_30, sia_mail_15, sia_mail_7,
@@ -98,9 +98,9 @@ while ($user = $result->fetch_assoc()) {
             );
 
             $update = $conn->prepare("
-                UPDATE users SET {$flagColumn} = 1 WHERE emp_id = ?
+                UPDATE users SET {$flagColumn} = 1 WHERE id = ?
             ");
-            $update->bind_param("i", $user['emp_id']);
+            $update->bind_param("i", $user['id']);
             $update->execute();
             $update->close();
         }
@@ -140,9 +140,9 @@ while ($user = $result->fetch_assoc()) {
             );
 
             $update = $conn->prepare("
-                UPDATE users SET {$doc['flag']} = 1 WHERE emp_id = ?
+                UPDATE users SET {$doc['flag']} = 1 WHERE id = ?
             ");
-            $update->bind_param("i", $user['emp_id']);
+            $update->bind_param("i", $user['id']);
             $update->execute();
             $update->close();
         }

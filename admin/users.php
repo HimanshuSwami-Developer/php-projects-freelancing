@@ -3,7 +3,7 @@ require_once './../session.php';
 require_once './../db.php';
 
 /* ===============================
-   AUTH CHECK (Admin / Owner)
+   AUTH CHECK
 ================================ */
 if (
     !isset($_SESSION['user_id']) ||
@@ -15,24 +15,37 @@ if (
 
 $conn = getDB();
 
+function img($path){
+    if(!$path) return '<span class="text-gray-400">—</span>';
+
+    $fs  = __DIR__ . "/../" . $path;
+    $url = "../" . $path;
+
+    return file_exists($fs)
+        ? "<img src='$url'
+                 class='mx-auto h-12 rounded border
+                        hover:scale-110 transition cursor-pointer'
+                 onclick=\"openImageModal('$url')\">"
+        : '<span class="text-gray-400">—</span>';
+}
+
 /* ===============================
-   OWNER UPDATE ROLE / STATUS
+   UPDATE ROLE / STATUS (OWNER)
 ================================ */
 if (
     $_SERVER['REQUEST_METHOD'] === 'POST' &&
+    isset($_POST['update_role']) &&
     $_SESSION['user_role'] === 'owner'
 ) {
-    $emp_id    = intval($_POST['emp_id']);
+    $id        = (int)$_POST['user_id'];
     $role      = $_POST['role'];
-    $is_active = intval($_POST['is_active']);
+    $is_active = (int)$_POST['is_active'];
 
-    if (in_array($role, ['admin', 'user'])) {
+    if (in_array($role, ['user','admin'])) {
         $stmt = $conn->prepare("
-            UPDATE users
-            SET role = ?, is_active = ?
-            WHERE emp_id = ?
+            UPDATE users SET role=?, is_active=? WHERE id=?
         ");
-        $stmt->bind_param("sii", $role, $is_active, $emp_id);
+        $stmt->bind_param("sii", $role, $is_active, $id);
         $stmt->execute();
         $stmt->close();
     }
@@ -42,227 +55,213 @@ if (
 }
 
 /* ===============================
-   FETCH ALL USERS
+   UPDATE PASSWORD (ADMIN / OWNER)
+================================ */
+if (
+    $_SERVER['REQUEST_METHOD'] === 'POST' &&
+    isset($_POST['update_password']) &&
+    in_array($_SESSION['user_role'], ['admin','owner'])
+) {
+    $id  = (int)$_POST['user_id'];
+    $pwd = $_POST['password']; // plain as requested
+
+    $stmt = $conn->prepare("
+        UPDATE users SET password=? WHERE id=?
+    ");
+    $stmt->bind_param("si", $pwd, $id);
+    $stmt->execute();
+    $stmt->close();
+
+    header("Location: ".$_SERVER['PHP_SELF']);
+    exit;
+}
+
+/* ===============================
+   FETCH USERS + DOCUMENTS
 ================================ */
 $stmt = $conn->prepare("
-    SELECT emp_id, name, email, contact, address,
-           role, is_active,
-           act_doc, act_expirey,
-           sia_doc, sia_expirey,
-           share_code_doc, share_code_expirey
-           , sia_licence_number, share_code_text, first_aid_doc
-    FROM users where role != 'owner'
-    ORDER BY emp_id ASC
+SELECT 
+    u.id, u.name, u.email, u.contact, u.address, u.role, u.is_active,
+
+    ac.act_blue_doc, ac.act_blue_expiry,
+    ac.act_orange_doc, ac.act_orange_expiry,
+
+    s.sia_licence_doc, s.sia_licence_number, s.sia_licence_expiry,
+
+    sc.share_code_doc, sc.share_code_number, sc.share_code_expiry,
+    sc.first_aid_doc, sc.first_aid_expiry
+
+FROM users u
+LEFT JOIN act_certificate ac ON ac.user_id = u.id
+LEFT JOIN sia_licence s ON s.user_id = u.id
+LEFT JOIN sharecode_first_aid sc ON sc.user_id = u.id
+WHERE u.role != 'owner'
+ORDER BY u.id ASC
 ");
 $stmt->execute();
 $users = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 $stmt->close();
 
-$docs = [
-    'act_doc'        => 'ACT Certificate',
-    'sia_doc'        => 'SIA Certificate',
-    'share_code_doc' => 'Share Code'
-];
-
-$expiryMap = [
-    'act_doc'        => 'act_expirey',
-    'sia_doc'        => 'sia_expirey',
-    'share_code_doc' => 'share_code_expirey'
-];
+/* ===============================
+   EXPIRY COLOR
+================================ */
+function expiryClass($date, $warn = 30) {
+    if (!$date) return '';
+    $today = new DateTime();
+    $exp   = new DateTime($date);
+    $diff  = (int)$today->diff($exp)->format('%r%a');
+    if ($diff < 0) return 'bg-red-200';
+    if ($diff <= $warn) return 'bg-red-100';
+    return '';
+}
 ?>
-
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
 <title>Users Management</title>
 <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100">
 
+<body class="bg-slate-100">
+    
 <?php include 'navbar.php'; ?>
+<div class="p-6">
+<!-- HEADER -->
+<div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+    <h2 class="text-2xl font-bold text-slate-800">
+        <?= $_SESSION['user_role']==='owner' ? 'Owner Dashboard' : 'Admin Dashboard' ?>
+    </h2>
 
-<div class="p-6 space-y-6">
-
-<h2 class="text-2xl font-bold">
-    <?= $_SESSION['user_role'] === 'owner' ? 'Owner Dashboard - All Users' : 'Admin Dashboard - Users' ?>
-</h2>
-
-<!-- SEARCH -->
-<input
-    type="text"
-    id="searchInput"
-    placeholder="Search by ID, Name or Email"
-    class="w-full md:w-1/2 border p-2 rounded"
-    onkeyup="filterUsers()"
->
-
-<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-
-  <!-- ACT -->
-  <div class="border p-3 rounded bg-gray-50">
-    <h3 class="font-semibold mb-2">ACT Certificate Expiry</h3>
-    <input type="date" id="actFrom" class="border p-2 rounded w-full mb-2">
-    <input type="date" id="actTo" class="border p-2 rounded w-full mb-2">
-    <select id="actSort" class="border p-2 rounded w-full mb-2">
-      <option value="asc">Ascending</option>
-      <option value="desc">Descending</option>
-    </select>
-    <button onclick="filterExpiry('act')" class="bg-blue-600 text-white w-full py-1 rounded">
-      Apply
-    </button>
-  </div>
-
-  <!-- SIA -->
-  <div class="border p-3 rounded bg-gray-50">
-    <h3 class="font-semibold mb-2">SIA Certificate Expiry</h3>
-    <input type="date" id="siaFrom" class="border p-2 rounded w-full mb-2">
-    <input type="date" id="siaTo" class="border p-2 rounded w-full mb-2">
-    <select id="siaSort" class="border p-2 rounded w-full mb-2">
-      <option value="asc">Ascending</option>
-      <option value="desc">Descending</option>
-    </select>
-    <button onclick="filterExpiry('sia')" class="bg-blue-600 text-white w-full py-1 rounded">
-      Apply
-    </button>
-  </div>
-
-  <!-- SHARE CODE -->
-  <div class="border p-3 rounded bg-gray-50">
-    <h3 class="font-semibold mb-2">Share Code Expiry</h3>
-    <input type="date" id="shareFrom" class="border p-2 rounded w-full mb-2">
-    <input type="date" id="shareTo" class="border p-2 rounded w-full mb-2">
-    <select id="shareSort" class="border p-2 rounded w-full mb-2">
-      <option value="asc">Ascending</option>
-      <option value="desc">Descending</option>
-    </select>
-    <button onclick="filterExpiry('share')" class="bg-blue-600 text-white w-full py-1 rounded">
-      Apply
-    </button>
-  </div>
-
+    <span class="mt-2 md:mt-0 inline-flex items-center px-3 py-1 rounded-full text-sm
+        <?= $_SESSION['user_role']==='owner'
+            ? 'bg-purple-100 text-purple-700'
+            : 'bg-blue-100 text-blue-700' ?>">
+        Role: <?= strtoupper($_SESSION['user_role']) ?>
+    </span>
 </div>
 
-<button onclick="resetAllFilters()"
-  class="mb-4 bg-gray-600 text-white px-4 py-2 rounded">
-  Reset All Filters
-</button>
+<!-- SEARCH -->
+<div class="relative max-w-md mb-4">
+    <input id="searchInput"
+           onkeyup="filterUsers()"
+           placeholder="Search by name or email"
+           class="w-full pl-10 pr-4 py-2 border rounded-lg shadow-sm focus:ring focus:ring-blue-200">
 
+    <span class="absolute left-3 top-2.5 text-gray-400">🔍</span>
+</div>
 
-<div class="bg-white rounded shadow overflow-x-auto">
-<table id="usersTable" class="w-full border mt-4">
-<thead class="bg-gray-200">
+<!-- TABLE CARD -->
+<div class="bg-white shadow-lg rounded-xl overflow-x-auto">
+<table id="usersTable" class="min-w-full text-sm text-slate-700">
+
+<thead class="bg-slate-200 sticky top-0 z-10">
 <tr>
 <th class="p-3 border">ID</th>
-<th class="p-3 border">Name</th>
-<th class="p-3 border">Email</th>
+<th class="p-3 border">User</th>
 <th class="p-3 border">Contact</th>
 <th class="p-3 border">Address</th>
 
-<?php if ($_SESSION['user_role'] === 'owner'): ?>
+<?php if($_SESSION['user_role']==='owner'): ?>
 <th class="p-3 border">Role</th>
 <th class="p-3 border">Status</th>
-<th class="p-3 border">Action</th>
+<th class="p-3 border">Save</th>
 <?php endif; ?>
 
-<?php foreach ($docs as $label): ?>
-<th class="p-3 border"><?= $label ?></th>
+<th class="p-3 border">ACT Blue</th>
 <th class="p-3 border">Expiry</th>
-<?php endforeach; ?>
-<th class="p-3 border">First Aid DOC</th>
-<th class="p-3 border">SIA Licence No</th>
+<th class="p-3 border">ACT Orange</th>
+<th class="p-3 border">Expiry</th>
+<th class="p-3 border">SIA</th>
+<th class="p-3 border">Expiry</th>
 <th class="p-3 border">Share Code</th>
-<th class="p-3 border">Gallery</th>
-
+<th class="p-3 border">Expiry</th>
+<th class="p-3 border">First Aid</th>
+<th class="p-3 border">Password</th>
 </tr>
 </thead>
 
-<tbody>
-<?php foreach ($users as $user): ?>
-<tr class="text-center border-t">
+<tbody class="divide-y">
+<?php foreach($users as $u): ?>
+<tr class="hover:bg-slate-50 transition text-center">
 
-<td class="p-2 border"><?= $user['emp_id'] ?></td>
-<td class="p-2 border"><?= htmlspecialchars($user['name']) ?></td>
-<td class="p-2 border"><?= htmlspecialchars($user['email']) ?></td>
-<td class="p-2 border"><?= htmlspecialchars($user['contact']) ?></td>
-<td class="p-2 border"><?= htmlspecialchars($user['address']) ?></td>
+<td class="p-3 border font-semibold"><?= $u['id'] ?></td>
 
-<?php if ($_SESSION['user_role'] === 'owner'): ?>
+<td class="p-3 border text-left">
+    <div class="font-medium"><?= htmlspecialchars($u['name']) ?></div>
+    <div class="text-xs text-gray-500"><?= htmlspecialchars($u['email']) ?></div>
+</td>
+
+<td class="p-3 border"><?= htmlspecialchars($u['contact']) ?></td>
+<td class="p-3 border max-w-xs truncate"><?= htmlspecialchars($u['address']) ?></td>
+
+<?php if($_SESSION['user_role']==='owner'): ?>
 <form method="POST">
-<td class="p-2 border">
-    <input type="hidden" name="emp_id" value="<?= $user['emp_id'] ?>">
-    <select name="role" class="border p-1 rounded">
-        <option value="user" <?= $user['role']==='user'?'selected':'' ?>>User</option>
-        <option value="admin" <?= $user['role']==='admin'?'selected':'' ?>>Admin</option>
-    </select>
+<td class="p-3 border">
+<input type="hidden" name="user_id" value="<?= $u['id'] ?>">
+<select name="role" class="border rounded px-2 py-1 text-sm">
+<option value="user" <?= $u['role']==='user'?'selected':'' ?>>User</option>
+<option value="admin" <?= $u['role']==='admin'?'selected':'' ?>>Admin</option>
+</select>
 </td>
 
-<td class="p-2 border">
-    <select name="is_active" class="border p-1 rounded">
-        <option value="1" <?= $user['is_active']?'selected':'' ?>>Active</option>
-        <option value="0" <?= !$user['is_active']?'selected':'' ?>>Inactive</option>
-    </select>
+<td class="p-3 border">
+<select name="is_active"
+        class="border rounded px-2 py-1 text-sm
+        <?= $u['is_active']?'bg-green-50':'bg-red-50' ?>">
+<option value="1" <?= $u['is_active']?'selected':'' ?>>Active</option>
+<option value="0" <?= !$u['is_active']?'selected':'' ?>>Inactive</option>
+</select>
 </td>
 
-<td class="p-2 border">
-    <button class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">
-        Save
-    </button>
+<td class="p-3 border">
+<button name="update_role"
+        class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded">
+Save
+</button>
 </td>
 </form>
 <?php endif; ?>
 
-<?php foreach ($docs as $key => $label): ?>
-<td class="p-2 border">
-<?php
-$path = __DIR__ . "../../user/" . $user[$key];
-if (!empty($user[$key]) && file_exists($path)): ?>
-<img src="../../user/<?= htmlspecialchars($user[$key]) ?>" class="mx-auto max-h-16 rounded border">
-<?php else: ?>
-<span class="text-red-500 text-sm">Not uploaded</span>
-<?php endif; ?>
+<td class="p-3 border"><?= img($u['act_blue_doc']) ?></td>
+<td class="p-3 border <?= expiryClass($u['act_blue_expiry']) ?>">
+    <?= $u['act_blue_expiry'] ?: '—' ?>
 </td>
 
-<?php if ($key === 'act_doc'): ?>
-<td class="p-2 border expiry-act"
-    data-date="<?= $user['act_expirey'] ?? '' ?>">
-    <?= !empty($user['act_expirey']) ? $user['act_expirey'] : '-' ?>
-</td>
-<?php elseif ($key === 'sia_doc'): ?>
-<td class="p-2 border expiry-sia"
-    data-date="<?= $user['sia_expirey'] ?? '' ?>">
-    <?= !empty($user['sia_expirey']) ? $user['sia_expirey'] : '-' ?>
-</td>
-<?php elseif ($key === 'share_code_doc'): ?>
-<td  class="p-2 border expiry-share" 
-    data-date="<?= $user['share_code_expirey'] ?? '' ?>">
-    <?= !empty($user['share_code_expirey']) ? $user['share_code_expirey'] : '-' ?>
-</td>
-<?php endif; ?>
-
-<?php endforeach; ?>
-<td class="p-2 border">
-<?php 
-$docPath = __DIR__ . '../../user/' . $user['first_aid_doc'];
-if(!empty("../../user/$user[first_aid_doc]") && file_exists($docPath)): ?>
-<img src="<?= htmlspecialchars("../../user/$user[first_aid_doc]") ?>" class="mx-auto max-h-16 border rounded">
-<?php else: ?>
-<span class="text-red-600 text-sm">Not uploaded</span>
-<?php endif; ?>
-</td>
-<td class="p-2 border font-semibold text-blue-700">
-    <?= !empty($user['sia_licence_number']) ? $user['sia_licence_number'] : '-' ?>
+<td class="p-3 border"><?= img($u['act_orange_doc']) ?></td>
+<td class="p-3 border <?= expiryClass($u['act_orange_expiry']) ?>">
+    <?= $u['act_orange_expiry'] ?: '—' ?>
 </td>
 
-<td class="p-2 border font-semibold text-purple-700">
-    <?= !empty($user['share_code_text']) ? $user['share_code_text'] : '-' ?>
+<td class="p-3 border">
+    <?= img($u['sia_licence_doc']) ?>
+    <div class="text-xs mt-1"><?= $u['sia_licence_number'] ?></div>
 </td>
-<td class="p-2 border">
-    <button
-        onclick="openGallery('<?= htmlspecialchars($user['email']) ?>')"
-        class="bg-indigo-600 text-white px-3 py-1 rounded text-sm hover:bg-indigo-700">
-        View Gallery
-    </button>
+<td class="p-3 border <?= expiryClass($u['sia_licence_expiry']) ?>">
+    <?= $u['sia_licence_expiry'] ?: '—' ?>
+</td>
+
+<td class="p-3 border">
+    <?= img($u['share_code_doc']) ?>
+    <div class="text-xs mt-1"><?= $u['share_code_number'] ?></div>
+</td>
+<td class="p-3 border <?= expiryClass($u['share_code_expiry']) ?>">
+    <?= $u['share_code_expiry'] ?: '—' ?>
+</td>
+
+<td class="p-3 border"><?= img($u['first_aid_doc']) ?></td>
+
+<td class="p-3 border">
+<form method="POST" class="flex items-center gap-2 justify-center">
+<input type="hidden" name="user_id" value="<?= $u['id'] ?>">
+<input type="password"
+       name="password"
+       placeholder="New password"
+       class="border rounded px-2 py-1 text-xs w-28" required>
+<button name="update_password"
+        class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs">
+Set
+</button>
+</form>
 </td>
 
 </tr>
@@ -270,126 +269,13 @@ if(!empty("../../user/$user[first_aid_doc]") && file_exists($docPath)): ?>
 </tbody>
 </table>
 </div>
+
 </div>
-
-<div id="galleryModal"
-     class="hidden fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
-  <div class="bg-white rounded p-6 h-[70%] w-[80%] relative">
-    <button onclick="closeGallery()"
-            class="absolute top-2 right-2 text-xl font-bold">&times;</button>
-
-    <h3 class="text-lg font-semibold mb-4">User Documents</h3>
-
-    <div id="galleryContent"
-         class="grid grid-cols-2 md:grid-cols-3 gap-4">
-    </div>
-  </div>
-</div>
-
 <script>
-function openGallery(email) {
-
-    const modal = document.getElementById('galleryModal');
-    const content = document.getElementById('galleryContent');
-
-    content.innerHTML = 'Loading...';
-
-    fetch(`gallery.php?email=${encodeURIComponent(email)}`)
-        .then(res => res.json())
-        .then(files => {
-
-            content.innerHTML = '';
-
-            if (!files.length) {
-                content.innerHTML = '<p>No documents uploaded</p>';
-                return;
-            }
-
-            files.forEach(src => {
-                const img = document.createElement('img');
-                img.src = src;
-                img.className = 'border rounded h-[50%] w-full object-contain';
-                content.appendChild(img);
-            });
-        });
-
-    modal.classList.remove('hidden');
-}
-
-function closeGallery() {
-    document.getElementById('galleryModal').classList.add('hidden');
-}
-</script>
-
-<script>
-function filterExpiry(type) {
-
-    // 🔄 Always reset table first
-    resetTable();
-
-    // 🔄 Reset other filters (ONLY ONE ACTIVE)
-    ['act', 'sia', 'share'].forEach(t => {
-        if (t !== type) {
-            document.getElementById(t + 'From').value = '';
-            document.getElementById(t + 'To').value = '';
-            document.getElementById(t + 'Sort').value = 'asc';
-        }
-    });
-
-    const from = document.getElementById(type + 'From').value;
-    const to   = document.getElementById(type + 'To').value;
-    const sort = document.getElementById(type + 'Sort').value;
-
-    const tbody = document.querySelector('#usersTable tbody');
-    const rows  = Array.from(tbody.querySelectorAll('tr'));
-
-    let filtered = rows.filter(row => {
-        const cell = row.querySelector('.expiry-' + type);
-        if (!cell || !cell.dataset.date) return false;
-
-        const d = new Date(cell.dataset.date);
-
-        if (from && d < new Date(from)) return false;
-        if (to && d > new Date(to)) return false;
-
-        return true;
-    });
-
-    filtered.sort((a, b) => {
-        const da = new Date(a.querySelector('.expiry-' + type).dataset.date);
-        const db = new Date(b.querySelector('.expiry-' + type).dataset.date);
-        return sort === 'asc' ? da - db : db - da;
-    });
-
-    tbody.innerHTML = '';
-    filtered.forEach(r => tbody.appendChild(r));
-}
-
-// 🔄 Restore original table
-function resetTable() {
-    const tbody = document.querySelector('#usersTable tbody');
-    const rows = Array.from(tbody.querySelectorAll('tr'));
-    rows.sort((a, b) =>
-        a.cells[0].innerText.localeCompare(b.cells[0].innerText)
-    );
-    tbody.innerHTML = '';
-    rows.forEach(r => tbody.appendChild(r));
-}
-
-function resetAllFilters() {
-    window.location.reload();
-}
-</script>
-
-<!-- SEARCH SCRIPT -->
-<script>
-function filterUsers() {
-    const val = document.getElementById('searchInput').value.toLowerCase();
-    const rows = document.querySelectorAll('#usersTable tbody tr');
-
-    rows.forEach(row => {
-        const text = row.innerText.toLowerCase();
-        row.style.display = text.includes(val) ? '' : 'none';
+function filterUsers(){
+    let v=document.getElementById('searchInput').value.toLowerCase();
+    document.querySelectorAll('#usersTable tbody tr').forEach(r=>{
+        r.style.display=r.innerText.toLowerCase().includes(v)?'':'none';
     });
 }
 </script>

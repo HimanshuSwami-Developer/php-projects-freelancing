@@ -13,7 +13,8 @@ class Database {
     private $username = "root";
     private $password = "";
     // private $dbname = "ereal_state";
-    private $dbname = "attendance_system";
+    // private $dbname = "attendance_system";
+    private $dbname = "attend";
     public $conn;
     
     public function getConnection() {

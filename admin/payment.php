@@ -15,7 +15,7 @@ if (!isset($_SESSION['user_id']) || ($_SESSION['user_role'] !== 'admin' && $_SES
 /* ===============================
    FETCH EMPLOYEES
 ================================ */
-$empResult = $conn->query("SELECT emp_id, name FROM users WHERE role='user' ORDER BY name");
+$empResult = $conn->query("SELECT id, name FROM users WHERE role='user' ORDER BY name");
 $employees = [];
 while ($row = $empResult->fetch_assoc()) {
     $employees[] = $row;
@@ -24,7 +24,7 @@ while ($row = $empResult->fetch_assoc()) {
 /* ===============================
    FILTERS
 ================================ */
-$empFilter = $_GET['emp_id'] ?? '';
+$empFilter = $_GET['user_id'] ?? '';
 $statusFilter = $_GET['status'] ?? '';
 $from = $_GET['from'] ?? '';
 $to = $_GET['to'] ?? '';
@@ -34,7 +34,7 @@ $params = [];
 $types = "";
 
 if ($empFilter !== '') {
-    $where .= " AND a.emp_id=?";
+    $where .= " AND a.user_id=?";
     $params[] = $empFilter;
     $types .= "i";
 }
@@ -77,8 +77,8 @@ $stmt->close();
 ================================ */
 $sql = "SELECT 
             a.id AS attendance_id,
-            a.emp_id,
-            a.emp_name,
+            a.user_id,
+            a.user_name,
             a.mode,
             a.shift_start,
             a.shift_end,
@@ -94,7 +94,7 @@ $sql = "SELECT
             u.address
         FROM attendance a
         LEFT JOIN payment_track p ON p.attendance_id = a.id
-        LEFT JOIN users u ON a.emp_id = u.emp_id
+        LEFT JOIN users u ON a.user_id = u.id
         $where
         ORDER BY a.shift_start DESC
         LIMIT $limit OFFSET $offset";
@@ -125,10 +125,10 @@ $result = $stmt->get_result();
 
         <!-- FILTER -->
         <form method="GET" class="bg-white p-4 rounded shadow mb-4 grid grid-cols-1 md:grid-cols-5 gap-4">
-            <select name="emp_id" class="border p-2 rounded">
+            <select name="user_id" class="border p-2 rounded">
                 <option value="">All Employees</option>
                 <?php foreach ($employees as $emp): ?>
-                    <option value="<?= $emp['emp_id'] ?>" <?= ($empFilter == $emp['emp_id']) ? 'selected' : '' ?>>
+                    <option value="<?= $emp['user_id'] ?>" <?= ($empFilter == $emp['user_id']) ? 'selected' : '' ?>>
                         <?= htmlspecialchars($emp['name']) ?>
                     </option>
                 <?php endforeach; ?>
@@ -170,6 +170,7 @@ $result = $stmt->get_result();
                         <th class="border p-2">Shift</th>
                         <th class="border p-2">Payment- I</th>
                         <th class="border p-2">Payment- II</th>
+                        <th class="border p-2">Expense</th>
                         <th class="border p-2">Payment Status</th>
                         <th class="border p-2">Action</th>
                     </tr>
@@ -177,8 +178,8 @@ $result = $stmt->get_result();
                 <tbody>
                     <?php while ($row = $result->fetch_assoc()): ?>
                         <tr class="text-center">
-                            <td class="border p-2"><?= $row['emp_id'] ?></td>
-                            <td class="border p-2"><?= htmlspecialchars($row['emp_name']) ?></td>
+                            <td class="border p-2"><?= $row['user_id'] ?></td>
+                            <td class="border p-2"><?= htmlspecialchars($row['user_name']) ?></td>
                             <td class="border p-2"><?= ucfirst($row['mode']) ?></td>
                             <td class="border p-2"><?= date("d M Y, g:i a", strtotime($row['shift_start'])) ?> -
                                 <?= date("g:i a", strtotime($row['shift_end'])) ?>
@@ -194,6 +195,12 @@ $result = $stmt->get_result();
                                 <input type="number" value="<?= $row['ni_payment'] ?>" class="w-20 p-1 border rounded"
                                     data-payment-id="<?= $row['payment_id'] ?>" min="0"
                                     data-attendance-id="<?= $row['attendance_id'] ?>" data-field="ni_payment">
+                            </td>
+                    
+                            <td class="border p-2">
+                                <input type="number" value="<?= $row['expense'] ?>" class="w-20 p-1 border rounded"
+                                    data-payment-id="<?= $row['payment_id'] ?>" min="0"
+                                    data-attendance-id="<?= $row['attendance_id'] ?>" data-field="expense">
                             </td>
 
                             <td class="border p-2">
@@ -217,8 +224,8 @@ $result = $stmt->get_result();
 
                                 <?php if ($row['payment_id']): ?>
                                     <button class="bg-blue-500 text-white px-2 py-1 rounded pdf-btn"
-                                        data-emp-id="<?= $row['emp_id'] ?>"
-                                        data-emp-name="<?= htmlspecialchars($row['emp_name']) ?>"
+                                        data-emp-id="<?= $row['user_id'] ?>"
+                                        data-emp-name="<?= htmlspecialchars($row['user_name']) ?>"
                                         data-emp-email="<?= htmlspecialchars($row['email'] ?? '') ?>"
                                         data-emp-role="<?= htmlspecialchars($row['role'] ?? '') ?>"
                                         data-mode="<?= $row['mode'] ?>"
@@ -241,7 +248,7 @@ $result = $stmt->get_result();
         <?php if ($totalPages > 1): ?>
             <div class="flex justify-center gap-2 mt-4">
                 <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-                    <a href="?page=<?= $i ?>&emp_id=<?= $empFilter ?>&status=<?= $statusFilter ?>&from=<?= $from ?>&to=<?= $to ?>"
+                    <a href="?page=<?= $i ?>&user_id=<?= $empFilter ?>&status=<?= $statusFilter ?>&from=<?= $from ?>&to=<?= $to ?>"
                         class="px-3 py-1 rounded border <?= $i == $page ? 'bg-blue-600 text-white' : 'bg-white' ?>">
                         <?= $i ?>
                     </a>
@@ -260,12 +267,13 @@ $result = $stmt->get_result();
                 const attendanceId = btn.dataset.attendanceId;
                 const cash = row.querySelector('input[data-field="cash_payment"]').value;
                 const ni = row.querySelector('input[data-field="ni_payment"]').value;
+                const expense = row.querySelector('input[data-field="expense"]').value;
                 const status = row.querySelector('select[data-field="payment_status"]').value;
 
                 fetch('update_payment.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ payment_id: paymentId, attendance_id: attendanceId, cash_payment: cash, ni_payment: ni, payment_status: status })
+                    body: JSON.stringify({ payment_id: paymentId, attendance_id: attendanceId,  expense: expense, cash_payment: cash, ni_payment: ni, payment_status: status })
                 }).then(res => res.json()).then(data => {
                     alert(data.message);
                     location.reload();

@@ -12,7 +12,7 @@ session_start();
 if (isset($_SESSION['user_id']) && isset($_SESSION['user_role'])) {
 
     // Admin user
-    if ($_SESSION['user_role'] === 'admin') {
+    if ($_SESSION['user_role'] === 'admin'|| $_SESSION['user_role'] === 'owner') {
         header("Location: admin/index.php");
         exit;
     }

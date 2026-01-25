@@ -13,7 +13,7 @@ if (isset($_SESSION['user_id'])) {
     $stmt = $conn->prepare("
         SELECT is_active 
         FROM users 
-        WHERE emp_id = ?
+        WHERE id = ?
         LIMIT 1
     ");
     $stmt->bind_param("i", $_SESSION['user_id']);

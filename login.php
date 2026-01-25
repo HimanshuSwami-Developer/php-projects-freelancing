@@ -27,7 +27,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $password = $_POST["password"];
 
     $stmt = $conn->prepare("
-        SELECT emp_id, name, password, role, is_active
+        SELECT id, name, password, role, is_active
         FROM users
         WHERE email = ?
         LIMIT 1
@@ -44,9 +44,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         // ❌ BLOCK INACTIVE USER
         $error = "Your account is inactive. Please contact administrator.";
     }
-    elseif (password_verify($password, $user['password'])) {
+    elseif ($password === $user['password']) {
 
-        $_SESSION['user_id']   = $user['emp_id'];
+        $_SESSION['user_id']   = $user['id'];
         $_SESSION['user_name'] = $user['name'];
         $_SESSION['user_role'] = $user['role'];
         $_SESSION['email']     = $user['email'];
@@ -58,7 +58,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             <script>
                 localStorage.setItem("user_role", "<?= $user['role'] ?>");
                 localStorage.setItem("user_name", "<?= htmlspecialchars($user['name']) ?>");
-                localStorage.setItem("user_id", "<?= $user['emp_id'] ?>");
+                localStorage.setItem("user_id", "<?= $user['id'] ?>");
                 localStorage.setItem("email", "<?= $user['email'] ?>");
             </script>
         </head>
@@ -85,56 +85,97 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body class="bg-gray-100 flex items-center justify-center h-screen">
+<body class="min-h-screen bg-slate-100 flex items-center justify-center font-sans">
 
-<div class="bg-white p-8 rounded shadow w-96">
+<div class="w-full max-w-md">
 
-    <h2 class="text-2xl font-bold mb-4 text-center">Login</h2>
+    <!-- Card -->
+    <div class="bg-white border border-slate-200 rounded-lg shadow-sm p-8">
 
-    <?php if (isset($_GET['inactive'])): ?>
-        <p class="text-red-600 mb-3 text-center">
-            Your account has been deactivated.
-        </p>
-    <?php endif; ?>
+        <!-- Header -->
+        <div class="mb-6 text-center">
+            <h1 class="text-2xl font-semibold text-slate-800">
+                System Login
+            </h1>
+            <p class="text-sm text-slate-500 mt-1">
+                Enter your credentials to access your account
+            </p>
+        </div>
 
-    <?php if ($error): ?>
-        <p class="text-red-600 mb-3 text-center">
-            <?= htmlspecialchars($error) ?>
-        </p>
-    <?php endif; ?>
+        <?php if (isset($_GET['inactive'])): ?>
+            <div class="mb-4 p-3 rounded bg-red-50 border border-red-200 text-red-700 text-sm text-center">
+                Your account has been deactivated.
+            </div>
+        <?php endif; ?>
 
-    <form method="POST">
-        <input
-            type="email"
-            name="email"
-            required
-            placeholder="Email"
-            class="w-full p-3 border rounded mb-3"
-        >
+        <?php if ($error): ?>
+            <div class="mb-4 p-3 rounded bg-red-50 border border-red-200 text-red-700 text-sm text-center">
+                <?= htmlspecialchars($error) ?>
+            </div>
+        <?php endif; ?>
 
-        <input
-            type="password"
-            name="password"
-            required
-            placeholder="Password"
-            class="w-full p-3 border rounded mb-3"
-        >
+        <!-- Form -->
+        <form method="POST" class="space-y-4">
 
-        <button class="w-full bg-blue-600 text-white p-3 rounded hover:bg-blue-700">
-            Login
-        </button>
-    </form>
+            <!-- Email -->
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">
+                    Email Address
+                </label>
+                <input
+                    type="email"
+                    name="email"
+                    required
+                    class="w-full px-3 py-2 border border-slate-300 rounded-md
+                           focus:outline-none focus:ring-2 focus:ring-blue-500
+                           focus:border-blue-500 transition"
+                >
+            </div>
 
-    <div class="text-center mt-4">
-        <p class="text-gray-600">
+            <!-- Password -->
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">
+                    Password
+                </label>
+                <input
+                    type="password"
+                    name="password"
+                    required
+                    class="w-full px-3 py-2 border border-slate-300 rounded-md
+                           focus:outline-none focus:ring-2 focus:ring-blue-500
+                           focus:border-blue-500 transition"
+                >
+            </div>
+
+            <!-- Button -->
+            <button
+                type="submit"
+                class="w-full py-2.5 bg-blue-600 text-white text-sm font-medium rounded-md
+                       hover:bg-blue-700 transition focus:outline-none focus:ring-2
+                       focus:ring-blue-500 focus:ring-offset-2"
+            >
+                Sign In
+            </button>
+
+        </form>
+
+        <!-- Footer -->
+        <div class="mt-6 text-center text-sm text-slate-500">
             Don’t have an account?
-            <a href="register.php" class="text-blue-600 font-semibold hover:underline">
-                Register here
+            <a href="register.php" class="text-blue-600 hover:underline font-medium">
+                Request Access
             </a>
-        </p>
+        </div>
+
     </div>
+
+    <!-- Footer Text -->
+    <p class="text-center text-xs text-slate-400 mt-6">
+        © <?= date('Y') ?> Your Company Name. All rights reserved.
+    </p>
 
 </div>
 
 </body>
+
 </html>

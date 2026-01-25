@@ -6,7 +6,7 @@ require_once './../db.php';
    AUTO TRIGGER EXPIRY CHECK
    (RUNS ONCE PER DAY ONLY)
 ================================ */
-require_once './../document_expiry_mail.php';
+// require_once './../document_expiry_mail.php';
 
 
 if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'user') {

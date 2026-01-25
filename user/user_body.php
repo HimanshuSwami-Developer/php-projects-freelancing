@@ -1,569 +1,712 @@
 <?php
-require_once './../session.php';
-require_once './../db.php';
-
-/* ===============================
-   AUTH CHECK
-================================ */
+require_once "./../session.php";
+require_once "./../db.php";
 
 $conn = getDB();
-$emp_id = $_SESSION['user_id'];
+$userId = $_SESSION['user_id'] ?? null;
+
+if (!$userId) {
+    header("Location: login.php");
+    exit;
+}
 
 /* ===============================
-   FETCH USER DATA
+   FETCH USER + DOCUMENT DATA
 ================================ */
 $stmt = $conn->prepare("
-    SELECT emp_id, name, role, email, contact, address,
-   act_doc, act_expirey,
-   sia_doc, sia_expirey,
-   sia_licence_number,
-   share_code_doc, share_code_expirey,
-   share_code_text,
-   first_aid_doc
-FROM users
-WHERE emp_id = ?
+SELECT 
+    u.name, u.email, u.contact, u.role,
+
+    ac.act_blue_doc, ac.act_blue_expiry,
+    ac.act_orange_doc, ac.act_orange_expiry,
+
+    s.sia_licence_doc, s.sia_licence_number, s.sia_licence_expiry,
+
+    sc.share_code_doc, sc.share_code_number, sc.share_code_expiry,
+    sc.first_aid_doc, sc.first_aid_expiry
+
+FROM users u
+LEFT JOIN act_certificate ac ON ac.user_id = u.id
+LEFT JOIN sia_licence s ON s.user_id = u.id
+LEFT JOIN sharecode_first_aid sc ON sc.user_id = u.id
+WHERE u.id = ?
 ");
-$stmt->bind_param("i", $emp_id);
+$stmt->bind_param("i", $userId);
 $stmt->execute();
 $user = $stmt->get_result()->fetch_assoc();
 $stmt->close();
 
-/* ===============================
-   DOCUMENT CONFIG
-================================ */
-$docs = [
-    'act_doc' => 'ACT Certificate',
-    'sia_doc' => 'SIA Certificate',
-    'share_code_doc' => 'Share Code',
-    'first_aid_doc' => 'First Aid Certificate'
-];
 
-$expiryMap = [
-    'act_doc' => 'act_expirey',
-    'sia_doc' => 'sia_expirey',
-    'share_code_doc' => 'share_code_expirey'
-];
-
-$expiryRules = [
-    'act_doc' => '+1 year',
-    'sia_doc' => '+3 years',
-    'share_code_doc' => '+3 months'
-];
-
-/* ===============================
-   IMAGE COMPRESSION FUNCTION
-================================ */
-function compressImage($source, $destination, $quality = 75)
+function expiryClass($date, $warningDays = 30)
 {
-    if (!function_exists('imagecreatefromjpeg') || !function_exists('imagecreatefrompng')) {
-        // fallback: just move the file without compression
-        move_uploaded_file($source, $destination);
-        return;
+    if (empty($date))
+        return '';
+
+    $today = new DateTime();
+    $expiry = new DateTime($date);
+    $diff = (int) $today->diff($expiry)->format('%r%a');
+
+    if ($diff < 0) {
+        return 'bg-red-200';       // expired
     }
 
-    $info = getimagesize($source);
-
-    if ($info['mime'] === 'image/jpeg') {
-        $image = imagecreatefromjpeg($source);
-        imagejpeg($image, $destination, $quality);
-    } elseif ($info['mime'] === 'image/png') {
-        $image = imagecreatefrompng($source);
-        imagepng($image, $destination, 7);
-    } else {
-        move_uploaded_file($source, $destination);
+    if ($diff <= $warningDays) {
+        return 'bg-red-100';       // near expiry
     }
-    imagedestroy($image);
+
+    return '';
 }
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['doc_type'])) {
 
-/* ===============================
-   HANDLE UPLOAD / RE-UPLOAD
-================================ */
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $type = $_POST['doc_type'];
 
-    $baseDir = __DIR__ . "/Upload/{$user['email']}/";
-    if (!is_dir($baseDir)) {
-        mkdir($baseDir, 0777, true);
+    $rootFs = dirname($_SERVER['DOCUMENT_ROOT']);
+    $baseFs = $rootFs . "/Upload/{$user['email']}/";
+    $baseDb = "/Upload/{$user['email']}/";
+
+    if (!is_dir($baseFs))
+        mkdir($baseFs, 0777, true);
+
+    switch ($type) {
+
+        case 'act_blue':
+        case 'act_orange':
+            $file = "{$type}_doc";
+            move_uploaded_file($_FILES[$file]['tmp_name'], $baseFs . "{$type}.png");
+
+            $docPath = $baseDb . "{$type}.png";
+            $expiryDate = $_POST["{$type}_expiry"];
+
+            $stmt = $conn->prepare("
+                UPDATE act_certificate
+                SET {$type}_doc = ?, {$type}_expiry = ?
+                WHERE user_id = ?
+            ");
+            $stmt->bind_param(
+                "ssi",
+                $docPath,
+                $expiryDate,
+                $userId
+            );
+            break;
+
+        case 'sia':
+            move_uploaded_file($_FILES['sia_licence_doc']['tmp_name'], $baseFs . "sia.png");
+
+            $stmt = $conn->prepare("
+    UPDATE sia_licence
+    SET sia_licence_doc = ?,
+        sia_licence_number = ?,
+        sia_licence_expiry = ?
+    WHERE user_id = ?
+");
+
+            /* ✅ VARIABLES ONLY */
+            $siaDoc = $baseDb . "sia.png";
+            $siaNumber = $_POST['sia_licence_number'];
+            $siaExpiry = $_POST['sia_licence_expiry'];
+
+            $stmt->bind_param(
+                "sssi",
+                $siaDoc,
+                $siaNumber,
+                $siaExpiry,
+                $userId
+            );
+
+            $stmt->execute();
+            $stmt->close();
+
+            break;
+
+        case 'share':
+            move_uploaded_file($_FILES['share_code_doc']['tmp_name'], $baseFs . "share.png");
+
+            $stmt = $conn->prepare("
+    UPDATE sharecode_first_aid
+    SET share_code_doc = ?, 
+        share_code_number = ?, 
+        share_code_expiry = ?
+    WHERE user_id = ?
+");
+
+            $shareDoc = $baseDb . "share.png";
+            $shareNumber = $_POST['share_code_number'];
+            $shareExpiry = $_POST['share_code_expiry'];
+
+            $stmt->bind_param(
+                "sssi",
+                $shareDoc,
+                $shareNumber,
+                $shareExpiry,
+                $userId
+            );
+
+            $stmt->execute();
+            $stmt->close();
+
+            break;
+
+        case 'firstaid':
+            move_uploaded_file($_FILES['first_aid_doc']['tmp_name'], $baseFs . "first_aid.png");
+
+            $stmt = $conn->prepare("
+    UPDATE sharecode_first_aid
+    SET first_aid_doc = ?, 
+        first_aid_expiry = ?
+    WHERE user_id = ?
+");
+
+            $firstAidDoc = $baseDb . "first_aid.png";
+            $firstAidExpiry = $_POST['first_aid_expiry'];
+
+            $stmt->bind_param(
+                "ssi",
+                $firstAidDoc,
+                $firstAidExpiry,
+                $userId
+            );
+
+            $stmt->execute();
+            $stmt->close();
+
+            break;
     }
 
-    $allowedMime = ['image/jpeg', 'image/png'];
-
-    $submitAllowedDocs = ['act_doc', 'first_aid_doc'];
-
-    foreach ($docs as $column => $label) {
-
-        // 🚫 BLOCK SIA & SHARE CODE ON SUBMIT
-        // if (!in_array($column, $submitAllowedDocs)) {
-        //     continue;
-        // }
-
-        /* BLOCK RE-UPLOAD FOR FIRST AID */
-        if ($column === 'first_aid_doc' && !empty($user['first_aid_doc'])) {
-            continue;
-        }
-
-        if (!isset($_FILES[$column]) || $_FILES[$column]['error'] !== 0) {
-            continue;
-        }
-
-        $tmp = $_FILES[$column]['tmp_name'];
-        $mime = mime_content_type($tmp);
-
-        if (!in_array($mime, $allowedMime)) {
-            die("Only JPG and PNG images are allowed.");
-        }
-
-        /* DELETE OLD FILE (ANY EXTENSION) */
-        foreach (glob($baseDir . $column . '.*') as $oldFile) {
-            unlink($oldFile);
-        }
-
-        $ext = pathinfo($_FILES[$column]['name'], PATHINFO_EXTENSION);
-        $filename = $column . '.' . strtolower($ext);
-        $dest = $baseDir . $filename;
-
-        compressImage($tmp, $dest, 75);
-
-        if (filesize($dest) > 2 * 1024 * 1024) {
-            compressImage($tmp, $dest, 60);
-        }
-
-        $relativePath = "Upload/{$user['email']}/{$filename}";
-        if ($column === 'first_aid_doc') {
-
-            $sql = "
-        UPDATE users
-        SET $column = ?, updated_at = NOW()
-        WHERE emp_id = ?
-    ";
-            $update = $conn->prepare($sql);
-            $update->bind_param("si", $relativePath, $emp_id);
-
-        } else {
-
-            $expiryColumn = $expiryMap[$column];
-            // $expiryDate = date('Y-m-d', strtotime($expiryRules[$column]));
-            $expiryDate = $user[$expiryColumn] ?? null;
-
-
-            $sql = "
-        UPDATE users
-        SET $column = ?, $expiryColumn = ?, updated_at = NOW()
-        WHERE emp_id = ?
-    ";
-            $update = $conn->prepare($sql);
-            $update->bind_param("ssi", $relativePath, $expiryDate, $emp_id);
-        }
-
-
-        $update->execute();
-        $update->close();
+    if (isset($stmt)) {
+        $stmt->execute();
+        $stmt->close();
     }
 
-    $_SESSION['upload_success'] = "Documents updated successfully.";
-    header("Location: " . $_SERVER['PHP_SELF']);
+    header("Location: " . $_SERVER['REQUEST_URI']);
     exit;
 }
+
+
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html>
 
 <head>
-    <meta charset="UTF-8">
     <title>User Documents</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body class="bg-gray-100">
+<body class="bg-gray-100 p-6">
 
-    <div class="p-6 space-y-10">
+    <div class="max-w-6xl mx-auto bg-white p-6 shadow rounded">
 
-        <!-- USER OVERVIEW -->
-        <div>
-            <h2 class="text-2xl font-bold mb-2">User Overview (Read Only)</h2>
-            <div class="bg-white rounded shadow overflow-x-auto">
-                <table class="w-full border">
-                    <thead class="bg-gray-200">
-                        <tr>
-                            <th class="p-3 border">Employee ID</th>
-                            <th class="p-3 border">Name</th>
-                            <th class="p-3 border">Email</th>
-                            <th class="p-3 border">Contact</th>
-                            <th class="p-3 border">Address</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr class="text-center">
-                            <td class="p-3 border"><?= $user['emp_id'] ?></td>
-                            <td class="p-3 border"><?= htmlspecialchars($user['name']) ?></td>
-                            <td class="p-3 border"><?= htmlspecialchars($user['email']) ?></td>
-                            <td class="p-3 border"><?= htmlspecialchars($user['contact']) ?></td>
-                            <td class="p-3 border"><?= htmlspecialchars($user['address']) ?></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+        <!-- PROFILE -->
+        <h2 class="text-2xl font-bold mb-4">Profile</h2>
 
-        <?php if (!empty($_SESSION['upload_success'])): ?>
-            <div id="uploadSuccessMsg" class="bg-green-100 text-green-700 p-3 rounded">
-                <?= $_SESSION['upload_success'];
-                unset($_SESSION['upload_success']); ?>
-            </div>
-        <?php endif; ?>
+        <p><b>Name:</b> <?= htmlspecialchars($user['name']) ?></p>
+        <p><b>Email:</b> <?= htmlspecialchars($user['email']) ?></p>
+        <p><b>Contact:</b> <?= htmlspecialchars($user['contact']) ?></p>
+        <p><b>Role:</b> <?= strtoupper($user['role']) ?></p>
 
-        <!-- VIEW DOCUMENTS -->
-        <div class="bg-white p-6 rounded shadow">
-            <h3 class="text-xl font-semibold mb-4">Uploaded Documents</h3>
+        <hr class="my-6">
 
-            <div class="grid grid-cols-4 gap-6 overflow-x-auto">
-                <?php foreach ($docs as $key => $label): ?>
-                    <div class="border rounded p-4 text-center">
-                        <h4 class="font-semibold mb-2"><?= $label ?></h4>
-                        <?php if (!empty($user[$key]) && file_exists(__DIR__ . '/' . $user[$key])): ?>
-                            <img src="<?= $user[$key] ?>" class="max-h-40 mx-auto border rounded">
-                            <?php if ($key !== 'first_aid_doc'): ?>
-                                <p class="text-sm mt-2 text-gray-600">
-                                    Expires on: <?= $user[$expiryMap[$key]] ?>
-                                </p>
-                            <?php else: ?>
-                                <p class="text-sm mt-2 text-green-600 font-semibold">
-                                    One-time upload (No expiry)
-                                </p>
-                            <?php endif; ?>
+        <!-- DOCUMENT TABLE -->
+        <table class="w-full border">
+            <thead class="bg-gray-200">
+                <tr>
+                    <th class="border p-2">Document</th>
+                    <th class="border p-2">Details</th>
+                    <th class="border p-2">Expiry</th>
+                    <th class="border p-2">View</th>
+                </tr>
+            </thead>
+            <tbody>
 
+                <tr class="<?= expiryClass($user['act_blue_expiry']) ?>">
+
+                    <td class="border p-2 font-semibold">ACT Blue</td>
+                    <td class="border p-2">—</td>
+                    <td class="border p-2"><?= $user['act_blue_expiry'] ?? '—' ?></td>
+                    <td class="border p-2 text-center">
+                        <?php if (!empty($user['act_blue_doc'])): ?>
+                            <button type="button" onclick="openImageModal('/<?= ltrim($user['act_blue_doc'], '/') ?>')"
+                                class="text-blue-600 underline">
+                                View
+                            </button>
                         <?php else: ?>
-                            <span class="text-red-600 text-sm">Not uploaded yet</span>
+                            —
                         <?php endif; ?>
+                    </td>
 
-                    </div>
-                <?php endforeach; ?>
-            </div>
-        </div>
+                </tr>
 
-        <!-- UPLOAD -->
-        <div class="bg-white p-6 rounded shadow">
-            <h3 class="text-xl font-semibold mb-4">Upload / Re-upload Documents</h3>
+                <tr class="<?= expiryClass($user['act_orange_expiry']) ?>">
 
-            <form method="POST" enctype="multipart/form-data">
-                <div class="grid grid-cols-4 gap-6 overflow-x-auto">
+                    <td class="border p-2 font-semibold">ACT Orange</td>
 
-                    <?php foreach ($docs as $key => $label): ?>
-                        <div class="border rounded p-4">
-                            <label class="block font-semibold mb-2">
-                                <?= $label ?>
-                                <span class="text-sm text-gray-500">
-                                    <?php
-                                    if ($key === 'first_aid_doc' && !empty($user[$key])) {
-                                        echo '(Uploaded)';
-                                    } else {
-                                        echo empty($user[$key]) ? '(Upload)' : '(Re-upload)';
-                                    }
-                                    ?>
-                                </span>
+                    <td class="border p-2">—</td>
 
-                            </label>
+                    <td class="border p-2">
+                        <?= $user['act_orange_expiry'] ?: '—' ?>
+                    </td>
 
-                            <?php if ($key === 'first_aid_doc' && !empty($user['first_aid_doc'])): ?>
-                                <p class="text-green-600 text-sm font-semibold">
-                                    Already uploaded (cannot be changed)
-                                </p>
-                            <?php else: ?>
-                                <input type="file" name="<?= $key ?>" accept="image/*" class="w-full border p-2 rounded"
-                                    onchange="previewImage(this,'preview_<?= $key ?>')">
-                            <?php endif; ?>
-                            <?php if ($key === 'sia_doc'): ?>
-                                    <div class="mt-2 text-sm hidden" id="siaResult">
-                                        <p><b>Licence No:</b> <span id="siaLicence">—</span></p>
-                                        <p><b>Expiry:</b> <span id="siaExpiry">—</span></p>
-                                    </div>
-                                <?php endif; ?>
-
-                                <?php if ($key === 'share_code_doc'): ?>
-                                    <div class="mt-2 text-sm hidden" id="shareResult">
-                                        <p><b>Share Code:</b> <span id="shareCode">—</span></p>
-                                        <p><b>Valid Until:</b> <span id="shareExpiry">—</span></p>
-                                    </div>
-                                <?php endif; ?>
+                    <td class="border p-2 text-center">
+                        <?php if (!empty($user['act_orange_doc'])): ?>
+                            <button type="button" onclick="openImageModal('/<?= ltrim($user['act_orange_doc'], '/') ?>')"
+                                class="text-blue-600 underline">
+                                View
+                            </button>
+                        <?php else: ?>
+                            —
+                        <?php endif; ?>
+                    </td>
+                </tr>
 
 
-                            <img id="preview_<?= $key ?>" class="hidden mt-3 max-h-32 mx-auto border rounded">
-                        </div>
-                    <?php endforeach; ?>
+                <tr class="<?= expiryClass($user['sia_licence_expiry']) ?>">
 
+                    <td class="border p-2 font-semibold">SIA Licence</td>
+
+                    <td class="border p-2">
+                        <b>No:</b> <?= $user['sia_licence_number'] ?: '—' ?>
+                    </td>
+
+                    <td class="border p-2">
+                        <?= $user['sia_licence_expiry'] ?: '—' ?>
+                    </td>
+
+                    <td class="border p-2 text-center">
+                        <?php if (!empty($user['sia_licence_doc'])): ?>
+                            <button type="button" onclick="openImageModal('/<?= ltrim($user['sia_licence_doc'], '/') ?>')"
+                                class="text-blue-600 underline">
+                                View
+                            </button>
+                        <?php else: ?>
+                            —
+                        <?php endif; ?>
+                    </td>
+                </tr>
+
+
+                <tr class="<?= expiryClass($user['share_code_expiry']) ?>">
+
+                    <td class="border p-2 font-semibold">Share Code</td>
+
+                    <td class="border p-2">
+                        <b>Code:</b> <?= $user['share_code_number'] ?: '—' ?>
+                    </td>
+
+                    <td class="border p-2">
+                        <?= $user['share_code_expiry'] ?: '—' ?>
+                    </td>
+
+                    <td class="border p-2 text-center">
+                        <?php if (!empty($user['share_code_doc'])): ?>
+                            <button type="button" onclick="openImageModal('/<?= ltrim($user['share_code_doc'], '/') ?>')"
+                                class="text-blue-600 underline">
+                                View
+                            </button>
+                        <?php else: ?>
+                            —
+                        <?php endif; ?>
+                    </td>
+                </tr>
+
+                <tr class="<?= expiryClass($user['first_aid_expiry']) ?>">
+
+                    <td class="border p-2 font-semibold">First Aid</td>
+
+                    <td class="border p-2">—</td>
+
+                    <td class="border p-2">
+                        <?= $user['first_aid_expiry'] ?: '—' ?>
+                    </td>
+
+                    <td class="border p-2 text-center">
+                        <?php if (!empty($user['first_aid_doc'])): ?>
+                            <button type="button" onclick="openImageModal('/<?= ltrim($user['first_aid_doc'], '/') ?>')"
+                                class="text-blue-600 underline">
+                                View
+                            </button>
+                        <?php else: ?>
+                            —
+                        <?php endif; ?>
+                    </td>
+                </tr>
+
+
+            </tbody>
+        </table>
+
+
+        <form method="POST" enctype="multipart/form-data"
+            onsubmit="return validateBeforeSave(this.querySelector('.save-btn'))">
+
+            <input type="hidden" name="doc_type" value="act_blue">
+
+            <div class="border p-4 rounded relative" data-doc="act_blue">
+
+                <h4 class="font-semibold mb-2">ACT Blue</h4>
+
+                <input type="file" name="act_blue_doc" accept="image/*" data-type="blue"
+                    onchange="handleDocumentOCR(this)" class="w-full border p-2" required>
+
+                <img class="act-preview hidden mt-3 max-h-72 border mx-auto" />
+
+                <div class="act-result hidden mt-3 text-sm">
+                    <p><strong>Completion Date:</strong> <span class="act-issue"></span></p>
+                    <p><strong>Expiry Date:</strong> <span class="act-expiry"></span></p>
                 </div>
 
-                <button id="submitBtn" type="submit"
-                    class="mt-6 bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 disabled:opacity-50">
-                    Submit Changes
+                <input type="hidden" name="act_blue_expiry">
+
+                <button type="submit" class="save-btn hidden mt-3 bg-blue-600 text-white px-4 py-1 rounded">
+                    Save ACT Blue
                 </button>
-            </form>
+
+            </div>
+        </form>
+
+
+
+        <form method="POST" enctype="multipart/form-data"
+            onsubmit="return validateBeforeSave(this.querySelector('.save-btn'))">
+
+            <input type="hidden" name="doc_type" value="act_orange">
+
+            <div class="border p-4 rounded relative" data-doc="act_orange">
+
+                <h4 class="font-semibold mb-2">ACT Orange</h4>
+
+                <input type="file" name="act_orange_doc" accept="image/*" data-type="orange"
+                    onchange="handleDocumentOCR(this)" class="w-full border p-2" required>
+
+                <img class="act-preview hidden mt-3 max-h-72 border mx-auto" />
+
+                <div class="act-result hidden mt-3 text-sm">
+                    <p><strong>Completion Date:</strong> <span class="act-issue"></span></p>
+                    <p><strong>Expiry Date:</strong> <span class="act-expiry"></span></p>
+                </div>
+
+                <input type="hidden" name="act_orange_expiry">
+
+                <button type="submit" class="save-btn hidden mt-3 bg-blue-600 text-white px-4 py-1 rounded">
+                    Save ACT Orange
+                </button>
+
+            </div>
+        </form>
+
+        <form method="POST" enctype="multipart/form-data"
+            onsubmit="return validateBeforeSave(this.querySelector('.save-btn'))">
+
+            <input type="hidden" name="doc_type" value="sia">
+
+            <div class="border p-4 rounded relative" data-doc="sia">
+
+                <h4 class="font-semibold mb-2">SIA Licence</h4>
+
+                <input type="file" name="sia_licence_doc" accept="image/*" data-type="sia"
+                    onchange="handleDocumentOCR(this)" class="w-full border p-2" required>
+
+                <img class="doc-preview hidden mt-3 max-h-72 border mx-auto" />
+
+                <div class="doc-result hidden mt-3 text-sm">
+                    <p><strong>Licence No:</strong> <span class="sia-licence"></span></p>
+                    <p><strong>Expiry Date:</strong> <span class="sia-expiry"></span></p>
+                </div>
+
+                <input type="hidden" name="sia_licence_number">
+                <input type="hidden" name="sia_licence_expiry">
+
+                <button type="submit" class="save-btn hidden mt-3 bg-blue-600 text-white px-4 py-1 rounded">
+                    Save SIA Licence
+                </button>
+
+            </div>
+        </form>
+
+
+        <form method="POST" enctype="multipart/form-data"
+            onsubmit="return validateBeforeSave(this.querySelector('.save-btn'))">
+
+            <input type="hidden" name="doc_type" value="share">
+
+            <div class="border p-4 rounded relative" data-doc="share">
+
+                <h4 class="font-semibold mb-2">Share Code</h4>
+
+                <input type="file" name="share_code_doc" accept="image/*" data-type="share"
+                    onchange="handleDocumentOCR(this)" class="w-full border p-2" required>
+
+                <img class="doc-preview hidden mt-3 max-h-72 border mx-auto" />
+
+                <div class="doc-result hidden mt-3 text-sm">
+                    <p><strong>Code:</strong> <span class="share-code"></span></p>
+                    <p><strong>Expiry Date:</strong> <span class="share-expiry"></span></p>
+                </div>
+
+                <input type="hidden" name="share_code_number">
+                <input type="hidden" name="share_code_expiry">
+
+                <button type="submit" class="save-btn hidden mt-3 bg-blue-600 text-white px-4 py-1 rounded">
+                    Save Share Code
+                </button>
+
+            </div>
+        </form>
+
+
+        <form method="POST" enctype="multipart/form-data"
+            onsubmit="return validateBeforeSave(this.querySelector('.save-btn'))">
+
+            <input type="hidden" name="doc_type" value="firstaid">
+
+            <div class="border p-4 rounded relative" data-doc="firstaid">
+
+                <h4 class="font-semibold mb-2">First Aid</h4>
+
+                <input type="file" name="first_aid_doc" accept="image/*" data-type="firstaid"
+                    onchange="handleDocumentOCR(this)" class="w-full border p-2" required>
+
+                <img class="doc-preview hidden mt-3 max-h-72 border mx-auto" />
+
+                <div class="doc-result hidden mt-3 text-sm">
+                    <p><strong>Awarded Date:</strong> <span class="fa-issue"></span></p>
+                    <p><strong>Expiry Date:</strong> <span class="fa-expiry"></span></p>
+                </div>
+
+                <input type="hidden" name="first_aid_expiry">
+
+                <button type="submit" class="save-btn hidden mt-3 bg-blue-600 text-white px-4 py-1 rounded">
+                    Save First Aid
+                </button>
+
+            </div>
+        </form>
+
+
+    </div>
+
+    <!-- IMAGE MODAL -->
+    <div id="imageModal" class="fixed inset-0 bg-black bg-opacity-70 hidden flex items-center justify-center z-50">
+        <div class="relative bg-white p-4 rounded shadow max-w-4xl">
+            <button onclick="closeImageModal()"
+                class="absolute top-2 right-2 bg-red-600 text-white px-3 py-1 rounded">✕</button>
+            <img id="modalImage" class="max-h-[80vh] mx-auto border rounded">
         </div>
-
-<!-- OCR LOADER -->
-<div id="ocrLoader"
-     class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div class="bg-white rounded-lg p-6 flex flex-col items-center gap-4 shadow-lg">
-        <div class="animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-transparent"></div>
-        <p class="text-sm font-semibold text-gray-700">
-            Extracting document details, please wait...
-        </p>
     </div>
-</div>
 
+    <div id="ocrLoader" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white px-6 py-4 rounded shadow text-lg">
+            Extracting document details…
+        </div>
     </div>
-<script src="https://js.puter.com/v2/"></script>
 
 
-    <!-- BLUR DETECTION + PREVIEW -->
+
     <script>
-function showOCRLoader() {
-    document.getElementById('ocrLoader').classList.remove('hidden');
-}
+        function openImageModal(src) {
+            document.getElementById("modalImage").src = src;
+            document.getElementById("imageModal").classList.remove("hidden");
+        }
+        function closeImageModal() {
+            document.getElementById("modalImage").src = "";
+            document.getElementById("imageModal").classList.add("hidden");
+        }
+    </script>
 
-function hideOCRLoader() {
-    document.getElementById('ocrLoader').classList.add('hidden');
-}
-
-        async function toDataURL(file) {
-    return new Promise(resolve => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result);
-        reader.readAsDataURL(file);
-    });
-}
-
-let ocrStatus = {
-    sia_doc: { valid: false },
-    share_code_doc: { valid: false }
-};
-
-function updateSubmitState() {
-    const submitBtn = document.getElementById("submitBtn");
-
-    const siaInvalid =
-        document.querySelector("input[name='sia_doc']")?.files.length &&
-        !ocrStatus.sia_doc.valid;
-
-    const shareInvalid =
-        document.querySelector("input[name='share_code_doc']")?.files.length &&
-        !ocrStatus.share_code_doc.valid;
-
-    submitBtn.disabled = siaInvalid || shareInvalid;
-}
-
-
-async function runOCR(file, type) {
-
-    showOCRLoader(); // 🔥 SHOW OVERLAY
-
-    try {
-        const rawText = await puter.ai.img2txt(await toDataURL(file));
-
-        const t = rawText
-            .toUpperCase()
-            .replace(/[^A-Z0-9\s]/g, ' ')
-            .replace(/\s+/g, ' ');
-
-        let payload = { type };
-
-        /* =======================
-           SIA
-        ======================= */
-        if (type === 'sia') {
-
-            const licence = t.match(/\b\d{4}\s\d{4}\s\d{4}\s\d{4}\b/);
-
-            const day = t.match(/\b([0-3]?\d)\b/);
-            const month = t.match(/\b(JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|SEPT|OCT|NOV|DEC)\b/);
-            const year = t.match(/\b(20[2-3]\d)\b/);
-
-            const licenceNo = licence ? licence[0] : 'Not detected';
-            const expiry = (day && month && year)
-                ? new Date(`${day[1]} ${month[1]} ${year[1]}`).toISOString().split('T')[0]
-                : 'Not detected';
-
-            document.getElementById('siaLicence').innerText = licenceNo;
-            document.getElementById('siaExpiry').innerText = expiry;
-            document.getElementById('siaResult').classList.remove('hidden');
-
-            payload.licence = licenceNo !== 'Not detected' ? licenceNo : null;
-            payload.expiry  = expiry !== 'Not detected' ? expiry : null;
-            
-            ocrStatus.sia_doc.valid = !!(payload.licence && payload.expiry);
+    <script>
+        function showLoader() {
+            document.getElementById("ocrLoader").classList.remove("hidden");
         }
 
-        /* =======================
-           SHARE CODE
-        ======================= */
-        if (type === 'share') {
-
-            const code = t.match(/\b[A-Z0-9]{3}\s[A-Z0-9]{3}\s[A-Z0-9]{3}\b/);
-
-            const date = t.match(
-                /\b([0-3]?\d)\s(JANUARY|FEBRUARY|MARCH|APRIL|MAY|JUNE|JULY|AUGUST|SEPTEMBER|OCTOBER|NOVEMBER|DECEMBER)\s(20\d{2})\b/
-            );
-
-            const shareCode = code ? code[0] : 'Not detected';
-            const expiry = date
-                ? new Date(`${date[1]} ${date[2]} ${date[3]}`).toISOString().split('T')[0]
-                : 'Not detected';
-
-            document.getElementById('shareCode').innerText = shareCode;
-            document.getElementById('shareExpiry').innerText = expiry;
-            document.getElementById('shareResult').classList.remove('hidden');
-
-            payload.code   = shareCode !== 'Not detected' ? shareCode : null;
-            payload.expiry = expiry !== 'Not detected' ? expiry : null;
-            
-            ocrStatus.share_code_doc.valid = !!(payload.code && payload.expiry);
+        function hideLoader() {
+            document.getElementById("ocrLoader").classList.add("hidden");
         }
 
-        // SAVE OCR DATA
-        await fetch("save_ocr.php", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload)
-        });
-
-        updateSubmitState();
-
-    } catch (err) {
-        alert("OCR failed. Please try a clearer image.");
-        console.error(err);
-    } finally {
-        hideOCRLoader(); // 🔥 ALWAYS HIDE OVERLAY
-    }
-}
-
-
-        let blurStatus = {
-            act_doc: false,
-            sia_doc: false,
-            share_code_doc: false
-        };
-
-        const BLUR_THRESHOLD = 100;
-
-        function computeVariance(data) {
-            const n = data.length;
-            let mean = data.reduce((a, b) => a + b, 0) / n;
-            let variance = data.reduce((a, b) => a + (b - mean) * (b - mean), 0) / n;
-            return variance;
-        }
-
-        function checkBlur(file) {
+        function toDataURL(file) {
             return new Promise(resolve => {
-                const img = new Image();
                 const reader = new FileReader();
-                reader.onload = e => img.src = e.target.result;
+                reader.onload = e => resolve(e.target.result);
                 reader.readAsDataURL(file);
-
-                img.onload = () => {
-                    const canvas = document.createElement("canvas");
-                    const maxDim = 300; // scale down
-                    let w = img.width;
-                    let h = img.height;
-                    if (Math.max(w, h) > maxDim) {
-                        const scale = maxDim / Math.max(w, h);
-                        w *= scale; h *= scale;
-                    }
-                    canvas.width = w; canvas.height = h;
-                    const ctx = canvas.getContext("2d");
-                    ctx.drawImage(img, 0, 0, w, h);
-
-                    const imgData = ctx.getImageData(0, 0, w, h);
-                    const gray = [];
-                    for (let i = 0; i < imgData.data.length; i += 4) {
-                        const r = imgData.data[i], g = imgData.data[i + 1], b = imgData.data[i + 2];
-                        gray.push(0.299 * r + 0.587 * g + 0.114 * b);
-                    }
-
-                    // Laplacian kernel
-                    const lap = [];
-                    for (let y = 1; y < h - 1; y++) {
-                        for (let x = 1; x < w - 1; x++) {
-                            const i = y * w + x;
-                            const val = -gray[i - w - 1] - gray[i - w] - gray[i - w + 1]
-                                - gray[i - 1] + 8 * gray[i] - gray[i + 1]
-                                - gray[i + w - 1] - gray[i + w] - gray[i + w + 1];
-                            lap.push(val);
-                        }
-                    }
-
-                    const variance = computeVariance(lap);
-                    resolve(variance < BLUR_THRESHOLD);
-                };
             });
         }
+    </script>
 
-        async function previewImage(input, id) {
+    <script src="https://js.puter.com/v2/"></script>
+
+    <script>
+        async function handleDocumentOCR(input) {
+
             const file = input.files[0];
-            const key = input.name;
-            if (!file || !file.type.startsWith('image/')) {
-                alert("Only image files allowed"); input.value = ""; return;
+            if (!file) return;
+
+            const type = input.dataset.type;
+            const wrapper = input.closest("[data-doc]");
+
+            const preview =
+                wrapper.querySelector(".doc-preview") ||
+                wrapper.querySelector(".act-preview");
+
+            if (!preview) {
+                console.error("Preview image not found");
+                return;
             }
 
-            // show preview immediately
+
+            const resultBox =
+                wrapper.querySelector(".doc-result") ||
+                wrapper.querySelector(".act-result");
+
+            const saveBtn = wrapper.querySelector(".save-btn");
+
+            showLoader();
+
+            /* IMAGE PREVIEW */
             const reader = new FileReader();
             reader.onload = e => {
-                const img = document.getElementById(id);
-                img.src = e.target.result;
-                img.classList.remove("hidden");
+                preview.src = e.target.result;
+                preview.classList.remove("hidden");
             };
             reader.readAsDataURL(file);
 
-    if (input.name === 'sia_doc') {
-        runOCR(file, 'sia');
-    }
+            try {
+                const rawText = await puter.ai.img2txt(await toDataURL(file));
 
-    if (input.name === 'share_code_doc') {
-        runOCR(file, 'share');
-    }
-            // check blur in background
-            const isBlurry = await checkBlur(file);
-            blurStatus[key] = isBlurry;
-            const submitBtn = document.getElementById("submitBtn");
-            submitBtn.disabled = Object.values(blurStatus).includes(true);
+                const t = rawText
+                    .toUpperCase()
+                    .replace(/[^A-Z0-9./\s]/g, ' ')
+                    .replace(/\s+/g, ' ');
 
-            if (isBlurry) {
-                alert("Image might be blurry. Please upload a clearer image.");
+                let success = false;
+
+                /* ACT */
+                if (type === 'blue' || type === 'orange') {
+
+                    const dateMatch = t.match(/\b([0-3]?\d)[./]([0-1]?\d)[./](20\d{2})\b/);
+                    if (!dateMatch) throw "ACT date not detected";
+
+                    const issueDate = new Date(`${dateMatch[3]}-${dateMatch[2]}-${dateMatch[1]}`);
+                    const expiryDate = new Date(issueDate);
+                    expiryDate.setFullYear(expiryDate.getFullYear() + 1);
+
+                    wrapper.querySelector(".act-issue").innerText =
+                        issueDate.toLocaleDateString("en-GB");
+
+                    wrapper.querySelector(".act-expiry").innerText =
+                        expiryDate.toLocaleDateString("en-GB");
+
+                    wrapper.querySelector(`input[name="act_${type}_expiry"]`).value =
+                        expiryDate.toISOString().split("T")[0];
+
+                    success = true;
+                }
+
+                /* SIA */
+                if (type === 'sia') {
+
+                    const licenceMatch =
+                        t.match(/\b\d{4}\s\d{4}\s\d{4}\s\d{4}\b/);
+
+                    const day = t.match(/\b([0-3]?\d)\b/);
+                    const month = t.match(/\b(JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|SEPT|OCT|NOV|DEC)\b/);
+                    const year = t.match(/\b(20[2-3]\d)\b/);
+
+                    if (!licenceMatch || !day || !month || !year) {
+                        alert("SIA licence details not detected");
+                        return;
+                    }
+
+                    const expiryISO = new Date(`${day[1]} ${month[1]} ${year[1]}`)
+                        .toISOString()
+                        .split("T")[0];
+
+                    wrapper.querySelector(".sia-licence").innerText = licenceMatch[0];
+                    wrapper.querySelector(".sia-expiry").innerText = expiryISO;
+
+                    wrapper.querySelector("input[name='sia_licence_number']").value = licenceMatch[0];
+                    wrapper.querySelector("input[name='sia_licence_expiry']").value = expiryISO;
+
+                    success = true;
+                }
+
+                /* SHARE CODE */
+                if (type === 'share') {
+
+                    const code = t.match(/\b[A-Z0-9]{3}\s[A-Z0-9]{3}\s[A-Z0-9]{3}\b/);
+                    const expiry = t.match(/\b([0-3]?\d)\s(JANUARY|FEBRUARY|MARCH|APRIL|MAY|JUNE|JULY|AUGUST|SEPTEMBER|OCTOBER|NOVEMBER|DECEMBER)\s(20\d{2})\b/);
+
+                    if (!code || !expiry) throw "Share code missing";
+
+                    const expiryISO = new Date(`${expiry[1]} ${expiry[2]} ${expiry[3]}`)
+                        .toISOString().split("T")[0];
+
+                    wrapper.querySelector(".share-code").innerText = code[0];
+                    wrapper.querySelector(".share-expiry").innerText = expiryISO;
+
+                    wrapper.querySelector("input[name='share_code_number']").value = code[0];
+                    wrapper.querySelector("input[name='share_code_expiry']").value = expiryISO;
+
+                    success = true;
+                }
+
+                /* FIRST AID */
+                if (type === 'firstaid') {
+
+                    const dateMatch =
+                        t.match(/\b([0-3]?\d)\s(DECEMBER|JANUARY|FEBRUARY|MARCH|APRIL|MAY|JUNE|JULY|AUGUST|SEPTEMBER|OCTOBER|NOVEMBER)\s(20\d{2})\b/);
+
+                    if (!dateMatch) throw "First Aid date missing";
+
+                    const issueDate = new Date(`${dateMatch[1]} ${dateMatch[2]} ${dateMatch[3]}`);
+                    const expiryDate = new Date(issueDate);
+                    expiryDate.setFullYear(expiryDate.getFullYear() + 1);
+
+                    wrapper.querySelector(".fa-issue").innerText =
+                        issueDate.toLocaleDateString("en-GB");
+
+                    wrapper.querySelector(".fa-expiry").innerText =
+                        expiryDate.toLocaleDateString("en-GB");
+
+                    wrapper.querySelector("input[name='first_aid_expiry']").value =
+                        expiryDate.toISOString().split("T")[0];
+
+                    success = true;
+                }
+
+                if (success) {
+                    resultBox.classList.remove("hidden");
+                    saveBtn.classList.remove("hidden");
+                }
+
+            } catch (e) {
+                alert("OCR failed: " + e);
+            } finally {
+                hideLoader();
             }
         }
     </script>
 
+
     <script>
-        setTimeout(() => {
-            const msg = document.getElementById("uploadSuccessMsg");
-            if (msg) msg.remove();
-        }, 1500);
+        function validateBeforeSave(btn) {
+            const wrapper = btn.closest("[data-doc]");
+            const expiryInput = wrapper.querySelector("input[type='hidden'][name$='_expiry']");
+
+            if (!expiryInput || !expiryInput.value) {
+                alert("OCR not completed or expiry missing");
+                return false;
+            }
+
+            if (new Date(expiryInput.value) < new Date()) {
+                alert("Document is expired");
+                return false;
+            }
+
+            return true;
+        }
     </script>
 
-<script>
-document.querySelector("form").addEventListener("submit", function (e) {
 
-    // SIA validation
-    if (
-        document.querySelector("input[name='sia_doc']")?.files.length &&
-        !ocrStatus.sia_doc.valid
-    ) {
-        alert("SIA document is missing Licence Number or Expiry date.");
-        e.preventDefault();
-        return;
-    }
-
-    // Share code validation
-    if (
-        document.querySelector("input[name='share_code_doc']")?.files.length &&
-        !ocrStatus.share_code_doc.valid
-    ) {
-        alert("Share Code document is missing Code or Expiry date.");
-        e.preventDefault();
-        return;
-    }
-});
-</script>
 
 </body>
 
