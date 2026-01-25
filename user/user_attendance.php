@@ -20,7 +20,7 @@ $empId = $_SESSION['user_id'];
 $from = $_GET['from'] ?? '';
 $to   = $_GET['to'] ?? '';
 
-$where = "WHERE emp_id = ?";
+$where = "WHERE user_id = ?";
 $params = [$empId];
 $types  = "i";
 
@@ -54,7 +54,7 @@ $totalPages = ceil($total / $limit);
    FETCH ATTENDANCE
 ================================ */
 $sql = "
-    SELECT emp_name, mode, shift_start, shift_end, status
+    SELECT user_name, mode, shift_start, shift_end, status
     FROM attendance
     $where
     ORDER BY shift_start DESC
@@ -127,7 +127,7 @@ $result = $stmt->get_result();
 
 <?php while ($row = $result->fetch_assoc()): ?>
 <tr class="text-center">
-    <td class="border p-2"><?= ucfirst($row['emp_name']) ?></td>
+    <td class="border p-2"><?= ucfirst($row['user_name']) ?></td>
     <td class="border p-2"><?= ucfirst($row['mode']) ?></td>
     <td class="border p-2">
     <?= date("d M Y, g:i a", strtotime($row['shift_start'])) ?>
@@ -140,8 +140,7 @@ $result = $stmt->get_result();
     <td class="border p-2">
         <span class="
             px-3 py-1 rounded text-white
-            <?= $row['status'] === 'present' ? 'bg-green-600' :
-                ($row['status'] === 'half_day' ? 'bg-yellow-500' : 'bg-red-600') ?>">
+            <?= $row['status'] === 'present' ? 'bg-green-600' : 'bg-red-600' ?>">
             <?= ucfirst(str_replace('_',' ', $row['status'])) ?>
         </span>
     </td>

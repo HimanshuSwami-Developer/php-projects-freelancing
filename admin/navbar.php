@@ -22,23 +22,33 @@ $role = $_SESSION['user_role'];
 
 
 <?php if (isset($_GET['inactive'])): ?>
-<div class="bg-red-100 text-red-700 p-3 text-center">
-    Your account is inactive. Contact administrator.
-</div>
+    <div class="bg-red-100 text-red-700 p-3 text-center">
+        Your account is inactive. Contact administrator.
+    </div>
 <?php endif; ?>
 
 <nav class="bg-gray-900 text-white px-6 py-4 flex justify-between items-center">
 
     <!-- LEFT -->
-    <div class="text-xl font-bold">
-        Admin Dashboard
-    </div>
+
+    <?php if ($role === 'admin'): ?>
+        <!-- ADMIN ONLY -->
+        <div class="text-xl font-bold">
+            Admin Dashboard
+        </div>
+    <?php endif; ?>
+
+    <?php if ($role === 'owner'): ?>
+        <!-- OWNER ONLY -->
+        <div class="text-xl font-bold">
+            Owner Dashboard
+        </div>
+    <?php endif; ?>
 
     <!-- RIGHT -->
     <div class="space-x-6 flex items-center text-sm">
 
-        <a href="index.php"
-           class="hover:text-gray-300">
+        <a href="index.php" class="hover:text-gray-300">
             Attendance
         </a>
 
@@ -56,13 +66,21 @@ $role = $_SESSION['user_role'];
             </a>
         <?php endif; ?>
 
-        <a href="payment.php"
-           class="hover:text-gray-300">
+        <a href="payment.php" class="hover:text-gray-300">
             Payments
         </a>
+        <form method="POST" action="./../download_folder.php">
+    <button
+        type="submit"
+        class="px-4 py-2 bg-slate-700 text-white rounded-md text-sm
+               hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-500">
+        Download All User Documents
+    </button>
+</form>
 
-        <a href="./../logout.php"
-           class="bg-red-600 px-4 py-2 rounded hover:bg-red-700">
+
+
+        <a href="./../logout.php" class="bg-red-600 px-4 py-2 rounded hover:bg-red-700">
             Logout
         </a>
 

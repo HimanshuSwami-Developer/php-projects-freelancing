@@ -20,7 +20,7 @@ $userId = $_SESSION['user_id'];
 $from = $_GET['from'] ?? '';
 $to = $_GET['to'] ?? '';
 
-$where = "WHERE a.emp_id=?";
+$where = "WHERE a.user_id=?";
 $params = [$userId];
 $types = "i";
 
@@ -57,8 +57,8 @@ $stmt->close();
 ================================ */
 $sql = "SELECT 
             a.id AS attendance_id,
-            a.emp_id,
-            a.emp_name,
+            a.id,
+            a.user_name,
             a.mode,
             a.shift_start,
             a.shift_end,

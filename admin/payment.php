@@ -89,6 +89,7 @@ $sql = "SELECT
             COALESCE(p.expense,0) AS expense,
             COALESCE(p.payment_status,'pending') AS payment_status,
             u.email,
+            u.emp_id,
             u.contact,
             u.role,
             u.address
@@ -119,7 +120,7 @@ $result = $stmt->get_result();
 <body class="bg-gray-100">
     <?php include 'navbar.php'; ?>
 
-    <div class="max-w-7xl mx-auto mt-6">
+    <div class="max-w-[80%] mx-8 mx-auto mt-6">
 
         <h1 class="text-2xl font-bold mb-4">Payment Tracker</h1>
 
@@ -128,7 +129,7 @@ $result = $stmt->get_result();
             <select name="user_id" class="border p-2 rounded">
                 <option value="">All Employees</option>
                 <?php foreach ($employees as $emp): ?>
-                    <option value="<?= $emp['user_id'] ?>" <?= ($empFilter == $emp['user_id']) ? 'selected' : '' ?>>
+                    <option value="<?= $emp['id'] ?>" <?= ($empFilter == $emp['id']) ? 'selected' : '' ?>>
                         <?= htmlspecialchars($emp['name']) ?>
                     </option>
                 <?php endforeach; ?>
@@ -155,6 +156,11 @@ $result = $stmt->get_result();
                     class="bg-gray-400 text-white px-4 py-2 rounded w-full md:w-auto text-center">
                     Reset
                 </button>
+                <a href="export_payment.php?<?= http_build_query($_GET) ?>"
+   class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">
+   Export Excel
+</a>
+
             </div>
 
         </form>
@@ -164,6 +170,7 @@ $result = $stmt->get_result();
             <table class="w-full border text-sm">
                 <thead class="bg-gray-200">
                     <tr>
+                        <th class="border p-2">ID</th>
                         <th class="border p-2">Emp ID</th>
                         <th class="border p-2">Name</th>
                         <th class="border p-2">Mode</th>
@@ -179,6 +186,7 @@ $result = $stmt->get_result();
                     <?php while ($row = $result->fetch_assoc()): ?>
                         <tr class="text-center">
                             <td class="border p-2"><?= $row['user_id'] ?></td>
+                            <td class="border p-2"><?= $row['emp_id'] ?></td>
                             <td class="border p-2"><?= htmlspecialchars($row['user_name']) ?></td>
                             <td class="border p-2"><?= ucfirst($row['mode']) ?></td>
                             <td class="border p-2"><?= date("d M Y, g:i a", strtotime($row['shift_start'])) ?> -

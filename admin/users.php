@@ -55,20 +55,46 @@ if (
 }
 
 /* ===============================
-   UPDATE PASSWORD (ADMIN / OWNER)
+   UPDATE USER LOGIN (ADMIN / OWNER)
 ================================ */
 if (
     $_SERVER['REQUEST_METHOD'] === 'POST' &&
-    isset($_POST['update_password']) &&
+    isset($_POST['update_login']) &&
     in_array($_SESSION['user_role'], ['admin','owner'])
 ) {
-    $id  = (int)$_POST['user_id'];
-    $pwd = $_POST['password']; // plain as requested
+    $id     = (int)$_POST['user_id'];
+    $emp_id = (int)$_POST['emp_id'];
+    $email  = strtolower(trim($_POST['email']));
+    $pwd    = trim($_POST['password'] ?? '');
 
-    $stmt = $conn->prepare("
-        UPDATE users SET password=? WHERE id=?
+    // Check duplicate emp_id / email (excluding self)
+    $chk = $conn->prepare("
+        SELECT id FROM users
+        WHERE (emp_id = ? OR email = ?) AND id != ?
     ");
-    $stmt->bind_param("si", $pwd, $id);
+    $chk->bind_param("isi", $emp_id, $email, $id);
+    $chk->execute();
+    $chk->store_result();
+
+    if ($chk->num_rows > 0) {
+        $chk->close();
+        die("Employee ID or Email already exists");
+    }
+    $chk->close();
+
+    // Update email + emp_id
+    if ($pwd !== '') {
+        $stmt = $conn->prepare("
+            UPDATE users SET emp_id=?, email=?, password=? WHERE id=?
+        ");
+        $stmt->bind_param("issi", $emp_id, $email, $pwd, $id);
+    } else {
+        $stmt = $conn->prepare("
+            UPDATE users SET emp_id=?, email=? WHERE id=?
+        ");
+        $stmt->bind_param("isi", $emp_id, $email, $id);
+    }
+
     $stmt->execute();
     $stmt->close();
 
@@ -76,12 +102,13 @@ if (
     exit;
 }
 
+
 /* ===============================
    FETCH USERS + DOCUMENTS
 ================================ */
 $stmt = $conn->prepare("
 SELECT 
-    u.id, u.name, u.email, u.contact, u.address, u.role, u.is_active,
+    u.id,u.emp_id, u.name, u.email, u.contact, u.address, u.role, u.is_active,
 
     ac.act_blue_doc, ac.act_blue_expiry,
     ac.act_orange_doc, ac.act_orange_expiry,
@@ -157,6 +184,7 @@ function expiryClass($date, $warn = 30) {
 <thead class="bg-slate-200 sticky top-0 z-10">
 <tr>
 <th class="p-3 border">ID</th>
+<th class="p-3 border">EMP ID</th>
 <th class="p-3 border">User</th>
 <th class="p-3 border">Contact</th>
 <th class="p-3 border">Address</th>
@@ -176,7 +204,7 @@ function expiryClass($date, $warn = 30) {
 <th class="p-3 border">Share Code</th>
 <th class="p-3 border">Expiry</th>
 <th class="p-3 border">First Aid</th>
-<th class="p-3 border">Password</th>
+<th class="p-3 border">Action Button</th>
 </tr>
 </thead>
 
@@ -185,6 +213,7 @@ function expiryClass($date, $warn = 30) {
 <tr class="hover:bg-slate-50 transition text-center">
 
 <td class="p-3 border font-semibold"><?= $u['id'] ?></td>
+<td class="p-3 border font-semibold"><?= $u['emp_id'] ?></td>
 
 <td class="p-3 border text-left">
     <div class="font-medium"><?= htmlspecialchars($u['name']) ?></div>
@@ -251,17 +280,15 @@ Save
 <td class="p-3 border"><?= img($u['first_aid_doc']) ?></td>
 
 <td class="p-3 border">
-<form method="POST" class="flex items-center gap-2 justify-center">
-<input type="hidden" name="user_id" value="<?= $u['id'] ?>">
-<input type="password"
-       name="password"
-       placeholder="New password"
-       class="border rounded px-2 py-1 text-xs w-28" required>
-<button name="update_password"
-        class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs">
-Set
+<button
+    onclick="openEditUserModal(
+        <?= $u['id'] ?>,
+        '<?= htmlspecialchars($u['email'], ENT_QUOTES) ?>',
+        '<?= $u['emp_id'] ?? '' ?>'
+    )"
+    class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm">
+    Create Login
 </button>
-</form>
 </td>
 
 </tr>
@@ -270,8 +297,80 @@ Set
 </table>
 </div>
 
+
+<!-- EDIT USER LOGIN MODAL -->
+<div id="editUserModal"
+     class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+
+  <div class="bg-white rounded-lg shadow-xl w-full max-w-md">
+
+    <div class="px-6 py-4 border-b">
+      <h3 class="text-lg font-semibold text-slate-800">
+        Update User Login
+      </h3>
+    </div>
+
+    <form method="POST" class="px-6 py-4 space-y-4">
+
+      <input type="hidden" name="update_login" value="1">
+      <input type="hidden" name="user_id" id="edit_user_id">
+
+      <div>
+        <label class="block text-sm font-medium mb-1">Employee ID</label>
+        <input type="number" name="emp_id" id="edit_emp_id" required
+               class="w-full border rounded px-3 py-2">
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium mb-1">Email Address</label>
+        <input type="email" name="email" id="edit_email" required
+               class="w-full border rounded px-3 py-2">
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium mb-1">
+            New Password <span class="text-xs text-gray-500">(leave blank to keep current)</span>
+        </label>
+        <input type="password" name="password"
+               class="w-full border rounded px-3 py-2">
+      </div>
+
+      <div class="flex justify-end gap-3 pt-4 border-t">
+        <button type="button"
+                onclick="closeEditUserModal()"
+                class="px-4 py-2 text-sm border rounded">
+          Cancel
+        </button>
+        <button type="submit"
+                class="px-4 py-2 bg-blue-600 text-white rounded text-sm">
+          Update
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+
 </div>
 <script>
+    function openEditUserModal(id, email, empId) {
+    document.getElementById('edit_user_id').value = id;
+    document.getElementById('edit_email').value = email;
+    document.getElementById('edit_emp_id').value = empId || '';
+    document.getElementById('editUserModal').classList.remove('hidden');
+}
+
+function closeEditUserModal() {
+    document.getElementById('editUserModal').classList.add('hidden');
+}
+
+function openCreateUserModal(){
+    document.getElementById('createUserModal').classList.remove('hidden');
+}
+function closeCreateUserModal(){
+    document.getElementById('createUserModal').classList.add('hidden');
+}
 function filterUsers(){
     let v=document.getElementById('searchInput').value.toLowerCase();
     document.querySelectorAll('#usersTable tbody tr').forEach(r=>{

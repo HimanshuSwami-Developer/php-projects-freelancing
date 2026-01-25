@@ -420,7 +420,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     Register & Save
                 </button>
 
+
         </form>
+         <div class="mt-6 text-center text-sm text-slate-500">
+            Do have an account?
+            <a href="login.php" class="text-blue-600 hover:underline font-medium">
+               Login
+            </a>
+        </div>
 
 
     </div>
