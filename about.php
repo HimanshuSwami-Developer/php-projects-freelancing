@@ -1,6 +1,6 @@
-<?php 
-$title = "About Us"; 
-include __DIR__ . "/includes/header.php"; 
+<?php
+$title = "About Us";
+include __DIR__ . "/includes/header.php";
 
 
 // JSON updated ONLY: owners & single location
@@ -38,35 +38,52 @@ $companyData = json_decode('{
     }
   ],
 
-  "team": [
-    {
-      "name": "Lokesh Sharma",
-      "role": "Owner",
-      "description": "Primary contact for sales and enquiries. Guides clients throughout the property buying process."
-    },
-    {
-      "name": "Ajay Sirohi",
-      "role": "Co-Owner",
-      "description": "Assists clients with site visits, options selection and deal finalization."
-    },
-    {
-      "name": "D.D. Sharma",
-      "role": "Senior Advisor",
-      "description": "Leads customer consultation, documentation assistance and overall advisory support."
-    }
+"team": [
+  {
+    "image": "/assets/images/dd_sharma.jpg",
+    "name": "D.D. Sharma",
+    "role": "Owner",
+    "description": "With over 17 years of experience in the real estate industry since 2007, D.D. Sharma brings deep market knowledge, strong negotiation expertise, and strategic insight. He leads client advisory, legal documentation guidance, and ensures every transaction is handled with transparency, compliance, and long-term value in mind."
+  },
+  {
+    "image": "/assets/images/lokesh_sharma.jpg",
+    "name": "Ajay Sirohi",
+    "role": "Owner",
+    "description": "Ajay Sirohi plays a key role in business operations and client coordination. He specializes in site visits, property shortlisting, and deal closures, ensuring clients receive the best options aligned with their requirements, budget, and investment goals."
+  },
+  {
+    "image": "/assets/images/lokesh_sharma.jpg",
+    "name": "Lokesh Sharma",
+    "role": "Business Manager",
+    "description": "Lokesh Sharma manages sales strategy, client relations, and day-to-day business operations. He serves as the primary point of contact for buyers and investors, guiding them through the entire property journey with professionalism, clarity, and personalized service."
+  },
+  {
+    "image": "/assets/images/nishakant_shukla.jpg",
+    "name": "Nishakant Shukla",
+    "role": "Senior Sales Manager",
+    "description": "Nishakant Shukla oversees client consultations and sales execution. With strong expertise in residential and commercial property markets, he assists clients in identifying the right opportunities while ensuring smooth coordination, timely follow-ups, and successful deal completion."
+   }
   ]
 }', true);
 ?>
 
 <style>
-  .text-gold { color: #D4AF37; }
-  .bg-gold { background-color: #D4AF37; }
-  .border-gold { border-color: #D4AF37; }
+  .text-gold {
+    color: #D4AF37;
+  }
+
+  .bg-gold {
+    background-color: #D4AF37;
+  }
+
+  .border-gold {
+    border-color: #D4AF37;
+  }
 </style>
 
 <section class="relative">
-  <div class="h-[450px] bg-cover bg-fixed bg-center" 
-       style="background-image:url('https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=1400&q=80');">
+  <div class="h-[450px] bg-cover bg-fixed bg-center"
+    style="background-image:url('https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=1400&q=80');">
     <div class="bg-black/70 h-full w-full flex items-center justify-center text-center px-4">
       <div>
         <span class="text-gold uppercase tracking-[0.3em] text-sm font-semibold mb-4 block">Our Story</span>
@@ -94,7 +111,8 @@ $companyData = json_decode('{
 
     <ul class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
       <?php foreach ($companyData["highlights"] as $point): ?>
-        <li class="flex items-center space-x-4 bg-[#111] p-6 rounded-lg border border-yellow-900/20 hover:border-gold/50 transition duration-500">
+        <li
+          class="flex items-center space-x-4 bg-[#111] p-6 rounded-lg border border-yellow-900/20 hover:border-gold/50 transition duration-500">
           <div class="h-10 w-10 rounded-full border border-gold flex items-center justify-center flex-shrink-0">
             <i class="fas fa-check text-gold text-sm"></i>
           </div>
@@ -118,7 +136,7 @@ $companyData = json_decode('{
 
 <section class="bg-black py-20 px-4">
   <div class="max-w-4xl mx-auto">
-    
+
     <h2 class="text-3xl font-bold text-gold text-center uppercase tracking-widest">
       Where We Operate
     </h2>
@@ -132,9 +150,8 @@ $companyData = json_decode('{
       <?php foreach ($companyData["locations"] as $loc): ?>
         <div class="group relative overflow-hidden rounded-2xl bg-[#111] border border-yellow-900/10">
 
-          <img src="<?= $loc["image"] ?>" 
-               alt="<?= $loc["title"] ?>" 
-               class="h-80 w-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-110 transition duration-700">
+          <img src="<?= $loc["image"] ?>" alt="<?= $loc["title"] ?>"
+            class="h-80 w-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-110 transition duration-700">
 
           <div class="p-10">
             <h3 class="text-2xl font-bold text-gold tracking-wider">
@@ -158,10 +175,12 @@ $companyData = json_decode('{
 
 <section class="bg-[#0a0a0a] py-20 px-4 border-t border-yellow-900/20">
   <div class="max-w-7xl mx-auto">
-    <h2 class="text-3xl font-bold text-white text-center uppercase tracking-widest mb-12">Our <span class="text-gold">Core Values</span></h2>
+    <h2 class="text-3xl font-bold text-white text-center uppercase tracking-widest mb-12">Our <span
+        class="text-gold">Core Values</span></h2>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-10">
       <?php foreach ($companyData["values"] as $value): ?>
-        <div class="bg-black border border-yellow-900/10 rounded-xl p-10 text-center hover:border-gold transition duration-500">
+        <div
+          class="bg-black border border-yellow-900/10 rounded-xl p-10 text-center hover:border-gold transition duration-500">
           <h3 class="text-xl font-bold text-gold uppercase tracking-tighter mb-4"><?= $value["title"] ?></h3>
           <p class="text-gray-400 leading-relaxed"><?= $value["description"] ?></p>
         </div>
@@ -174,16 +193,27 @@ $companyData = json_decode('{
 <section class="bg-black py-20 px-4">
   <div class="max-w-7xl mx-auto">
     <h2 class="text-3xl font-bold text-gold text-center uppercase tracking-widest">Leadership Team</h2>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-12 mt-16">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mt-16">
       <?php foreach ($companyData["team"] as $member): ?>
-        <div class="bg-[#111] p-8 rounded-2xl border-b-4 border-transparent hover:border-gold transition-all duration-500 shadow-2xl">
-          <div class="h-16 w-16 bg-gold/10 rounded-full flex items-center justify-center mb-6">
-            <i class="fas fa-user-tie text-gold text-2xl"></i>
+        <div
+          class="bg-[#111] p-8 rounded-2xl border-b-4 border-transparent hover:border-gold transition-all duration-500 shadow-2xl text-center">
+
+          <div class="w-32 h-32 mx-auto mb-6 overflow-hidden rounded-full border-4 border-gold/30">
+            <img src="<?= htmlspecialchars($member['image']) ?>" alt="<?= htmlspecialchars($member['name']) ?>"
+              class="w-full h-full object-cover grayscale hover:grayscale-0 transition duration-500">
           </div>
+
           <h4 class="text-xl font-bold text-white"><?= $member["name"] ?></h4>
-          <p class="text-sm text-gold font-bold uppercase tracking-widest mt-1"><?= $member["role"] ?></p>
-          <p class="mt-4 text-gray-500 text-sm leading-loose"><?= $member["description"] ?></p>
+          <p class="text-sm text-gold font-bold uppercase tracking-widest mt-1">
+            <?= $member["role"] ?>
+          </p>
+
+          <p class="mt-4 text-gray-500 text-sm leading-loose">
+            <?= $member["description"] ?>
+          </p>
+
         </div>
+
       <?php endforeach; ?>
     </div>
   </div>

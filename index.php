@@ -141,6 +141,23 @@
     </div>
   </div>
 </section>
+<section id="previous-projects" class="py-24 bg-gray-50">
+  <div class="container mx-auto px-6">
+    <div class="text-center mb-20">
+      <span class="text-gold font-bold uppercase tracking-[0.4em] text-xs">
+        Our Legacy
+      </span>
+      <h2 class="text-4xl font-bold text-gray-900 tracking-tighter uppercase mt-3">
+        Previous Project Portfolio
+      </h2>
+      <div class="w-20 h-1 bg-gold mx-auto mt-6"></div>
+    </div>
+
+    <div id="previousProjects"
+         class="flex overflow-x-auto space-x-6 pb-6 scroll-smooth no-scrollbar">
+    </div>
+  </div>
+</section>
 
 <div class="py-24 bg-white mx-auto w-full overflow-hidden">
   <div class="text-center mb-16">
@@ -213,6 +230,62 @@ $(function () {
             }
         });
     }
+
+    // Previous / Portfolio Projects
+$.getJSON('/assets/data/portfolios.json', function (data) {
+
+  // Everything that is NOT new = previous projects
+  const previous = data.filter(p => p.status !== "new");
+  const container = $("#previousProjects");
+
+  if (!previous.length) {
+    container.append(`
+      <p class="text-gray-400 text-center w-full">
+        Portfolio projects will be added soon.
+      </p>
+    `);
+    return;
+  }
+
+  previous.forEach(p => {
+    container.append(`
+      <a href="portfolio_details.php?id=${p.id}"
+         class="min-w-[90%] md:min-w-[30%] lg:min-w-[28%] flex-shrink-0">
+
+        <div class="group bg-white rounded-xl overflow-hidden
+                    shadow hover:shadow-2xl transition-all duration-500">
+
+          <div class="relative h-64 overflow-hidden">
+            <img src="${p.image_thumbnail}" alt="${p.title}"
+                 class="w-full h-full object-cover group-hover:scale-110 transition duration-700">
+
+            <div class="absolute top-3 left-3 bg-black/60 text-white px-3 py-1 rounded-full text-[10px] font-bold uppercase">
+              Portfolio
+            </div>
+          </div>
+
+          <div class="p-6">
+            <h3 class="text-lg font-bold uppercase">${p.title}</h3>
+            <p class="text-gray-400 text-xs uppercase mb-3">${p.location}</p>
+
+            <div class="flex items-center text-yellow-400 text-xs mb-3">
+              ${[1,2,3,4,5].map(i =>
+                `<i class="fa-solid fa-star ${p.rating >= i ? '' : 'text-gray-300'}"></i>`
+              ).join('')}
+              <span class="ml-2 text-gray-500 font-bold text-sm">(${p.rating})</span>
+            </div>
+
+            <div class="flex justify-between text-xs uppercase font-bold text-gray-500">
+              <span>${p.room_type}</span>
+              <span>${p.area} Sq.Yd</span>
+            </div>
+          </div>
+        </div>
+      </a>
+    `);
+  });
+});
+
 
     // Property Loading
    $.getJSON('/assets/data/properties.json', function (data) {

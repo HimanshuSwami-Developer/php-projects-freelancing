@@ -60,8 +60,8 @@
           <li><a href="/testimonials" class="text-gray-400 hover:text-[#D4AF37] transition-colors flex items-center">
               <i class="fas fa-comment-alt mr-2 text-sm text-[#D4AF37]"></i>Testimonials
             </a></li>
-          <li><a href="/blog" class="text-gray-400 hover:text-[#D4AF37] transition-colors flex items-center">
-              <i class="fas fa-newspaper mr-2 text-sm text-[#D4AF37]"></i>Blog
+          <li><a href="/portfolios" class="text-gray-400 hover:text-[#D4AF37] transition-colors flex items-center">
+              <i class="fas fa-newspaper mr-2 text-sm text-[#D4AF37]"></i>Portfolio Projects
             </a></li>
         </ul>
       </div>
