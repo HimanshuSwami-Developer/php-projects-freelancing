@@ -54,12 +54,20 @@ $totalPages = ceil($total / $limit);
    FETCH ATTENDANCE
 ================================ */
 $sql = "
-    SELECT user_name, mode, shift_start, shift_end, status
-    FROM attendance
+    SELECT 
+        a.user_name,
+        a.mode,
+        s.shift_name,
+        a.shift_start,
+        a.shift_end,
+        a.status
+    FROM attendance a
+    LEFT JOIN shifts s ON s.id = a.shift_id
     $where
-    ORDER BY shift_start DESC
+    ORDER BY a.shift_start DESC
     LIMIT $limit OFFSET $offset
 ";
+
 $stmt = $conn->prepare($sql);
 $stmt->bind_param($types, ...$params);
 $stmt->execute();
@@ -110,6 +118,7 @@ $result = $stmt->get_result();
 <tr>
     <th class="border p-2">Name</th>
     <th class="border p-2">Mode</th>
+    <th class="border p-2">Shift Name</th>
     <th class="border p-2">Shift Start</th>
     <th class="border p-2">Shift End</th>
     <th class="border p-2">Status</th>
@@ -129,6 +138,10 @@ $result = $stmt->get_result();
 <tr class="text-center">
     <td class="border p-2"><?= ucfirst($row['user_name']) ?></td>
     <td class="border p-2"><?= ucfirst($row['mode']) ?></td>
+    <td class="border p-2">
+    <?= htmlspecialchars($row['shift_name'] ?? '—') ?>
+</td>
+
     <td class="border p-2">
     <?= date("d M Y, g:i a", strtotime($row['shift_start'])) ?>
 </td>

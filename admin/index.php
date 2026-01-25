@@ -17,6 +17,13 @@ $adminId = $_SESSION['user_id'];
 /* ===============================
    FETCH EMPLOYEES
 ================================ */
+$shifts = [];
+$res = $conn->query("SELECT id, shift_name, shift_type FROM shifts ORDER BY shift_name");
+while ($row = $res->fetch_assoc()) {
+    $shifts[] = $row;
+}
+
+
 $employees = [];
 $empResult = $conn->query("
     SELECT id, emp_id ,name 
@@ -42,54 +49,6 @@ if (isset($_GET['delete'])) {
     exit;
 }
 
-/* ===============================
-   ADD / UPDATE ATTENDANCE
-================================ */
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
-    if (!empty($_POST['attendance_id'])) {
-        $stmt = $conn->prepare("
-            UPDATE attendance SET
-            user_id=?, user_name=?, mode=?,
-            shift_start=?, shift_end=?, status=?, updated_by=?
-            WHERE id=?
-        ");
-        $stmt->bind_param(
-            "isssssii",
-            $_POST['user_id'],
-            $_POST['user_name'],
-            $_POST['mode'],
-            $_POST['shift_start'],
-            $_POST['shift_end'],
-            $_POST['status'],
-            $adminId,
-            $_POST['attendance_id']
-        );
-        $_SESSION['success'] = "Attendance updated";
-    } else {
-        $stmt = $conn->prepare("
-            INSERT INTO attendance
-            (user_id, user_name, mode, shift_start, shift_end, status, updated_by)
-            VALUES (?,?,?,?,?,?,?)
-        ");
-        $stmt->bind_param(
-            "isssssi",
-            $_POST['user_id'],
-            $_POST['user_name'],
-            $_POST['mode'],
-            $_POST['shift_start'],
-            $_POST['shift_end'],
-            $_POST['status'],
-            $adminId
-        );
-        $_SESSION['success'] = "Attendance added";
-    }
-
-    $stmt->execute();
-    $stmt->close();
-    header("Location: index.php");
-    exit;
-}
 
 /* ===============================
    FILTERS
@@ -146,18 +105,150 @@ $totalPages = ceil($total / $limit);
 $sql = "
     SELECT 
         a.*,
-        u.emp_id
+        u.emp_id,
+        s.shift_name
     FROM attendance a
-    LEFT JOIN users u ON u.id = a.user_id
+    LEFT JOIN users u   ON u.id = a.user_id
+    LEFT JOIN shifts s  ON s.id = a.shift_id
     $where
     ORDER BY a.shift_start DESC
     LIMIT $limit OFFSET $offset
 ";
+
 $stmt = $conn->prepare($sql);
 if ($params)
     $stmt->bind_param($types, ...$params);
 $stmt->execute();
 $attendance = $stmt->get_result();
+
+
+/* ===============================
+   ADD / UPDATE SHIFT
+================================ */
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_shift'])) {
+
+    $shiftId = $_POST['shift_id'] ?? '';
+    $shiftName = trim($_POST['shift_name'] ?? '');
+    $shiftType = $_POST['shift_type'] ?? '';
+
+    if ($shiftName === '' || !in_array($shiftType, ['static', 'event'])) {
+        $_SESSION['shift_error'] = "Invalid shift data.";
+        header("Location: " . $_SERVER['REQUEST_URI']);
+        exit;
+    }
+
+    if ($shiftId) {
+        // UPDATE
+        $stmt = $conn->prepare("
+            UPDATE shifts
+            SET shift_name=?, shift_type=?
+            WHERE id=?
+        ");
+        $stmt->bind_param("ssi", $shiftName, $shiftType, $shiftId);
+        $_SESSION['shift_success'] = "Shift updated successfully.";
+    } else {
+        // INSERT
+        $stmt = $conn->prepare("
+            INSERT INTO shifts (shift_name, shift_type)
+            VALUES (?, ?)
+        ");
+        $stmt->bind_param("ss", $shiftName, $shiftType);
+        $_SESSION['shift_success'] = "Shift added successfully.";
+    }
+
+    $stmt->execute();
+    $stmt->close();
+
+    header("Location: " . $_SERVER['PHP_SELF']);
+    exit;
+}
+
+/* ===============================
+   DELETE SHIFT
+================================ */
+if (isset($_GET['delete_shift'])) {
+    $id = (int) $_GET['delete_shift'];
+
+    $stmt = $conn->prepare("DELETE FROM shifts WHERE id=?");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $stmt->close();
+
+    $_SESSION['shift_success'] = "Shift deleted.";
+    header("Location: " . $_SERVER['PHP_SELF']);
+    exit;
+}
+
+/* ===============================
+   FETCH SHIFTS
+================================ */
+$shifts = [];
+$res = $conn->query("SELECT * FROM shifts ORDER BY shift_name");
+while ($row = $res->fetch_assoc()) {
+    $shifts[] = $row;
+}
+
+
+/* ===============================
+   ADD / UPDATE ATTENDANCE
+================================ */
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+    if (!empty($_POST['attendance_id'])) {
+        $stmt = $conn->prepare("
+    UPDATE attendance SET
+        user_id=?, 
+        user_name=?, 
+        mode=?,
+        shift_start=?, 
+        shift_end=?, 
+        status=?, 
+        updated_by=?,
+        shift_id=?
+    WHERE id=?
+");
+
+        $stmt->bind_param(
+            "isssssiii",
+            $_POST['user_id'],       // i
+            $_POST['user_name'],     // s
+            $_POST['mode'],          // s
+            $_POST['shift_start'],   // s
+            $_POST['shift_end'],     // s
+            $_POST['status'],        // s
+            $adminId,                // i
+            $_POST['shift_id'],      // i
+            $_POST['attendance_id']  // i
+        );
+
+        $_SESSION['success'] = "Attendance updated";
+    } else {
+        $stmt = $conn->prepare("
+    INSERT INTO attendance
+    (user_id, user_name, mode, shift_start, shift_end, status, updated_by, shift_id)
+    VALUES (?,?,?,?,?,?,?,?)
+");
+
+        $stmt->bind_param(
+            "isssssii",
+            $_POST['user_id'],       // i
+            $_POST['user_name'],     // s
+            $_POST['mode'],          // s
+            $_POST['shift_start'],   // s
+            $_POST['shift_end'],     // s
+            $_POST['status'],        // s
+            $adminId,                // i
+            $_POST['shift_id']       // i
+        );
+        $_SESSION['success'] = "Attendance added";
+    }
+
+    $stmt->execute();
+    $stmt->close();
+    header("Location: index.php");
+    exit;
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -182,9 +273,13 @@ $attendance = $stmt->get_result();
                     + Add Shift
                 </a>
                 <a href="export_attendance.php?<?= http_build_query($_GET) ?>"
-                    class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+                    class="bg-green-600 mr-10 text-white px-4 py-2 rounded hover:bg-green-700">
                     Export Excel
                 </a>
+                <a onclick="openShiftPopup()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
+                    Manage Shifts
+                </a>
+
             </div>
 
         </div>
@@ -233,6 +328,7 @@ $attendance = $stmt->get_result();
                         <th class="border p-2">EMP ID</th>
                         <th class="border p-2">Name</th>
                         <th class="border p-2">Mode</th>
+                        <th class="border p-2">Shift Name</th>
                         <th class="border p-2">Shift Start</th>
                         <th class="border p-2">Shift End</th>
                         <th class="border p-2">Status</th>
@@ -255,6 +351,9 @@ $attendance = $stmt->get_result();
                             <td class="border p-2"><?= $row['emp_id'] ?></td>
                             <td class="border p-2"><?= htmlspecialchars($row['user_name']) ?></td>
                             <td class="border p-2"><?= ucfirst($row['mode']) ?></td>
+                            <td class="border p-2 font-medium">
+                                <?= htmlspecialchars($row['shift_name'] ?? '—') ?>
+                            </td>
                             <td class="border p-2"><?= date("d M Y, g:i a", strtotime($row['shift_start'])) ?></td>
                             <td class="border p-2"><?= date("d M Y, g:i a", strtotime($row['shift_end'])) ?></td>
                             <td class="border p-2">
@@ -374,6 +473,25 @@ $attendance = $stmt->get_result();
                         </div>
                     </div>
 
+                    <!-- SHIFT NAME -->
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">
+                            Shift Name
+                        </label>
+
+                        <select name="shift_id" id="shift_id_select" required class="w-full px-4 py-3 border border-gray-300 rounded-xl
+               focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+
+                            <option value="">Select shift...</option>
+
+                            <?php foreach ($shifts as $s): ?>
+                                <option value="<?= $s['id'] ?>" data-type="<?= $s['shift_type'] ?>">
+                                    <?= htmlspecialchars($s['shift_name']) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+
                     <!-- Date & Time Inputs -->
                     <div class="grid grid-cols-2 gap-4">
                         <div class="space-y-2">
@@ -460,6 +578,128 @@ $attendance = $stmt->get_result();
         </div>
 
     </div>
+
+    <!-- SHIFT POPUP -->
+    <div id="shiftPopup" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+
+        <div class="bg-white w-full max-w-3xl rounded-xl shadow-xl p-6 relative">
+
+            <!-- CLOSE -->
+            <button onclick="closeShiftPopup()" class="absolute top-3 right-4 text-2xl font-bold">&times;</button>
+
+            <h3 class="text-xl font-semibold mb-4">Shift Management</h3>
+
+            <!-- ADD / EDIT FORM -->
+            <form method="POST" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <input type="hidden" name="save_shift" value="1">
+                <input type="hidden" name="shift_id" id="shift_id">
+
+                <input type="text" name="shift_name" id="shift_name" placeholder="Shift Name" required
+                    class="border p-2 rounded">
+
+                <select name="shift_type" id="shift_type" required class="border p-2 rounded">
+                    <option value="">Shift Type</option>
+                    <option value="static">Static</option>
+                    <option value="event">Event</option>
+                </select>
+
+                <button type="submit" class="bg-blue-600 text-white rounded px-4">
+                    Save Shift
+                </button>
+            </form>
+
+            <!-- SHIFT TABLE -->
+            <div class="border rounded overflow-x-auto">
+                <table class="w-full text-sm border">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th class="border p-2">ID</th>
+                            <th class="border p-2">Shift Name</th>
+                            <th class="border p-2">Type</th>
+                            <th class="border p-2">Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <?php if (!$shifts): ?>
+                            <tr>
+                                <td colspan="4" class="p-4 text-center text-gray-500">
+                                    No shifts added
+                                </td>
+                            </tr>
+                        <?php endif; ?>
+
+                        <?php foreach ($shifts as $s): ?>
+                            <tr class="text-center">
+                                <td class="border p-2"><?= $s['id'] ?></td>
+                                <td class="border p-2 font-medium"><?= htmlspecialchars($s['shift_name']) ?></td>
+                                <td class="border p-2">
+                                    <span class="px-2 py-1 rounded text-white text-xs
+            <?= $s['shift_type'] == 'static' ? 'bg-green-600' : 'bg-purple-600' ?>">
+                                        <?= ucfirst($s['shift_type']) ?>
+                                    </span>
+                                </td>
+                                <td class="border p-2 space-x-2">
+                                    <button onclick='editShift(<?= json_encode($s) ?>)'
+                                        class="bg-yellow-500 text-white px-3 py-1 rounded">
+                                        Edit
+                                    </button>
+
+                                    <a href="?delete_shift=<?= $s['id'] ?>" onclick="return confirm('Delete this shift?')"
+                                        class="bg-red-600 text-white px-3 py-1 rounded">
+                                        Delete
+                                    </a>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function openShiftPopup() {
+            document.getElementById('shiftPopup').classList.remove('hidden');
+        }
+
+        function closeShiftPopup() {
+            document.getElementById('shiftPopup').classList.add('hidden');
+        }
+
+        function editShift(data) {
+            document.getElementById('shift_id').value = data.id;
+            document.getElementById('shift_name').value = data.shift_name;
+            document.getElementById('shift_type').value = data.shift_type;
+            openShiftPopup();
+        }
+    </script>
+
+    <script>
+        function filterShiftsByMode(mode) {
+            const shiftSelect = document.getElementById('shift_id_select');
+            const options = shiftSelect.querySelectorAll('option');
+
+            shiftSelect.value = "";
+
+            options.forEach(opt => {
+                if (!opt.dataset.type) return; // skip placeholder
+
+                opt.hidden = (opt.dataset.type !== mode);
+            });
+        }
+
+        // listen to mode change
+        document.querySelectorAll('input[name="mode"]').forEach(radio => {
+            radio.addEventListener('change', function () {
+                filterShiftsByMode(this.value);
+            });
+        });
+
+        // default load → event
+        filterShiftsByMode('event');
+    </script>
 
     <script>
         function openModal() {

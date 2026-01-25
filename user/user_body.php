@@ -182,6 +182,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['doc_type'])) {
     header("Location: " . $_SERVER['REQUEST_URI']);
     exit;
 }
+/* ===============================
+   SET PASSWORD (PLAIN TEXT)
+================================ */
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['set_password'])) {
+
+    $newPassword = trim($_POST['new_password'] ?? '');
+
+    if ($newPassword === '') {
+        $_SESSION['pwd_error'] = "Password cannot be empty.";
+        header("Location: ".$_SERVER['REQUEST_URI']);
+        exit;
+    }
+
+    $stmt = $conn->prepare("UPDATE users SET password=? WHERE id=?");
+    $stmt->bind_param("si", $newPassword, $userId);
+    $stmt->execute();
+    $stmt->close();
+
+    $_SESSION['pwd_success'] = "Password updated successfully.";
+    header("Location: ".$_SERVER['REQUEST_URI']);
+    exit;
+}
+
 
 
 ?>
@@ -205,6 +228,63 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['doc_type'])) {
         <p><b>Email:</b> <?= htmlspecialchars($user['email']) ?></p>
         <p><b>Contact:</b> <?= htmlspecialchars($user['contact']) ?></p>
         <p><b>Role:</b> <?= strtoupper($user['role']) ?></p>
+<button onclick="openPasswordModal()"
+        class="mt-3 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
+    Set Password
+</button>
+
+
+<!-- PASSWORD MODAL -->
+<div id="passwordModal"
+     class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+
+    <div class="bg-white rounded-xl shadow-xl w-full max-w-md p-6 relative">
+
+        <!-- Close -->
+        <button onclick="closePasswordModal()"
+                class="absolute top-3 right-3 text-gray-500 hover:text-black text-xl">
+            &times;
+        </button>
+
+        <h3 class="text-lg font-semibold mb-4">Set New Password</h3>
+
+        <?php if (!empty($_SESSION['pwd_error'])): ?>
+        <div class="bg-red-100 text-red-700 p-2 rounded mb-3">
+            <?= $_SESSION['pwd_error']; unset($_SESSION['pwd_error']); ?>
+        </div>
+        <?php endif; ?>
+
+        <?php if (!empty($_SESSION['pwd_success'])): ?>
+        <div class="bg-green-100 text-green-700 p-2 rounded mb-3">
+            <?= $_SESSION['pwd_success']; unset($_SESSION['pwd_success']); ?>
+        </div>
+        <?php endif; ?>
+
+        <form method="POST" class="space-y-4">
+            <input type="hidden" name="set_password" value="1">
+
+            <div>
+                <label class="block text-sm font-medium mb-1">New Password</label>
+                <input type="text" name="new_password" required
+                       class="w-full border rounded px-3 py-2">
+            </div>
+
+            <div class="flex justify-end gap-3 pt-2">
+                <button type="button"
+                        onclick="closePasswordModal()"
+                        class="px-4 py-2 border rounded">
+                    Cancel
+                </button>
+
+                <button type="submit"
+                        class="px-4 py-2 bg-blue-600 text-white rounded">
+                    Save Password
+                </button>
+            </div>
+        </form>
+
+    </div>
+</div>
 
         <hr class="my-6">
 
@@ -504,6 +584,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['doc_type'])) {
 
 
     <script>
+function openPasswordModal() {
+    document.getElementById('passwordModal').classList.remove('hidden');
+}
+
+function closePasswordModal() {
+    document.getElementById('passwordModal').classList.add('hidden');
+}
+
         function openImageModal(src) {
             document.getElementById("modalImage").src = src;
             document.getElementById("imageModal").classList.remove("hidden");

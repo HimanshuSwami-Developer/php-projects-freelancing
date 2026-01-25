@@ -333,7 +333,7 @@ $result = $stmt->get_result();
                 // Table Rows
                 doc.setFont("helvetica", "normal");
                 const payments = [
-                    { desc: "Payment- I", amount: parseFloat(btn.dataset.cash) },
+                    { desc: "NI Payment", amount: parseFloat(btn.dataset.cash) },
                     { desc: "Payment- II", amount: parseFloat(btn.dataset.ni) },
                     { desc: "Expense", amount: parseFloat(btn.dataset.expense || 0) }
                 ];
