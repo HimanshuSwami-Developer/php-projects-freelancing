@@ -104,7 +104,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['name'])) {
         <a href="/properties" class="block px-3 py-2 rounded hover:text-gold">Projects</a>
         <a href="/contact" class="block px-3 py-2 rounded hover:text-gold">Contact Us</a>
         
-        <a id="quoteBtn" class="block px-3 py-4 rounded bg-gold text-black font-bold text-center">GET A QUOTE</a>
+        <a id="quoteBtnMobile" class="block px-3 py-4 rounded bg-gold text-black font-bold text-center">GET A QUOTE</a>
       </div>
     </div>
   </header>
@@ -160,12 +160,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['name'])) {
   <script>
     const enquiryBtn = document.getElementById('enquiryBtn');
     const quoteBtn = document.getElementById('quoteBtn');
+    const quoteBtnMobile = document.getElementById('quoteBtnMobile');
     const enquiryModal = document.getElementById('enquiryModal');
     const closeModal = document.getElementById('closeModal');
     const enquiryForm = document.getElementById('enquiryForm');
 
     enquiryBtn.onclick = () => enquiryModal.classList.remove('hidden');
     quoteBtn.onclick = () => enquiryModal.classList.remove('hidden');
+    quoteBtnMobile.onclick = () => enquiryModal.classList.remove('hidden');
     closeModal.onclick = () => enquiryModal.classList.add('hidden');
 
     enquiryModal.addEventListener('click', (e) => {
