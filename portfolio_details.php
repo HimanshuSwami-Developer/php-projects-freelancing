@@ -35,7 +35,7 @@ include __DIR__ . "/includes/header.php";
 </style>
 
 
-<section class="pt-28 pb-24 bg-gray-50 min-h-screen">
+<section class="pt-10 md:pt-28 pb-24 bg-gray-50 min-h-screen">
   <div class="max-w-7xl mx-auto px-6">
 
     <!-- Breadcrumb -->
@@ -56,10 +56,10 @@ include __DIR__ . "/includes/header.php";
         <!-- Image Gallery -->
         <div class="lg:col-span-2">
           <img id="mainImage"
-               class="rounded-xl shadow-xl w-full h-[420px] object-cover mb-6">
+                class="rounded-xl shadow-xl w-full h-64 sm:h-80 lg:h-[420px] object-cover mb-6">
 
           <div id="gallery"
-               class="flex gap-4 overflow-x-auto no-scrollbar">
+               class="flex gap-4 overflow-x-auto no-scrollbar max-w-full">
           </div>
         </div>
 
@@ -151,9 +151,10 @@ $(function () {
     // Gallery
     project.images_gallery.forEach(img => {
       $('#gallery').append(`
-        <img src="${img}"
-             class="w-28 h-20 rounded-lg object-cover cursor-pointer hover:opacity-80"
-             onclick="$('#mainImage').attr('src', '${img}')">
+       <img src="${img}"
+     class="w-28 h-20 shrink-0 rounded-lg object-cover cursor-pointer hover:opacity-80"
+     onclick="$('#mainImage').attr('src', '${img}')">
+
       `);
     });
 

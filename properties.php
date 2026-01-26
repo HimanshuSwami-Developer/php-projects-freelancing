@@ -21,7 +21,7 @@
 </style>
 
 <section class="bg-[#fcfcfc] min-h-screen">
-  <div class="bg-[#0f0f10] pt-28 pb-16 px-4">
+  <div class="bg-[#0f0f10] pt-10 md:pt-28 pb-16 px-4">
     <div class="max-w-7xl mx-auto">
         <nav class="flex text-[10px] font-bold uppercase tracking-[0.3em] text-gray-500 mb-4">
             <span>Marketplace</span> <span class="mx-2">/</span> <span class="text-gold">Browse All</span>

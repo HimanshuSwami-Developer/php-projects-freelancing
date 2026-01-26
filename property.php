@@ -58,14 +58,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['propertyId'])) {
     border-color: var(--gold);
   }
 
-  @media (max-width: 768px) {
-
-    #galleryLeft,
-    #galleryRight {
-      display: none !important;
-    }
-  }
-
   .alert {
     padding: 15px;
     border-radius: 12px;
@@ -187,28 +179,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['propertyId'])) {
 
       const html = `
         <div class="grid md:grid-cols-2 gap-12 items-start">
-          <div class="space-y-6">
-            <div class="relative group">
-                <img id="mainImage" src="${property.image_thumbnail}" alt="${property.title}" class="rounded-2xl shadow-2xl w-full h-[450px] object-cover transition duration-500">
-                <div class="absolute top-4 right-4 bg-white/90 backdrop-blur px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest text-gray-900">Featured</div>
-            </div>
-            
-            <div class="relative px-2">
-              <button id="galleryLeft" class="absolute -left-4 top-1/2 -translate-y-1/2 bg-white shadow-xl rounded-full w-10 h-10 flex items-center justify-center z-10 hover:bg-gold transition">
-                <i class="fas fa-chevron-left text-xs"></i>
-              </button>
+          <!-- IMAGE + GALLERY (Portfolio Style) -->
+          <div class="w-full">
+            <img id="mainImage"
+              class="rounded-xl shadow-xl w-full h-100 sm:h-80 lg:h-[420px] object-cover mb-6">
 
-              <div id="galleryContainer" class="flex gap-4 overflow-x-auto no-scrollbar scroll-smooth py-2">
-                ${property.images_gallery.map((img, index) => `
-                  <img src="${img}" class="gallery-thumb w-28 h-20 object-cover rounded-xl cursor-pointer border-2 border-transparent hover:border-gold transition-all shrink-0 ${index === 0 ? 'active-thumb border-gold' : ''}">
-                `).join('')}
-              </div>
-
-              <button id="galleryRight" class="absolute -right-4 top-1/2 -translate-y-1/2 bg-white shadow-xl rounded-full w-10 h-10 flex items-center justify-center z-10 hover:bg-gold transition">
-                <i class="fas fa-chevron-right text-xs"></i>
-              </button>
-            </div>
           </div>
+            <div id="gallery"
+              class="flex gap-4 overflow-x-auto no-scrollbar max-w-full">
+            </div>
+
 
           <div class="flex flex-col h-full">
             <nav class="flex text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 mb-4">
@@ -320,12 +300,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['propertyId'])) {
 
       $('#propertyDetails').html(html);
 
-      // (Logic Preserved) Gallery click logic
-      $('.gallery-thumb').click(function () {
-        $('#mainImage').attr('src', $(this).attr('src'));
-        $('.gallery-thumb').removeClass('active-thumb border-gold');
-        $(this).addClass('active-thumb border-gold');
-      });
+     $('#mainImage').attr('src', property.image_thumbnail);
+
+// Portfolio-style gallery
+property.images_gallery.forEach(img => {
+  $('#gallery').append(`
+    <img src="${img}"
+      class="w-28 h-20 shrink-0 rounded-lg object-cover cursor-pointer hover:opacity-80"
+      onclick="$('#mainImage').attr('src', '${img}')">
+  `);
+});
+
 
       // (Logic Preserved) Gallery scroll
       const gallery = $('#galleryContainer');
