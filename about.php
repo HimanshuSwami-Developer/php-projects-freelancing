@@ -190,7 +190,7 @@ $companyData = json_decode('{
 </section>
 
 
-<section class="bg-black py-20 px-4">
+<section id="agents" class="bg-black py-20 px-4">
   <div class="max-w-7xl mx-auto">
     <h2 class="text-3xl font-bold text-gold text-center uppercase tracking-widest">Leadership Team</h2>
     <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mt-16">

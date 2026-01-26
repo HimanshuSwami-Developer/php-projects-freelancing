@@ -42,7 +42,7 @@
           <li><a href="/properties" class="text-gray-400 hover:text-[#D4AF37] transition-colors flex items-center">
               <i class="fas fa-star mr-2 text-sm text-[#D4AF37]"></i>Featured Listings
             </a></li>
-          <li><a href="/about" class="text-gray-400 hover:text-[#D4AF37] transition-colors flex items-center">
+          <li><a href="#agents" class="text-gray-400 hover:text-[#D4AF37] transition-colors flex items-center">
               <i class="fas fa-user-tie mr-2 text-sm text-[#D4AF37]"></i>Our Agents
             </a></li>
           <li><a href="/contact" class="text-gray-400 hover:text-[#D4AF37] transition-colors flex items-center">
@@ -57,10 +57,10 @@
           <li><a href="/about" class="text-gray-400 hover:text-[#D4AF37] transition-colors flex items-center">
               <i class="fas fa-building mr-2 text-sm text-[#D4AF37]"></i>About Us
             </a></li>
-          <li><a href="/testimonials" class="text-gray-400 hover:text-[#D4AF37] transition-colors flex items-center">
+          <li><a href="#testimonials" class="text-gray-400 hover:text-[#D4AF37] transition-colors flex items-center">
               <i class="fas fa-comment-alt mr-2 text-sm text-[#D4AF37]"></i>Testimonials
             </a></li>
-          <li><a href="/portfolios" class="text-gray-400 hover:text-[#D4AF37] transition-colors flex items-center">
+          <li><a href="#previous-projects" class="text-gray-400 hover:text-[#D4AF37] transition-colors flex items-center">
               <i class="fas fa-newspaper mr-2 text-sm text-[#D4AF37]"></i>Portfolio Projects
             </a></li>
         </ul>

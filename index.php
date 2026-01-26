@@ -159,7 +159,7 @@
   </div>
 </section>
 
-<div class="py-24 bg-white mx-auto w-full overflow-hidden">
+<div id="testimonials" class="py-24 bg-white mx-auto w-full overflow-hidden">
   <div class="text-center mb-16">
     <h2 class="text-3xl md:text-5xl font-bold text-gray-900 mb-4 tracking-tighter">CLIENT VOICES</h2>
     <p class="text-gold font-bold uppercase tracking-[0.3em] text-xs">Trusted by 8,000+ Customers</p>
@@ -257,7 +257,7 @@ $.getJSON('/assets/data/portfolios.json', function (data) {
 
           <div class="relative h-64 overflow-hidden">
             <img src="${p.image_thumbnail}" alt="${p.title}"
-                 class="w-full h-full object-cover group-hover:scale-110 transition duration-700">
+                 class="w-full h-[40%] object-cover group-hover:scale-110 transition duration-700">
 
             <div class="absolute top-3 left-3 bg-black/60 text-white px-3 py-1 rounded-full text-[10px] font-bold uppercase">
               Portfolio
@@ -304,7 +304,8 @@ $.getJSON('/assets/data/portfolios.json', function (data) {
 
         <div class="overflow-hidden relative h-64">
           <img src="${p.image_thumbnail}" alt="${p.title}"
-               class="w-full h-full object-cover group-hover:scale-110 transition duration-700">
+               class="w-full h-[40%] object-cover group-hover:scale-110 transition duration-700">
+              
           <div class="absolute top-3 left-3 bg-black/60 text-white px-3 py-1 rounded-full text-[10px] font-bold uppercase">
             Verified
           </div>
