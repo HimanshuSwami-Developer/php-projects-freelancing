@@ -21,14 +21,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $slug = strtolower(str_replace(' ', '_', $_POST['title']));
 
+    // if (
+    //     !empty($_FILES['image_thumbnail']['name']) &&
+    //     $_FILES['image_thumbnail']['size'] > 200 * 1024
+    // ) {
+    //     die('Thumbnail too large');
+    // }
+
+
     function uploadImage($file, $folder, $filename = null)
     {
-        if ($file['error'] !== UPLOAD_ERR_OK) return null;
+        if ($file['error'] !== UPLOAD_ERR_OK)
+            return null;
 
         $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
         $dir = __DIR__ . "/Uploads/$folder";
 
-        if (!is_dir($dir)) mkdir($dir, 0777, true);
+        if (!is_dir($dir))
+            mkdir($dir, 0777, true);
 
         $name = ($filename ?: uniqid()) . "." . $ext;
         move_uploaded_file($file['tmp_name'], "$dir/$name");
@@ -40,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!empty($_POST['id'])) {
         $res = $conn->query(
             "SELECT image_thumbnail, images_gallery 
-             FROM properties WHERE id=" . (int)$_POST['id']
+             FROM properties WHERE id=" . (int) $_POST['id']
         );
 
         if ($res && $res->num_rows) {
@@ -70,7 +80,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'error' => 0
                 ];
                 $img = uploadImage($file, $slug, $i + 1);
-                if ($img) $galleryImages[] = $img;
+                if ($img)
+                    $galleryImages[] = $img;
             }
         }
     }
@@ -88,7 +99,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Delete files from disk
         foreach ($deletedImages as $imgPath) {
             $fullPath = __DIR__ . '/' . $imgPath;
-            if (file_exists($fullPath)) unlink($fullPath);
+            if (file_exists($fullPath))
+                unlink($fullPath);
         }
     }
 
@@ -158,8 +170,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 /* ================= DELETE PROPERTY ================= */
 if (isset($_GET['delete'])) {
-    $conn->query("DELETE FROM properties WHERE id=" . (int)$_GET['delete']);
-    header("Location: properties.php");
+    $conn->query("DELETE FROM properties WHERE id=" . (int) $_GET['delete']);
+    header("Location: add_property.php");
     exit;
 }
 
@@ -323,6 +335,9 @@ include __DIR__ . "/includes/header.php";
         </div>
     </div>
 </div>
+<div id="compressionStatus" class="fixed bottom-4 right-4 bg-blue-600 text-white px-4 py-2 rounded-lg shadow-lg hidden">
+    Compressing images... Please wait
+</div>
 
 <style>
     .input {
@@ -354,40 +369,160 @@ include __DIR__ . "/includes/header.php";
         }
     }
 </style>
+<!-- In your HTML head or before your scripts -->
 <script src="https://unpkg.com/browser-image-compression@2.0.2/dist/browser-image-compression.js"></script>
-
 <script>
+    let isCompressing = false;
+    
     async function compressImages(input) {
+        if (!input || !input.files || input.files.length === 0) return;
+        
+        isCompressing = true;
+        console.log('Starting compression...');
+        
         const files = Array.from(input.files);
         const compressedFiles = [];
-
-        for (let file of files) {
-            const options = {
-                maxSizeMB: 0.5,          // target size
-                maxWidthOrHeight: 1600,  // resize
-                useWebWorker: true
-            };
-
-            const compressed = await imageCompression(file, options);
-            compressedFiles.push(compressed);
+        
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            
+            try {
+                // Skip if already small enough
+                if (file.size <= 80 * 1024) {
+                    console.log(`File ${file.name} is already ${(file.size/1024).toFixed(2)}KB, skipping compression`);
+                    compressedFiles.push(file);
+                    continue;
+                }
+                
+                console.log(`Compressing ${file.name} (${(file.size/1024).toFixed(2)}KB)`);
+                
+                // Compression options
+                const options = {
+                    maxSizeMB: 0.08,           // 80KB
+                    maxWidthOrHeight: 1024,     // Maximum dimension
+                    initialQuality: 0.7,        // Start with 70% quality
+                    useWebWorker: true,
+                    fileType: 'image/jpeg',
+                    alwaysKeepResolution: true
+                };
+                
+                // Compress the image
+                const compressedBlob = await imageCompression(file, options);
+                
+                // Create a proper File object from the Blob
+                const compressedFile = new File([compressedBlob], file.name, {
+                    type: 'image/jpeg',
+                    lastModified: new Date().getTime()
+                });
+                
+                console.log(`Compressed to ${(compressedFile.size/1024).toFixed(2)}KB`);
+                
+                // If still too large, compress more aggressively
+                if (compressedFile.size > 85 * 1024) {
+                    console.log('Second compression pass...');
+                    const options2 = {
+                        maxSizeMB: 0.07,
+                        maxWidthOrHeight: 800,
+                        initialQuality: 0.5,
+                        useWebWorker: true
+                    };
+                    
+                    const compressedBlob2 = await imageCompression(compressedBlob, options2);
+                    const compressedFile2 = new File([compressedBlob2], file.name, {
+                        type: 'image/jpeg',
+                        lastModified: new Date().getTime()
+                    });
+                    
+                    compressedFiles.push(compressedFile2);
+                    console.log(`Recompressed to ${(compressedFile2.size/1024).toFixed(2)}KB`);
+                } else {
+                    compressedFiles.push(compressedFile);
+                }
+                
+            } catch (error) {
+                console.error('Failed to compress:', error);
+                compressedFiles.push(file); // Use original if compression fails
+            }
         }
-
-        const dataTransfer = new DataTransfer();
-        compressedFiles.forEach(f => dataTransfer.items.add(f));
-        input.files = dataTransfer.files;
+        
+        // Replace the original files with compressed ones
+        if (compressedFiles.length > 0) {
+            const dataTransfer = new DataTransfer();
+            
+            compressedFiles.forEach(file => {
+                // Ensure it's a valid File object
+                if (file && file instanceof File) {
+                    dataTransfer.items.add(file);
+                }
+            });
+            
+            input.files = dataTransfer.files;
+            console.log('Compression complete. Files updated.');
+        }
+        
+        isCompressing = false;
     }
-
-    // Gallery
-    document.querySelector('input[name="images_gallery[]"]')
-        .addEventListener('change', function () {
-            compressImages(this);
-        });
-
-    // Thumbnail
-    document.querySelector('input[name="image_thumbnail"]')
-        .addEventListener('change', function () {
-            compressImages(this);
-        });
+    
+    // Initialize event listeners
+    document.addEventListener('DOMContentLoaded', function() {
+        // Listen for thumbnail input
+        const thumbInput = document.querySelector('input[name="image_thumbnail"]');
+        if (thumbInput) {
+            thumbInput.addEventListener('change', function() {
+                compressImages(this);
+            });
+        }
+        
+        // Listen for gallery input
+        const galleryInput = document.querySelector('input[name="images_gallery[]"]');
+        if (galleryInput) {
+            galleryInput.addEventListener('change', function() {
+                compressImages(this);
+            });
+        }
+        
+        // Prevent form submission during compression
+        const form = document.getElementById('propertyForm');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                if (isCompressing) {
+                    e.preventDefault();
+                    alert('Please wait for images to finish compressing...');
+                    return false;
+                }
+                return true;
+            });
+        }
+    });
+    
+    // Also initialize when modal opens (for edit mode)
+    if (typeof editProperty === 'function') {
+        const originalEditProperty = editProperty;
+        window.editProperty = function(data) {
+            originalEditProperty(data);
+            setTimeout(initCompressionListeners, 100);
+        };
+    }
+    
+    function initCompressionListeners() {
+        // Re-initialize listeners for dynamically shown inputs
+        const thumbInput = document.querySelector('input[name="image_thumbnail"]');
+        const galleryInput = document.querySelector('input[name="images_gallery[]"]');
+        
+        if (thumbInput) {
+            thumbInput.removeEventListener('change', compressImages);
+            thumbInput.addEventListener('change', function() {
+                compressImages(this);
+            });
+        }
+        
+        if (galleryInput) {
+            galleryInput.removeEventListener('change', compressImages);
+            galleryInput.addEventListener('change', function() {
+                compressImages(this);
+            });
+        }
+    }
 </script>
 
 <script>

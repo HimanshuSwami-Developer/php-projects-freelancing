@@ -166,6 +166,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['propertyId'])) {
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
+  function changeMainImage(src) {
+    $('#mainImage').attr('src', src);
+    $('#mainImageMobile').attr('src', src);
+  }
   $(function () {
     const params = new URLSearchParams(window.location.search);
     const propertyId = parseInt(params.get('id'));
@@ -180,15 +184,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['propertyId'])) {
       const html = `
         <div class="grid md:grid-cols-2 gap-12 items-start">
           <!-- IMAGE + GALLERY (Portfolio Style) -->
-          <div>
-          <div class="w-full">
-            <img id="mainImage"
-              class="rounded-xl shadow-xl w-full h-100 sm:h-80 lg:h-[420px] object-cover mb-6">
-          </div>
-            <div id="gallery"
-              class="flex gap-4 overflow-x-auto no-scrollbar max-w-full">
+                      <!-- Desktop -->
+            <div class="w-full hidden md:block">
+                <img id="mainImage"
+                    class="rounded-xl shadow-xl w-full h-[420px] object-cover mb-6">
+
+                <div id="gallery"
+                    class="flex gap-4 overflow-x-auto no-scrollbar"></div>
             </div>
-        </div>
+
+            <!-- Mobile -->
+            <div class="w-full md:hidden block">
+                <img id="mainImageMobile"
+                    class="rounded-xl shadow-xl w-full h-64 object-cover mb-4">
+</div>
+                <div id="galleryMobile"
+                    class="md:hidden flex gap-3 overflow-x-auto no-scrollbar"></div>
+            
+
+        
 
           <div class="flex flex-col h-full">
             <nav class="flex text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 mb-4">
@@ -263,7 +277,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['propertyId'])) {
                 </div>
 
                 <!-- RIGHT : MAP -->
-                <div class="h-96 rounded-2xl overflow-hidden shadow-inner border border-gray-200">
+                <div class="hidden h-96 rounded-2xl overflow-hidden shadow-inner border border-gray-200">
                   <iframe 
                     width="100%" 
                     height="100%" 
@@ -301,15 +315,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['propertyId'])) {
       $('#propertyDetails').html(html);
 
       $('#mainImage').attr('src', property.image_thumbnail);
+      $('#mainImageMobile').attr('src', property.image_thumbnail);
 
       // Portfolio-style gallery
       property.images_gallery.forEach(img => {
-        $('#gallery').append(`
+
+  const thumb = `
     <img src="${img}"
       class="w-28 h-20 shrink-0 rounded-lg object-cover cursor-pointer hover:opacity-80"
-      onclick="$('#mainImage').attr('src', '${img}')">
-  `);
-      });
+      onclick="changeMainImage('${img}')">
+  `;
+
+  $('#gallery').append(thumb);
+  $('#galleryMobile').append(thumb);
+});
 
 
       // (Logic Preserved) Gallery scroll
