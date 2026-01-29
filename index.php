@@ -51,7 +51,7 @@
       </p>
 
       <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-8">
-        <a id="cta-button" href="#projects" class="inline-flex items-center gap-6 border border-white/20 rounded-full pl-8 pr-2 py-2 hover:bg-white hover:text-black hover:border-gold transition-all group">
+        <a id="cta-button" href="#previous-projects" class="inline-flex items-center gap-6 border border-white/20 rounded-full pl-8 pr-2 py-2 hover:bg-white hover:text-black hover:border-gold transition-all group">
           <span class="font-bold uppercase tracking-widest text-xs">Explore Portfolio</span>
           <span class="w-12 h-12 bg-gold rounded-full flex items-center justify-center text-black group-hover:scale-110 transition-transform">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
@@ -232,10 +232,10 @@ $(function () {
     }
 
     // Previous / Portfolio Projects
-$.getJSON('/assets/data/portfolios.json', function (data) {
+$.getJSON('property_api.php', function (data) {
 
   // Everything that is NOT new = previous projects
-  const previous = data.filter(p => p.status !== "new");
+  const previous = data.filter(p => p.property_type === "portfolio");
   const container = $("#previousProjects");
 
   if (!previous.length) {
@@ -257,7 +257,7 @@ $.getJSON('/assets/data/portfolios.json', function (data) {
 
           <div class="relative h-64 overflow-hidden">
             <img src="${p.image_thumbnail}" alt="${p.title}"
-                 class="w-full h-[40%] object-cover group-hover:scale-110 transition duration-700">
+                 class="w-full h-[100%] object-cover group-hover:scale-110 transition duration-700">
 
             <div class="absolute top-3 left-3 bg-black/60 text-white px-3 py-1 rounded-full text-[10px] font-bold uppercase">
               Portfolio
@@ -277,7 +277,7 @@ $.getJSON('/assets/data/portfolios.json', function (data) {
 
             <div class="flex justify-between text-xs uppercase font-bold text-gray-500">
               <span>${p.room_type}</span>
-              <span>${p.area} Sq.Yd</span>
+              <span>${p.area} Sq.YD</span>
             </div>
           </div>
         </div>
@@ -288,12 +288,12 @@ $.getJSON('/assets/data/portfolios.json', function (data) {
 
 
     // Property Loading
-   $.getJSON('/assets/data/properties.json', function (data) {
+   $.getJSON('property_api.php', function (data) {
 
-  const completed = data.filter(p => p.status === "new");
+  const sale = data.filter(p => p.property_type === "sale");
   const container = $("#completedProjects");
 
-  completed.forEach(p => {
+  sale.forEach(p => {
 
     container.append(`
       <!-- 1 card on mobile / 3 cards on desktop -->
@@ -304,7 +304,7 @@ $.getJSON('/assets/data/portfolios.json', function (data) {
 
         <div class="overflow-hidden relative h-64">
           <img src="${p.image_thumbnail}" alt="${p.title}"
-               class="w-full h-[40%] object-cover group-hover:scale-110 transition duration-700">
+               class="w-full h-[100%] object-cover group-hover:scale-110 transition duration-700">
               
           <div class="absolute top-3 left-3 bg-black/60 text-white px-3 py-1 rounded-full text-[10px] font-bold uppercase">
             Verified

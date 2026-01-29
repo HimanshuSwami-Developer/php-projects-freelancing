@@ -118,7 +118,7 @@ $(function () {
 
   const id = new URLSearchParams(window.location.search).get('id');
 
-  $.getJSON('/assets/data/portfolios.json', function (data) {
+  $.getJSON('property_api.php', function (data) {
 
     // ✅ ONLY portfolio items
     const project = data.find(

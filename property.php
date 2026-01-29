@@ -170,7 +170,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['propertyId'])) {
     const params = new URLSearchParams(window.location.search);
     const propertyId = parseInt(params.get('id'));
 
-    $.getJSON('/assets/data/properties.json', function (data) {
+    $.getJSON('property_api.php', function (data) {
       const property = data.find(p => p.id === propertyId);
       if (!property) {
         $('#propertyDetails').html('<div class="text-center py-20"><p class="text-red-500 font-bold">Property not found in our database.</p></div>');
@@ -180,15 +180,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['propertyId'])) {
       const html = `
         <div class="grid md:grid-cols-2 gap-12 items-start">
           <!-- IMAGE + GALLERY (Portfolio Style) -->
+          <div>
           <div class="w-full">
             <img id="mainImage"
               class="rounded-xl shadow-xl w-full h-100 sm:h-80 lg:h-[420px] object-cover mb-6">
-
           </div>
             <div id="gallery"
               class="flex gap-4 overflow-x-auto no-scrollbar max-w-full">
             </div>
-
+        </div>
 
           <div class="flex flex-col h-full">
             <nav class="flex text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 mb-4">
@@ -247,7 +247,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['propertyId'])) {
 
                     <div class="bg-gray-50 p-4 rounded-xl">
                       <span class="block text-[10px] uppercase font-bold text-gray-400 mb-1">Total Area</span>
-                      <span class="text-sm font-bold text-gray-900">${property.area} Sq. Ft.</span>
+                      <span class="text-sm font-bold text-gray-900">${property.area} Sq. Yard.</span>
                     </div>
 
                     <div class="bg-gray-50 p-4 rounded-xl">
@@ -300,16 +300,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['propertyId'])) {
 
       $('#propertyDetails').html(html);
 
-     $('#mainImage').attr('src', property.image_thumbnail);
+      $('#mainImage').attr('src', property.image_thumbnail);
 
-// Portfolio-style gallery
-property.images_gallery.forEach(img => {
-  $('#gallery').append(`
+      // Portfolio-style gallery
+      property.images_gallery.forEach(img => {
+        $('#gallery').append(`
     <img src="${img}"
       class="w-28 h-20 shrink-0 rounded-lg object-cover cursor-pointer hover:opacity-80"
       onclick="$('#mainImage').attr('src', '${img}')">
   `);
-});
+      });
 
 
       // (Logic Preserved) Gallery scroll

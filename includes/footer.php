@@ -21,7 +21,7 @@
     <a href="#" class="h-8 w-8 rounded-full bg-gray-900 border border-gray-800 flex items-center justify-center text-gray-400 hover:bg-[#D4AF37] hover:text-black transition-colors">
       <i class="fab fa-twitter text-sm"></i>
     </a>
-    <a href="#" class="h-8 w-8 rounded-full bg-gray-900 border border-gray-800 flex items-center justify-center text-gray-400 hover:bg-[#D4AF37] hover:text-black transition-colors">
+    <a href="https://www.instagram.com/ddassociate.in?igsh=cGRjbjZ1ZmlmdTJy" class="h-8 w-8 rounded-full bg-gray-900 border border-gray-800 flex items-center justify-center text-gray-400 hover:bg-[#D4AF37] hover:text-black transition-colors">
       <i class="fab fa-instagram text-sm"></i>
     </a>
     <a href="#" class="h-8 w-8 rounded-full bg-gray-900 border border-gray-800 flex items-center justify-center text-gray-400 hover:bg-[#D4AF37] hover:text-black transition-colors">
@@ -85,7 +85,7 @@
           <i class="fas fa-phone-alt mr-3 text-[#D4AF37]"></i>
           <div>
             <p class="text-xs uppercase tracking-widest text-gray-500">Call us anytime</p>
-            <p class="font-semibold text-[#D4AF37]">9818604006</p>
+            <p class="font-semibold text-[#D4AF37]">+91 9953792555</p>
           </div>
         </div>
       </div>

@@ -116,7 +116,7 @@
         <h2 class="text-3xl font-black mb-2 text-gray-900 uppercase tracking-tighter">Send an Inquiry</h2>
         <p class="text-gray-400 text-sm mb-10 font-medium">Please fill out the form below and an associate will contact you.</p>
 
-        <form action="contact_mail.php" method="POST" class="space-y-6">
+        <form action="contact_mail_godaddy.php" method="POST" class="space-y-6">
           <div class="grid md:grid-cols-2 gap-6">
             <div>
               <label class="text-[10px] uppercase font-black tracking-widest text-gray-500 ml-1">Your Name</label>

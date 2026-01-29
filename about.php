@@ -46,7 +46,7 @@ $companyData = json_decode('{
     "description": "With over 17 years of experience in the real estate industry since 2007, D.D. Sharma brings deep market knowledge, strong negotiation expertise, and strategic insight. He leads client advisory, legal documentation guidance, and ensures every transaction is handled with transparency, compliance, and long-term value in mind."
   },
   {
-    "image": "/assets/images/lokesh_sharma.jpg",
+    "image": "/assets/images/ajay_sirohi.jpeg",
     "name": "Ajay Sirohi",
     "role": "Owner",
     "description": "Ajay Sirohi plays a key role in business operations and client coordination. He specializes in site visits, property shortlisting, and deal closures, ensuring clients receive the best options aligned with their requirements, budget, and investment goals."
@@ -171,6 +171,61 @@ $companyData = json_decode('{
 
   </div>
 </section>
+
+<section class="bg-black py-20 px-4 border-t border-yellow-900/20">
+  <div class="max-w-7xl mx-auto">
+
+    <div class="text-center mb-12">
+      <h2 class="text-3xl font-bold uppercase tracking-widest text-gold">
+        Find Us on the Map
+      </h2>
+      <p class="mt-4 text-gray-500 max-w-xl mx-auto">
+        Visit our office or connect with us for a personalized consultation.
+      </p>
+    </div>
+
+    <div class="relative group rounded-3xl overflow-hidden border border-gold/20 shadow-2xl">
+
+      <!-- Google Map -->
+      <iframe
+        src="https://www.google.com/maps?q=B-17/1/1%20Tirupati%20Apartment,%20Shyam%20Vihar%20Phase%202,%20New%20Delhi%20110043&output=embed"
+        class="w-full h-[450px] grayscale group-hover:grayscale-0 transition duration-700"
+        style="border:0;"
+        allowfullscreen=""
+        loading="lazy"
+        referrerpolicy="no-referrer-when-downgrade">
+      </iframe>
+
+      <!-- Dark Overlay -->
+      <div
+        class="absolute inset-0 bg-black/50 group-hover:bg-black/20 transition duration-700 pointer-events-none">
+      </div>
+
+      <!-- Location Card Overlay -->
+      <div
+        class="absolute bottom-8 left-1/2 -translate-x-1/2 bg-[#111] border border-gold/30 rounded-2xl px-8 py-6 text-center shadow-xl max-w-lg w-[90%]">
+        <h3 class="text-xl font-bold text-gold uppercase tracking-wider">
+          DD Associates Office
+        </h3>
+        <p class="text-gray-400 mt-2 text-sm leading-relaxed">
+          B-17/1/1 Tirupati Apartment,<br>
+          Shyam Vihar Phase 2,<br>
+          New Delhi – 110043
+        </p>
+
+        <a
+          href="https://www.google.com/maps?q=B-17/1/1%20Tirupati%20Apartment,%20Shyam%20Vihar%20Phase%202,%20New%20Delhi%20110043"
+          target="_blank"
+          class="inline-block mt-4 px-6 py-3 bg-gold text-black font-bold uppercase tracking-widest text-xs rounded-full hover:bg-white transition">
+          Open in Google Maps
+        </a>
+      </div>
+
+    </div>
+
+  </div>
+</section>
+
 
 
 <section class="bg-[#0a0a0a] py-20 px-4 border-t border-yellow-900/20">

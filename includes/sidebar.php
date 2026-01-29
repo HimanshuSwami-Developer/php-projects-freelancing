@@ -20,6 +20,12 @@ $current_page = basename($_SERVER['PHP_SELF']);
        <?php echo $current_page === 'enquiry_table.php' ? 'bg-gray-800 text-white' : 'text-gray-300'; ?>">
       <i class="fas fa-table mr-3"></i> Enquiry Dashboard
     </a>
+    
+    <a href="add_property.php"
+       class="flex items-center px-3 py-2 rounded-lg hover:bg-gray-800 transition
+       <?php echo $current_page === 'add_property.php' ? 'bg-gray-800 text-white' : 'text-gray-300'; ?>">
+     <i class="fas fa-building mr-3"></i> Add Property
+    </a>
   </nav>
   
   <div class="p-4 border-t border-gray-700">

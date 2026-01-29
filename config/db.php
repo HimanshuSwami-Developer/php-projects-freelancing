@@ -8,17 +8,16 @@ class Database {
     // private $password = "Himanshu2810";
     // private $dbname = "if0_40816910_ereal_state";
     
-    
     // private $host = "localhost";
     // private $username = "admin";
     // private $password = "ddassociate@123";
     // private $dbname = "ereal_state";
 
+    
     private $host = "localhost";
     private $username = "root";
     private $password = "";
     private $dbname = "ereal_state";
-    // private $dbname = "payment_tracker";
     public $conn;
     
     public function getConnection() {

@@ -22,14 +22,21 @@
 
 <section class="bg-[#fcfcfc] min-h-screen">
   <div class="bg-[#0f0f10] pt-10 md:pt-28 pb-16 px-4">
-    <div class="max-w-7xl mx-auto">
-        <nav class="flex text-[10px] font-bold uppercase tracking-[0.3em] text-gray-500 mb-4">
-            <span>Marketplace</span> <span class="mx-2">/</span> <span class="text-gold">Browse All</span>
-        </nav>
-        <h1 class="text-4xl md:text-6xl font-black text-white uppercase tracking-tighter mb-4">Find Your <span class="text-gold">Masterpiece</span></h1>
-        <p class="text-gray-400 max-w-xl font-light">Curated premium real estate across the NCR region. Use our advanced filters to discover bespoke living spaces.</p>
-    </div>
+  <div class="max-w-7xl mx-auto">
+    <nav class="flex text-[10px] font-bold uppercase tracking-[0.3em] text-gray-500 mb-4">
+      <span>Portfolio</span> <span class="mx-2">/</span> <span class="text-gold">Properties</span>
+    </nav>
+
+    <h1 class="text-4xl md:text-6xl font-black text-white uppercase tracking-tighter mb-4">
+      Our <span class="text-gold">Property Portfolio</span>
+    </h1>
+
+    <p class="text-gray-400 max-w-xl font-light">
+      A handpicked collection of signature residential and commercial properties, showcasing design, location, and long-term value.
+    </p>
   </div>
+</div>
+
 
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-10">
     <div class="bg-white p-4 rounded-2xl shadow-xl flex items-center gap-4 border border-gray-100">
@@ -119,7 +126,7 @@ $(function () {
   // Logic Preserved: Load JSON and locations
   $.getJSON('property_api.php', function (data) {
      properties = Array.isArray(data)
-  ? data.filter(p => p.property_type === "sale")
+  ? data.filter(p => p.property_type === "portfolio")
   : [];
     const locations = [...new Set(properties.map(p => p.location))];
     
@@ -186,12 +193,12 @@ $(function () {
 
     list.forEach(p => {
       const card = `
-      <a href="property.php?id=${p.id}" class="property-card group block bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl border border-gray-50">
+      <a href="portfolio_details.php?id=${p.id}" class="property-card group block bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl border border-gray-50">
         <div class="relative h-64 overflow-hidden">
           <img src="${p.image_thumbnail}" alt="${p.title}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
           <div class="absolute top-4 left-4">
-             <span class="px-4 py-1.5 text-[9px] font-black uppercase tracking-[0.2em] rounded-full shadow-lg ${p.status === 'new' ? 'bg-green-500 text-white' : 'bg-gold text-black'}">
-               ${p.status}
+             <span class="px-4 py-1.5 text-[9px] font-black uppercase tracking-[0.2em] rounded-full shadow-lg  bg-gray-200 text-black">
+               ${p.property_type}
              </span>
           </div>
           <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-6">
@@ -213,7 +220,6 @@ $(function () {
             <i class="fas fa-location-dot text-gold"></i> ${p.location}
           </p>
           
-         
           <div class="flex items-center justify-between pt-2 border-t border-gray-50">
             <div class="flex gap-4">
                 <div class="text-center">

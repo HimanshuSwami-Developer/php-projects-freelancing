@@ -1,0 +1,52 @@
+[26-Jan-2026 17:36:58 UTC] Home directory set to: /home/lxb4pt8wb7gl
+[26-Jan-2026 17:36:58 UTC] Binary directory: /home/lxb4pt8wb7gl/bin, Manager path: /home/lxb4pt8wb7gl/bin/ssl-manager
+[26-Jan-2026 17:36:58 UTC] API Base URL: https://externalautossl.service.spaceship.com/api/v1/externalautossl/user
+[26-Jan-2026 17:36:58 UTC] Download URL: https://ssl-manager.s3.amazonaws.com/bin/amd64/linux/ssl-manager
+[26-Jan-2026 17:37:09 UTC] Home directory set to: /home/lxb4pt8wb7gl
+[26-Jan-2026 17:37:09 UTC] Binary directory: /home/lxb4pt8wb7gl/bin, Manager path: /home/lxb4pt8wb7gl/bin/ssl-manager
+[26-Jan-2026 17:37:09 UTC] API Base URL: https://externalautossl.service.spaceship.com/api/v1/externalautossl/user
+[26-Jan-2026 17:37:09 UTC] Download URL: https://ssl-manager.s3.amazonaws.com/bin/amd64/linux/ssl-manager
+[26-Jan-2026 17:37:09 UTC] Action received: install
+[26-Jan-2026 17:37:09 UTC] Install action initiated.
+[26-Jan-2026 17:37:09 UTC] Created bin directory: /home/lxb4pt8wb7gl/bin
+[26-Jan-2026 17:37:09 UTC] Downloading manager binary from https://ssl-manager.s3.amazonaws.com/bin/amd64/linux/ssl-manager
+[26-Jan-2026 17:37:09 UTC] Trying file_get_contents method
+[26-Jan-2026 17:37:12 UTC] Downloaded manager binary using file_get_contents
+[26-Jan-2026 17:37:12 UTC] Manager installed successfully.
+[26-Jan-2026 17:37:12 UTC] Fetching manager info.
+[26-Jan-2026 17:37:12 UTC] Running command: /home/lxb4pt8wb7gl/bin/ssl-manager info 2>/dev/null
+[26-Jan-2026 17:37:12 UTC] Manager info: Error: Could not get control panel credentials
+{"error": "Error: panel credentials not found"}
+
+[26-Jan-2026 17:37:21 UTC] Home directory set to: /home/lxb4pt8wb7gl
+[26-Jan-2026 17:37:21 UTC] Binary directory: /home/lxb4pt8wb7gl/bin, Manager path: /home/lxb4pt8wb7gl/bin/ssl-manager
+[26-Jan-2026 17:37:21 UTC] API Base URL: https://externalautossl.service.spaceship.com/api/v1/externalautossl/user
+[26-Jan-2026 17:37:21 UTC] Download URL: https://ssl-manager.s3.amazonaws.com/bin/amd64/linux/ssl-manager
+[26-Jan-2026 17:37:21 UTC] Action received: register
+[26-Jan-2026 17:37:21 UTC] Running command: /home/lxb4pt8wb7gl/bin/ssl-manager register -t 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjFkNmlmTUlzRlpTcU5GTzdkWDBkeTltanBqX21qX1NnZ084bng2ektQTHcifQ.eyJpc3MiOiJodHRwczovL2V4dGVybmFsYXV0b3NzbC5zZXJ2aWNlLnNwYWNlc2hpcC5jb20iLCJuYmYiOjE3Njk0NDg3MjEsImlhdCI6MTc2OTQ0ODcyMSwiZXhwIjoxNzY5NTM1MTIxLCJhdWQiOlsiZXh0ZXJuYWxhdXRvc3NsIl0sInNjb3BlIjpbImV4dGVybmFsYXV0b3NzbC5leHRlcm5hbGF1dG9zc2wiLCJleHRlcm5hbGF1dG9zc2wudXNlci1pbnRlZ3JhdGlvbi1jcmVhdGUiXSwiY2xpZW50X2lkIjoiZXh0ZXJuYWwtc3NsLWNsaWVudCIsInN1YiI6ImNkOTg3NGNjLTczZTQtNGFjMC1hZDE3LTVlMWMxYmUzMTNlMSJ9.tT26DXgK5cuJi38jHLTGvIgu7kSl3cQIjM_ECnHiW3g3PueK93gvIHEt_QfmI1NQZAHiRe_0SwIDK94w7A0JSo5SaZ5-tBNFOmokJjbx-fmLCmxZN5BMu0NL3yiTcSkwDybXi1x6NJLYskuBe0U8HiaUjeot5vCc_eFDZnQV0zbhbQXuBMQchDCyruGGDx-unlrEYxf5_Wiy12jqtRKZqJ0V-ZHgVF7TKN0DZGRH3AndkpZQr6BK-X35wcBIUhaltYbpx72jkezqh4jyDZSET42MuS1UNfip6JMAQbRaD4Qw5h18fmNXjyu9gRW0jWOHj1VO0Hg7S9uIqqVAmPhVAw' -u 'https://externalautossl.service.spaceship.com/api/v1/externalautossl/user/' 2>&1
+[26-Jan-2026 17:37:25 UTC] Registration output: Installing certificate manager
+Vendor registered successfully
+Integrated with control panel successfully
+Setting up cron job
+
+[26-Jan-2026 17:37:25 UTC] Fetching manager info.
+[26-Jan-2026 17:37:25 UTC] Running command: /home/lxb4pt8wb7gl/bin/ssl-manager info 2>/dev/null
+[26-Jan-2026 17:37:25 UTC] Manager info: Control panel credentials found
+Vendor credentials found
+Cron is properly set up
+Manager is ready
+
+[26-Jan-2026 17:37:40 UTC] Home directory set to: /home/lxb4pt8wb7gl
+[26-Jan-2026 17:37:40 UTC] Binary directory: /home/lxb4pt8wb7gl/bin, Manager path: /home/lxb4pt8wb7gl/bin/ssl-manager
+[26-Jan-2026 17:37:40 UTC] API Base URL: https://externalautossl.service.spaceship.com/api/v1/externalautossl/user
+[26-Jan-2026 17:37:40 UTC] Download URL: https://ssl-manager.s3.amazonaws.com/bin/amd64/linux/ssl-manager
+[26-Jan-2026 17:37:40 UTC] Action received: remove_installer
+[26-Jan-2026 17:37:40 UTC] Fetching manager info.
+[26-Jan-2026 17:37:40 UTC] Running command: /home/lxb4pt8wb7gl/bin/ssl-manager info 2>/dev/null
+[26-Jan-2026 17:37:40 UTC] Manager info: Control panel credentials found
+Vendor credentials found
+Cron is properly set up
+Manager is ready
+
+[26-Jan-2026 17:37:40 UTC] Remove installer action initiated.
+[26-Jan-2026 17:37:40 UTC] Installer file removed.
