@@ -10,11 +10,11 @@ if (!isset($_SESSION['favourites'])) {
 }
 
 /* ================= PRODUCT ID ================= */
-$id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+$id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
 
 /* ================= TOGGLE FAVOURITE ================= */
 if (isset($_GET['fav'])) {
-    $pid = (int)$_GET['fav'];
+    $pid = (int) $_GET['fav'];
 
     if (isset($_SESSION['favourites'][$pid])) {
         unset($_SESSION['favourites'][$pid]);
@@ -36,6 +36,23 @@ if (!$product) {
 
 $isFav = isset($_SESSION['favourites'][$product['id']]);
 
+/* ================= FETCH PRODUCT IMAGES ================= */
+$imagesRes = $db->query("
+    SELECT image 
+    FROM product_images 
+    WHERE product_id = $id
+    ORDER BY id ASC
+");
+
+$allImages = [];
+while ($img = $imagesRes->fetch_assoc()) {
+    $allImages[] = "assets/images/products/" . $img['image'];
+}
+
+$mainImage = !empty($allImages)
+    ? $allImages[0]
+    : 'assets/images/no-image.png';
+
 /* ================= RELATED PRODUCTS ================= */
 $related = $db->query("
     SELECT * FROM products 
@@ -49,25 +66,31 @@ $related = $db->query("
 
     <!-- ================= PRODUCT MAIN ================= -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-16">
-
         <!-- ================= GALLERY ================= -->
         <div class="border border-gray-200 rounded-lg p-6 relative">
 
             <!-- Favourite Icon -->
             <a href="product-details.php?id=<?= $product['id'] ?>&fav=<?= $product['id'] ?>"
-               class="absolute top-4 right-4 text-3xl select-none">
+                class="absolute top-4 right-4 z-10 bg-white/80 backdrop-blur rounded-full p-1 text-2xl">
                 <?= $isFav ? '❤️' : '🤍' ?>
             </a>
 
-            <div class="h-96 bg-gray-100 flex items-center justify-center mb-4">
-                <span class="text-gray-400">Main Image</span>
+            <!-- MAIN IMAGE -->
+            <div class="h-96 bg-gray-100 rounded-lg overflow-hidden mb-4">
+                <img id="mainImage" src="<?= $mainImage ?>" alt="<?= htmlspecialchars($product['title']) ?>"
+                    class="w-full h-full object-cover transition">
             </div>
 
-            <div class="flex gap-3">
-                <div class="w-20 h-20 bg-gray-200"></div>
-                <div class="w-20 h-20 bg-gray-200"></div>
-                <div class="w-20 h-20 bg-gray-200"></div>
-            </div>
+            <!-- THUMBNAILS (HORIZONTAL SCROLL) -->
+            <?php if (count($allImages) > 1): ?>
+                <div class="flex gap-3 overflow-x-auto scrollbar-hide py-2">
+                    <?php foreach ($allImages as $img): ?>
+                        <img src="<?= $img ?>" onclick="changeImage(this.src)" class="w-20 h-20 flex-shrink-0 object-cover border rounded cursor-pointer
+                            hover:border-black transition">
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
+
         </div>
 
         <!-- ================= DETAILS ================= -->
@@ -93,37 +116,30 @@ $related = $db->query("
                 <?php endif; ?>
             </p>
 
-            <!-- ================= ADD TO CART FORM ================= -->
+            <!-- ================= ADD TO CART ================= -->
             <form method="post" action="cart.php" class="mt-8 space-y-6">
 
                 <input type="hidden" name="product_id" value="<?= $product['id'] ?>">
 
                 <!-- Size -->
                 <div>
-                    <label class="block text-sm font-semibold mb-2">
-                        Select Size
-                    </label>
-                    <select name="size" required
-                            class="border px-4 py-2 w-40">
-                        <option value="S">Select</option>
-                        <option value="S">S</option>
-                        <option value="M">M</option>
-                        <option value="L">L</option>
-                        <option value="XL">XL</option>
+                    <label class="block text-sm font-semibold mb-2">Select Size</label>
+                    <select name="size" required class="border px-4 py-2 w-40">
+                        <option value="">Select</option>
+                        <option>S</option>
+                        <option>M</option>
+                        <option>L</option>
+                        <option>XL</option>
                     </select>
                 </div>
 
                 <!-- Quantity -->
                 <div>
-                    <label class="block text-sm font-semibold mb-2">
-                        Quantity
-                    </label>
-                    <input type="number" name="quantity" value="1" min="1"
-                           class="border px-4 py-2 w-24">
+                    <label class="block text-sm font-semibold mb-2">Quantity</label>
+                    <input type="number" name="quantity" value="1" min="1" class="border px-4 py-2 w-24">
                 </div>
 
-                <button type="submit"
-                        class="border border-black px-10 py-3 font-semibold
+                <button type="submit" class="border border-black px-10 py-3 font-semibold
                                hover:bg-black hover:text-white transition">
                     Add to Cart
                 </button>
@@ -149,5 +165,11 @@ $related = $db->query("
     </div>
 
 </section>
+
+<script>
+    function changeImage(src) {
+        document.getElementById('mainImage').src = src;
+    }
+</script>
 
 <?php include 'includes/footer.php'; ?>

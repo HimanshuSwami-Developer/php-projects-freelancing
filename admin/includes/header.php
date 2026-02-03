@@ -21,6 +21,7 @@
 
     <nav class="space-y-4">
         <a href="dashboard.php" class="block hover:text-gray-300">Dashboard</a>
+        <a href="categories.php" class="block hover:text-gray-300">Categories</a>
         <a href="product-add.php" class="block hover:text-gray-300">Add Product</a>
         <a href="products.php" class="block hover:text-gray-300">Products</a>
         <a href="orders.php" class="block hover:text-gray-300">Orders</a>

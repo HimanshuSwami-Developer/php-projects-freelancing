@@ -2,16 +2,30 @@
 /*
 Expected variables:
 $p       → product array
-$isFav   → boolean (true/false)
-$pageUrl → current page url (for redirect)
+$isFav   → boolean
+$pageUrl → current page url
+$db      → database connection (already available)
 */
+
+/* ===== FETCH FIRST IMAGE ===== */
+$img = $db->query("
+    SELECT image 
+    FROM product_images 
+    WHERE product_id = {$p['id']} 
+    ORDER BY id ASC 
+    LIMIT 1
+")->fetch_assoc();
+
+$imagePath = $img
+    ? "assets/images/products/" . $img['image']
+    : "assets/images/no-image.png"; // fallback image
 ?>
 
-<div class="relative border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition">
+<div class="relative border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition bg-white">
 
     <!-- ===== Favourite Button ===== -->
     <a href="<?= $pageUrl ?>&fav=<?= $p['id'] ?>"
-       class="absolute top-3 right-3 z-10">
+       class="absolute top-3 right-3 z-10 bg-white/80 backdrop-blur rounded-full p-1">
 
         <?php if ($isFav): ?>
         <!-- Filled Heart -->
@@ -42,24 +56,26 @@ $pageUrl → current page url (for redirect)
     </a>
 
     <!-- ===== IMAGE ===== -->
-    <div class="h-56 bg-gray-100 flex items-center justify-center">
-        <span class="text-gray-400 text-sm">Product Image</span>
+    <div class="h-56 overflow-hidden bg-gray-100">
+        <img src="<?= $imagePath ?>"
+             alt="<?= htmlspecialchars($p['title']) ?>"
+             class="w-full h-full object-cover hover:scale-105 transition duration-300">
     </div>
 
     <!-- ===== CONTENT ===== -->
     <div class="p-5">
 
-        <h3 class="font-semibold text-lg">
+        <h3 class="font-semibold text-lg truncate">
             <?= htmlspecialchars($p['title']) ?>
         </h3>
 
         <!-- Rating -->
         <div class="flex items-center gap-1 text-sm mt-1">
-            ⭐ ⭐ ⭐ ⭐ <span class="text-gray-400">(4.0)</span>
+            ⭐ ⭐ ⭐ ⭐ <span class="text-gray-400">(<?= number_format($p['rating'],1) ?>)</span>
         </div>
 
         <p class="text-gray-500 text-sm mt-1">
-            ₹<?= number_format($p['price'], 2) ?>
+            ₹<?= number_format($p['sale_price'] ?? $p['price'], 2) ?>
         </p>
 
         <!-- Buttons -->
