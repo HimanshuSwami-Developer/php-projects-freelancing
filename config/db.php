@@ -3,10 +3,10 @@
 
 class Database {
     
-    // private $host = "sql307.infinityfree.com";
-    // private $username = "if0_40816910";
-    // private $password = "Himanshu2810";
-    // private $dbname = "if0_40816910_ereal_state";
+    // private $host = "sql210.infinityfree.com";
+    // private $username = "if0_41065730";
+    // private $password = "4psdXTQrLXh";
+    // private $dbname = "if0_41065730_banke_dress";
     
     // private $host = "localhost";
     // private $username = "admin";

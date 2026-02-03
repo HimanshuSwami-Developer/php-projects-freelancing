@@ -178,7 +178,10 @@ $categories = $db->query("SELECT * FROM categories WHERE status=1");
     <?= $editProduct ? 'Edit Product' : 'Add Product' ?>
 </h2>
 
-<form method="post" enctype="multipart/form-data" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<form method="post"
+      enctype="multipart/form-data"
+      id="productForm"
+      class="grid grid-cols-1 md:grid-cols-2 gap-4">
 
 <?php if ($editProduct): ?>
 <input type="hidden" name="id" value="<?= $editProduct['id'] ?>">
@@ -219,7 +222,13 @@ $categories = $db->query("SELECT * FROM categories WHERE status=1");
           placeholder="Description"
           class="border px-4 py-3 rounded col-span-2"><?= htmlspecialchars($editProduct['description'] ?? '') ?></textarea>
 
-<input type="file" name="images[]" multiple class="border px-4 py-3 rounded col-span-2">
+<input type="file"
+       name="images[]"
+       id="imageInput"
+       multiple
+       accept="image/*"
+       class="border px-4 py-3 rounded col-span-2">
+
 
 <button class="bg-black text-white px-10 py-3 rounded col-span-2 hover:bg-gray-800">
     <?= $editProduct ? 'Update Product' : 'Add Product' ?>
@@ -357,5 +366,55 @@ if ($img):
 
 <?php endif; ?>
 
+
+<script src="https://unpkg.com/browser-image-compression@2.0.2/dist/browser-image-compression.js"></script>
+
+<script>
+const form = document.getElementById('productForm');
+const input = document.getElementById('imageInput');
+
+if (form && input) {
+    form.addEventListener('submit', async function (e) {
+        e.preventDefault(); // stop submit until compression done
+
+        if (!input.files.length) {
+            form.submit();
+            return;
+        }
+
+        const compressedFiles = [];
+
+        for (const file of input.files) {
+            const options = {
+                maxSizeMB: 0.1,          // ≈100 KB
+                maxWidthOrHeight: 1200,
+                useWebWorker: true
+            };
+
+            const compressedBlob = await imageCompression(file, options);
+
+            // ✅ Convert Blob → File (THIS IS THE FIX)
+            const compressedFile = new File(
+                [compressedBlob],
+                file.name,
+                {
+                    type: compressedBlob.type,
+                    lastModified: Date.now()
+                }
+            );
+
+            compressedFiles.push(compressedFile);
+        }
+
+        // Replace original files
+        const dt = new DataTransfer();
+        compressedFiles.forEach(file => dt.items.add(file));
+        input.files = dt.files;
+
+        // submit AFTER compression
+        form.submit();
+    });
+}
+</script>
 
 <?php include 'includes/footer.php'; ?>
