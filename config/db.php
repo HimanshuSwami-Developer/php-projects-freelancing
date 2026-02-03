@@ -17,7 +17,7 @@ class Database {
     private $host = "localhost";
     private $username = "root";
     private $password = "";
-    private $dbname = "ereal_state";
+    private $dbname = "banke_dress";
     public $conn;
     
     public function getConnection() {
