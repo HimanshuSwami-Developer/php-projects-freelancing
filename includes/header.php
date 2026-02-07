@@ -129,6 +129,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['name'])) {
         <a href="/" class="block px-3 py-2 rounded hover:text-gold">Home</a>
         <a href="/about" class="block px-3 py-2 rounded hover:text-gold">About Us</a>
         <a href="/properties" class="block px-3 py-2 rounded hover:text-gold">Projects</a>
+        <a href="/portfolio" class="block px-3 py-2 rounded hover:text-gold">Portfolio</a>
         <a href="/contact" class="block px-3 py-2 rounded hover:text-gold">Contact Us</a>
 
         <a id="quoteBtnMobile" class="block px-3 py-4 rounded bg-gold text-black font-bold text-center">GET A QUOTE</a>
