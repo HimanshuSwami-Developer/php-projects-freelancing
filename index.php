@@ -250,7 +250,7 @@ $.getJSON('property_api.php', function (data) {
   previous.forEach(p => {
     container.append(`
       <a href="portfolio_details.php?id=${p.id}"
-         class="min-w-[90%] md:min-w-[30%] lg:min-w-[28%] flex-shrink-0">
+         class="w-[90%] md:w-[30%] lg:w-[28%] flex-none">
 
         <div class="group bg-white rounded-xl overflow-hidden
                     shadow hover:shadow-2xl transition-all duration-500">
@@ -297,9 +297,8 @@ $.getJSON('property_api.php', function (data) {
 
     container.append(`
       <!-- 1 card on mobile / 3 cards on desktop -->
-       <a href="property.php?id=${p.id}" class="min-w-[90%] md:min-w-[33%] lg:min-w-[33%] flex-shrink-0">
-      <div class="min-w-[90%] md:min-w-[33%] lg:min-w-[33%] 
-                  group bg-white rounded-xl overflow-hidden 
+       <a href="property.php?id=${p.id}" class="w-[90%] md:w-[33%] lg:w-[33%] flex-none">
+      <div class="group bg-white rounded-xl overflow-hidden 
                   shadow hover:shadow-2xl transition-all duration-500">
 
         <div class="overflow-hidden relative h-64">
