@@ -103,7 +103,7 @@
     <div id="completedProjects"   class="flex overflow-x-auto space-x-6 pb-4"></div>
      <!-- View More Button -->
     <div class="text-center mt-12">
-      <a href="projects.php"
+      <a href="/properties.php"
          class="inline-flex items-center gap-2
                 px-10 py-4
                 font-bold uppercase text-sm tracking-wider
@@ -171,7 +171,7 @@
     </div>
      <!-- View More Button -->
      <div class="text-center mt-12">
-      <a href="projects.php"
+      <a href="/portfolio.php"
          class="inline-flex items-center gap-2
                 px-10 py-4
                 font-bold uppercase text-sm tracking-wider

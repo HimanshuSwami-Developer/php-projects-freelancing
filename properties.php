@@ -58,6 +58,7 @@
         <div class="animate-pulse bg-white h-96 rounded-2xl"></div>
         <div class="animate-pulse bg-white h-96 rounded-2xl"></div>
     </div>
+    <div id="pagination" class="flex justify-center items-center gap-3 mt-12 pb-20"></div>
   </div>
 </section>
 
@@ -115,6 +116,9 @@
 <script>
 $(function () {
   let properties = [];
+let currentPage = 1;
+const itemsPerPage = 9; // 3x3 grid
+let filteredCache = [];
 
   // Logic Preserved: Load JSON and locations
   $.getJSON('property_api.php', function (data) {
@@ -132,7 +136,9 @@ $(function () {
         </label>`;
     });
     $("#locationFilter").html(locHtml);
-    renderProperties(properties);
+    filteredCache = properties;
+renderPage();
+
   });
 
   // Logic Preserved: Sidebar toggle
@@ -157,22 +163,109 @@ $(function () {
     applyFilters();
   });
 
-  function applyFilters() {
-    const search = $('#searchText').val().toLowerCase();
-    const beds = parseInt($('#bedsFilter').val()) || 0;
-    const status = $('#statusFilter').val();
-    const selectedLocations = $('.locationCheck:checked').map(function () { return this.value; }).get();
+function applyFilters() {
+  const search = $('#searchText').val().toLowerCase();
+  const beds = parseInt($('#bedsFilter').val()) || 0;
+  const status = $('#statusFilter').val();
+  const selectedLocations = $('.locationCheck:checked')
+    .map(function () { return this.value; }).get();
 
-    const filtered = properties.filter(p => {
-      return (
-        (p.title.toLowerCase().includes(search) || p.location.toLowerCase().includes(search)) &&
-        p.beds >= beds &&
-        (status === "all" || p.status === status) &&
-        (selectedLocations.length === 0 || selectedLocations.includes(p.location))
-      );
-    });
-    renderProperties(filtered);
+  filteredCache = properties.filter(p => {
+    return (
+      (p.title.toLowerCase().includes(search) ||
+       p.location.toLowerCase().includes(search)) &&
+      p.beds >= beds &&
+      (status === "all" || p.status === status) &&
+      (selectedLocations.length === 0 ||
+       selectedLocations.includes(p.location))
+    );
+  });
+
+  currentPage = 1;
+  renderPage();
+}
+
+function renderPage() {
+  const start = (currentPage - 1) * itemsPerPage;
+  const end = start + itemsPerPage;
+  const pageItems = filteredCache.slice(start, end);
+
+  renderProperties(pageItems);
+  renderPagination(filteredCache.length);
+}
+
+function renderPagination(totalItems) {
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const pagination = $('#pagination');
+  pagination.empty();
+
+  if (totalPages <= 1) return;
+
+  let start = Math.max(2, currentPage - 1);
+  let end = Math.min(totalPages - 1, currentPage + 1);
+
+  if (currentPage <= 3) {
+    start = 2;
+    end = Math.min(totalPages - 1, 5);
   }
+  if (currentPage >= totalPages - 2) {
+    start = Math.max(2, totalPages - 4);
+    end = totalPages - 1;
+  }
+
+  // Prev
+  pagination.append(navBtn('Prev', currentPage - 1, currentPage === 1));
+
+  // First
+  pagination.append(pageBtn(1));
+
+  if (start > 2) pagination.append(`<span class="px-2 text-gray-400 font-black">…</span>`);
+
+  for (let i = start; i <= end; i++) {
+    pagination.append(pageBtn(i));
+  }
+
+  if (end < totalPages - 1) pagination.append(`<span class="px-2 text-gray-400 font-black">…</span>`);
+
+  pagination.append(pageBtn(totalPages));
+
+  // Next
+  pagination.append(navBtn('Next', currentPage + 1, currentPage === totalPages));
+}
+
+
+function pageBtn(page) {
+  return `
+    <button data-page="${page}"
+      class="w-10 h-10 rounded-full text-xs font-black
+      ${page === currentPage
+        ? 'bg-gold text-black shadow-lg'
+        : 'bg-white border border-gray-200 hover:border-gold hover:text-gold'}">
+      ${page}
+    </button>
+  `;
+}
+
+function navBtn(label, page, disabled) {
+  return `
+    <button ${disabled ? 'disabled' : ''}
+      data-page="${page}"
+      class="px-4 py-2 rounded-full text-xs font-black uppercase
+      ${disabled
+        ? 'bg-gray-100 text-gray-400'
+        : 'bg-white border border-gray-200 hover:border-gold hover:text-gold'}">
+      ${label}
+    </button>
+  `;
+}
+
+$(document).on('click', '#pagination button:not([disabled])', function () {
+  currentPage = parseInt($(this).data('page'));
+  renderPage();
+  $('html, body').animate({
+    scrollTop: $('#propertiesGrid').offset().top - 120
+  }, 300);
+});
 
   function renderProperties(list) {
     const grid = $('#propertiesGrid');
