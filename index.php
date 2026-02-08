@@ -101,6 +101,19 @@
         <div class="w-16 h-1 bg-gold mx-auto mt-6"></div>
     </div>
     <div id="completedProjects"   class="flex overflow-x-auto space-x-6 pb-4"></div>
+     <!-- View More Button -->
+    <div class="text-center mt-12">
+      <a href="projects.php"
+         class="inline-flex items-center gap-2
+                px-10 py-4
+                font-bold uppercase text-sm tracking-wider
+                rounded-full
+                bg-gold text-white
+                transition-all duration-300">
+        View More Projects
+        <i class="fa-solid fa-arrow-right"></i>
+      </a>
+    </div>
   </div>
 </section>
 
@@ -109,7 +122,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
       <div class="w-full relative">
         <div class="absolute -top-6 -left-6 w-32 h-32 border-t-2 border-l-2 border-gold z-0"></div>
-        <img src="https://salvatori-dam.imgix.net/uploads/2021/02/MEDIA-GALLERY_Salvatori_Inspiration_Singapore-loft-style-1.jpg"
+        <img src="./assets/images/about_work.jpg"
              alt="Interior Decor"
              class="relative z-10 rounded-xl shadow-2xl w-full object-cover">
       </div>
@@ -155,6 +168,19 @@
 
     <div id="previousProjects"
          class="flex overflow-x-auto space-x-6 pb-6 scroll-smooth no-scrollbar">
+    </div>
+     <!-- View More Button -->
+     <div class="text-center mt-12">
+      <a href="projects.php"
+         class="inline-flex items-center gap-2
+                px-10 py-4
+                font-bold uppercase text-sm tracking-wider
+                rounded-full
+                bg-gold text-white
+                transition-all duration-300">
+        View More Porfolios
+        <i class="fa-solid fa-arrow-right"></i>
+      </a>
     </div>
   </div>
 </section>
@@ -235,7 +261,7 @@ $(function () {
 $.getJSON('property_api.php', function (data) {
 
   // Everything that is NOT new = previous projects
-  const previous = data.filter(p => p.property_type === "portfolio");
+  const previous = data.filter(p => p.property_type === "portfolio").slice(0, 5);
   const container = $("#previousProjects");
 
   if (!previous.length) {
@@ -290,7 +316,7 @@ $.getJSON('property_api.php', function (data) {
     // Property Loading
    $.getJSON('property_api.php', function (data) {
 
-  const sale = data.filter(p => p.property_type === "sale");
+  const sale = data.filter(p => p.property_type === "sale").slice(0, 5);
   const container = $("#completedProjects");
 
   sale.forEach(p => {
