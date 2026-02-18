@@ -150,7 +150,8 @@ $query_run = mysqli_query($con, $query);
 
             <!-- 1. HERO SECTION: Dynamic Text, Image, and Trust Badges -->
 <div class="hero-background pt-20 pb-16 md:pt-28 md:pb-24">
-    <div class="w-[1500px] mx-auto px-6 md:px-10 text-center">
+    <div class="max-w-[1500px] w-full mx-auto px-6 md:px-10 text-center">
+
 
         <!-- Intro Line -->
         <p class="text-lg md:text-xl font-semibold text-[#00C1EC] mb-4">
@@ -164,7 +165,8 @@ $query_run = mysqli_query($con, $query);
         </h1>
 
         <!-- Body Copy (JUSTIFIED) -->
-        <div class="space-y-4 text-base md:text-lg font-medium text-gray-200 w-[1400px] mx-auto text-justify">
+        <div class="space-y-4 text-base md:text-lg font-medium text-gray-200 max-w-[900px] mx-auto text-justify">
+
             <p>
                 If you’re thinking about working in security, you’re probably asking the same questions everyone does.
                 How long does it take? Do I need experience? Will it actually pay well? Fair questions.
