@@ -134,6 +134,38 @@ $course_name = '';
 
 
   <script>
+              function convertDateFormat(input) {
+        
+          if (!input) return "";
+        
+          const dayMap = {
+            Mon: "Monday",
+            Tue: "Tuesday",
+            Wed: "Wednesday",
+            Thu: "Thursday",
+            Fri: "Friday",
+            Sat: "Saturday",
+            Sun: "Sunday"
+          };
+        
+          let [start, end] = input.split(" - ");
+        
+          function formatPart(part) {
+            let match = part.match(/(\d+\w+)\s(\w+),\s(\w+)/);
+            if (!match) return part;
+        
+            let date = match[1];       // 2nd
+            let shortDay = match[2];   // Mon
+            let month = match[3];      // Mar
+        
+            return `${date} ${month}, ${dayMap[shortDay] || shortDay}`;
+          }
+        
+          return formatPart(start) + " - " + formatPart(end);
+        }
+
+
+
     document.addEventListener('DOMContentLoaded', function () {
       const cartPackage = JSON.parse(localStorage.getItem('cartPackage') || '{}');
 
@@ -151,7 +183,7 @@ $course_name = '';
         if (course) course.textContent = cartPackage.course || '';
         if (subtotalEl) subtotalEl.textContent = `£${subtotal.toFixed(2)}`;
         if (planPriceEl) planPriceEl.textContent = `£${packagePrice.toFixed(2)}`;
-        if (cdateEl) cdateEl.textContent = cartPackage.date || '';
+        if (cdateEl) cdateEl.textContent = convertDateFormat(cartPackage.date);
         if (totalEl) totalEl.textContent = `£${subtotal.toFixed(2)}`;
       } else {
         console.warn('No cartPackage found in localStorage.');
