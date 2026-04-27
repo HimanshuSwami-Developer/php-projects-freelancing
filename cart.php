@@ -396,7 +396,7 @@
                 <div class="cart-summary">
                     <h3 class="cart-summary-title">CART TOTALS</h3>
 
-                    <div class="promo-section">
+                    <div class="promo-section hidden">
                         <div class="promo-title cursor-pointer flex justify-between items-center" id="promoToggle">
                             <span>Apply promo or referral code</span>
                             <span>▼</span>

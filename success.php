@@ -43,20 +43,30 @@ curl_close($ch);
 
 $data = json_decode($response, true);
 $capture = $data['purchase_units'][0]['payments']['captures'][0] ?? null;
-$status = $capture['status'] ?? null;
+// $status = $capture['status'] ?? null;
+$status = "COMPLETED";
 // Capture was successful
 $transaction_id = $capture['id'];
 $payer_email = $data['payer']['email_address'];
 $payer_name = $data['payer']['name']['given_name'] . ' ' . $data['payer']['name']['surname'];
 $email = $data['payer']['email_address'];
 
-$query = "SELECT email_sent FROM orders WHERE paypal_order_id='$order_id' LIMIT 1";
-$query_run = mysqli_query($con, $query);
 
-if (!$query_run) {
-    die("Query failed: " . mysqli_error($con));
-}
-$order = mysqli_fetch_assoc($query_run);
+// fallback test data
+$payer_email = "himanshuswami2810@email.com";
+$payer_name = "Test User";
+$transaction_id = "TEST123";
+
+$order['email_sent'] = 0;
+
+
+// $query = "SELECT email_sent FROM orders WHERE paypal_order_id='$order_id' LIMIT 1";
+// $query_run = mysqli_query($con, $query);
+
+// if (!$query_run) {
+//     die("Query failed: " . mysqli_error($con));
+// }
+// $order = mysqli_fetch_assoc($query_run);
         
 if ($status === 'COMPLETED' && $order['email_sent'] == 0) {
 //           $sql = "
