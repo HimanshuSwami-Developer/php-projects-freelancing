@@ -149,82 +149,86 @@ $query_run = mysqli_query($con, $query);
         <div class="bg-[#f8f8f8]">
 
             <!-- 1. HERO SECTION: Dynamic Text, Image, and Trust Badges -->
-<div class="hero-background pt-20 pb-16 md:pt-28 md:pb-24">
-    <div class="max-w-[1500px] w-full mx-auto px-6 md:px-10 text-center">
+            <div class="hero-background pt-20 pb-16 md:pt-28 md:pb-24">
+                <div class="max-w-[1500px] w-full mx-auto px-6 md:px-10 text-center">
 
 
-        <!-- Intro Line -->
-        <p class="text-lg md:text-xl font-semibold text-[#00C1EC] mb-4">
-            Join the 400,000+ people already working in security!
-        </p>
+                    <!-- Intro Line -->
+                    <p class="text-lg md:text-xl font-semibold text-[#00C1EC] mb-4">
+                        Join the 400,000+ people already working in security!
+                    </p>
 
-        <!-- Main Heading -->
-        <h1 class="text-5xl md:text-6xl lg:text-7xl font-black mb-8 leading-[1.1] text-white">
-            Get trained, licensed, and
-            <span class="text-[#00C1EC]">start earning in just 3 weeks</span>.
-        </h1>
+                    <!-- Main Heading -->
+                    <h1 class="text-5xl md:text-6xl lg:text-7xl font-black mb-8 leading-[1.1] text-white">
+                        Get trained, licensed, and
+                        <span class="text-[#00C1EC]">start earning in just 3 weeks</span>.
+                    </h1>
 
-        <!-- Body Copy (JUSTIFIED) -->
-        <div class="space-y-4 text-base md:text-lg font-medium text-gray-200 max-w-[900px] mx-auto text-justify">
+                    <!-- Body Copy (JUSTIFIED) -->
+                    <div
+                        class="space-y-4 text-base md:text-lg font-medium text-gray-200 max-w-[900px] mx-auto text-justify">
 
-            <p>
-                If you’re thinking about working in security, you’re probably asking the same questions everyone does.
-                How long does it take? Do I need experience? Will it actually pay well? Fair questions.
-            </p>
+                        <p>
+                            If you’re thinking about working in security, you’re probably asking the same questions
+                            everyone does.
+                            How long does it take? Do I need experience? Will it actually pay well? Fair questions.
+                        </p>
 
-            <p>
-                At <strong>G Security & Training</strong>, we provide
-                <strong>SIA-approved security training courses in Leeds and Bradford</strong>
-                that help you get trained, licensed, and earning without dragging the process out.
-                You don’t need prior experience, and you don’t need to figure things out on your own.
-                We guide you from training all the way through to applying for your SIA licence — step by step.
-            </p>
+                        <p>
+                            At <strong>G Security & Training</strong>, we provide
+                            <strong>SIA-approved security training courses in Leeds and Bradford</strong>
+                            that help you get trained, licensed, and earning without dragging the process out.
+                            You don’t need prior experience, and you don’t need to figure things out on your own.
+                            We guide you from training all the way through to applying for your SIA licence — step by
+                            step.
+                        </p>
 
-            <p>
-                Security work is consistently in demand across the UK, and with the right training,
-                you could be ready to earn in as little as <strong>three weeks</strong>.
-            </p>
-        </div>
+                        <p>
+                            Security work is consistently in demand across the UK, and with the right training,
+                            you could be ready to earn in as little as <strong>three weeks</strong>.
+                        </p>
+                    </div>
 
-        <!-- CTA Buttons -->
-        <div class="flex flex-col sm:flex-row gap-4 justify-center mt-10">
-            <a href="/courses"
-               class="inline-block bg-[#00C1EC] text-white px-10 py-4 rounded-lg font-bold text-base md:text-lg shadow-lg transition hover:opacity-90">
-                Find an SIA-approved course
-            </a>
+                    <!-- CTA Buttons -->
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center mt-10">
+                        <a href="/courses"
+                            class="inline-block bg-[#00C1EC] text-white px-10 py-4 rounded-lg font-bold text-base md:text-lg shadow-lg transition hover:opacity-90">
+                            Find an SIA-approved course
+                        </a>
 
-            <a href="/faqs"
-               class="inline-block bg-white text-gray-900 px-10 py-4 rounded-lg font-bold text-base md:text-lg shadow-lg transition hover:bg-gray-200">
-                Which licence do I need?
-            </a>
-        </div>
+                        <a href="/faqs"
+                            class="inline-block bg-white text-gray-900 px-10 py-4 rounded-lg font-bold text-base md:text-lg shadow-lg transition hover:bg-gray-200">
+                            Which licence do I need?
+                        </a>
+                    </div>
 
-        <!-- Trust Bar -->
-        <div class="flex flex-wrap mt-14 gap-y-4 border-t border-gray-700 pt-6 text-sm md:text-base text-gray-300 font-medium justify-center">
+                    <!-- Trust Bar -->
+                    <div
+                        class="flex flex-wrap mt-14 gap-y-4 border-t border-gray-700 pt-6 text-sm md:text-base text-gray-300 font-medium justify-center">
 
-            <div class="flex items-center gap-2 w-1/2 md:w-auto md:px-4">
-                <span class="text-[#00C1EC] text-xl">⚡️</span>
-                Highly-rated, experienced trainers
+                        <div class="flex items-center gap-2 w-1/2 md:w-auto md:px-4">
+                            <span class="text-[#00C1EC] text-xl">⚡️</span>
+                            Highly-rated, experienced trainers
+                        </div>
+
+                        <div class="flex items-center gap-2 w-1/2 md:w-auto md:px-4">
+                            <span class="text-[#00C1EC] text-xl">🌈</span>
+                            SIA-approved training & certification
+                        </div>
+
+                        <div class="flex items-center gap-2 w-1/2 md:w-auto md:px-4">
+                            <span class="text-[#00C1EC] text-xl">🏆</span>
+                            Proven: 95% first-time pass rate
+                        </div>
+
+                        <div class="flex items-center gap-2 w-1/2 md:w-auto md:px-4">
+                            <span class="text-[#00C1EC] text-xl">✨</span>
+                            Trusted by 5,000+ success stories
+                        </div>
+                    </div>
+
+                </div>
             </div>
-
-            <div class="flex items-center gap-2 w-1/2 md:w-auto md:px-4">
-                <span class="text-[#00C1EC] text-xl">🌈</span>
-                SIA-approved training & certification
-            </div>
-
-            <div class="flex items-center gap-2 w-1/2 md:w-auto md:px-4">
-                <span class="text-[#00C1EC] text-xl">🏆</span>
-                Proven: 95% first-time pass rate
-            </div>
-
-            <div class="flex items-center gap-2 w-1/2 md:w-auto md:px-4">
-                <span class="text-[#00C1EC] text-xl">✨</span>
-                Trusted by 5,000+ success stories
-            </div>
-        </div>
-
-    </div>
-</div>
 
 
 
@@ -681,6 +685,29 @@ $query_run = mysqli_query($con, $query);
                                     specializes in <b>First Aid Training</b> and career coaching, helping students
                                     master security skills while learning how to <b>land jobs quickly</b>.
                                 </p>
+                            </div>
+                        </div>
+
+                        <div
+                            class="bg-gray-800 rounded-xl overflow-hidden shadow-lg border border-gray-700 flex flex-col hover:border-[#00C1EC] transition duration-300">
+
+                            <img src="https://res.cloudinary.com/dn2qotbxd/image/upload/v1778082417/gsecurity/WhatsApp_Image_2026-05-05_at_11.19.38_PM_vn2mv0.png"
+                                alt="Omar" class="w-full h-56 object-cover">
+
+                            <div class="p-5 text-white">
+
+                                <div class="flex justify-between items-center mb-2">
+                                    <p class="font-semibold text-xl">Omar</p>
+                                    <span class="text-yellow-500 text-sm">⭐⭐⭐⭐⭐</span>
+                                </div>
+
+                                <p class="text-gray-300 text-sm leading-relaxed">
+                                    Omar is a seasoned security professional with 10+ years of experience in
+                                    conflict management and risk assessment. Based in Manchester and Dynamisis PI
+                                    certified, he delivers practical, real-world training that prepares students for
+                                    modern security challenges.
+                                </p>
+
                             </div>
                         </div>
 

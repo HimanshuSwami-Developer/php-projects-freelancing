@@ -176,11 +176,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 <div class="space-y-4 sm:space-y-6">
                     <!-- Title (Adapted from live code) -->
                     <h1 class="text-3xl sm:text-4xl font-bold text-black">
-                        Level 2 Door Supervisor Refresher Course</span>
+                        SIA Top-Up Refresher For Door Supervision Course</span>
                     </h1>
                     <!-- Subheading (Adapted from live code) -->
                     <p class="text-black sm:text-lg">
-                        The Level 2 Door Supervisor Refresher Training is compulsory training for door supervisors with expiring SIA
+                        The SIA Top-Up Refresher For Door Supervision Training is compulsory training for door supervisors with expiring SIA
                         licencing. You will stay compliant with SIA standards and refresh your skillset to adapt to the
                         challenges faced in security today.
                     </p>
@@ -198,14 +198,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         <div class="w-full md:w-[70%] order-2 md:order-1">
 
                             <h2 class="text-2xl sm:text-3xl font-extrabold text-black mb-4 border-b-2 border-gray-100 pb-2">
-                                Level 2 Door Supervisor Refresher Course Details
+                                SIA Top-Up Refresher For Door Supervision Course Details
                             </h2>
 
                             <div class="space-y-3 text-sm sm:text-base grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3">
                                 
                                 <p class="text-gray-700">
                                     <span class="font-bold text-black block mb-0.5">Course Name:</span>
-                                    <span class="text-lg font-semibold text-[#00C1EC]">Level 2 Door Supervisor Refresher</span>
+                                    <span class="text-lg font-semibold text-[#00C1EC]">SIA Top-Up Refresher For Door Supervision </span>
                                 </p>
                                 
                                 <p class="text-gray-700">
@@ -333,7 +333,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             </div>
                             <h3 class="text-xl font-semibold mb-2">Get Refreshed</h3>
                             <p class="text-gray-600 leading-relaxed">
-                                Enroll in the Level 2 Door Supervisor Refresher Training to update your knowledge on new threats,
+                                Enroll in the SIA Top-Up Refresher For Door Supervision Training to update your knowledge on new threats,
                                 vulnerability awareness, and enhanced physical intervention skills.
                             </p>
                         </div>
@@ -407,7 +407,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 <div id="tab-1" class="tab-content current bg-white">
                     <div class="grid md:grid-cols-2 gap-x-12 gap-y-6">
                         <div class="course-details-item">
-                            <p class="text-[#00C1EC]"><span class="font-bold text-black">Course Name:</span> Level 2 Door Supervisor Refresher</p>
+                            <p class="text-[#00C1EC]"><span class="font-bold text-black">Course Name:</span> SIA Top-Up Refresher For Door Supervision </p>
                         </div>
                         <div class="course-details-item">
                             <p><span class="font-bold">Price:</span> Door Supervisor £249 (with First Aid)<br>Security Officer from £99.99</p>
@@ -439,7 +439,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
                 <!-- TAB 2: Course Content (Mapped from live code) -->
                 <div id="tab-2" class="tab-content bg-white">
-                    <p class="content-text text-black">The Level 2 Door Supervisor Refresher Training is made up of two units:</p>
+                    <p class="content-text text-black">The SIA Top-Up Refresher For Door Supervision Training is made up of two units:</p>
 
                     <span class="content-subtitle-new">Unit 1: Principles of Working as a Door Supervisor in the Private Security Industry (Refresher):</span>
                     <ul class="list-disc pl-8 content-text text-black">
